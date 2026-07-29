@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Encuentros · Fraccctal</title>
+<meta name="description" content="Encuentros y talleres de Fraccctal en Madrid: entradas y fechas.">
+<link rel="icon" type="image/png" href="assets/logo/favicon-32.png">
+<link rel="apple-touch-icon" href="assets/logo/favicon-180.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <a class="nav__logo" href="index.html"><img src="assets/logo/LOGO_BLACK.png" alt="Fraccctal"></a>
+    <button class="nav__toggle" aria-label="Abrir menú" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav__links">
+      <li><a href="encuentros.html" aria-current="page">Encuentros</a></li>
+      <li><a href="quienes-somos.html">Quiénes somos</a></li>
+      <li><a href="membresia.html">Membresía</a></li>
+      <li><a href="index.html#newsletter">Newsletter</a></li>
+      <li><a href="https://instagram.com/fraccctal" target="_blank" rel="noopener">Instagram</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero" style="padding-bottom:56px">
+  <div class="wrap">
+    <p class="hero__lockup">Encuentros</p>
+    <h1>Un lugar para atravesar juntxs</h1>
+    <p class="lede" style="margin-left:auto;margin-right:auto">Talleres y conversaciones curadas alrededor de placer, movimiento, conocimiento y espiritualidad. Aforo limitado.</p>
+  </div>
+</header>
+
+<section class="section--tight">
+  <div class="wrap">
+    <p class="eyebrow">Próximos</p>
+    <div class="events" id="events-list-upcoming"></div>
+  </div>
+</section>
+
+<section class="section--alt">
+  <div class="wrap two-col">
+    <div>
+      <p class="eyebrow">¿Y si vengo solx?</p>
+      <h2>Bienvenidx igual</h2>
+    </div>
+    <div>
+      <p>No hay que llegar con nadie ni conocer a nadie. La mayoría de las personas que vienen a un primer encuentro lo hacen solas. De hecho, es la razón por la que existe Fraccctal.</p>
+      <p>Si tienes dudas antes de reservar, escríbenos a <a href="mailto:fraccctal.contact@gmail.com">fraccctal.contact@gmail.com</a>.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section--tight">
+  <div class="wrap">
+    <p class="eyebrow">Encuentros anteriores</p>
+    <div class="events" id="events-list-past"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <img src="assets/logo/LOGO_WHITE.png" alt="Fraccctal">
+      <p style="opacity:0.75;max-width:32ch">Un club con membresía, en Madrid.</p>
+    </div>
+    <ul class="footer__links">
+      <li><a href="encuentros.html">Encuentros</a></li>
+      <li><a href="quienes-somos.html">Quiénes somos</a></li>
+      <li><a href="membresia.html">Membresía</a></li>
+      <li><a href="https://instagram.com/fraccctal" target="_blank" rel="noopener">Instagram</a></li>
+      <li><a href="https://substack.com/@fraccctal" target="_blank" rel="noopener">Substack</a></li>
+      <li><a href="mailto:fraccctal.contact@gmail.com">Contacto</a></li>
+    </ul>
+  </div>
+  <div class="footer__bottom">© 2026 Fraccctal. Madrid.</div>
+</footer>
+
+<script src="js/events.js"></script>
+<script src="js/main.js"></script>
+<script>renderEventsList("events-list-upcoming", "events-list-past");</script>
+</body>
+</html>
