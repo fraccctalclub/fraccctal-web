@@ -97,4 +97,37 @@ function renderEventsList(upcomingId, pastId) {
   }
 }
 
+function injectEventSchema() {
+  if (typeof FRACCCTAL_EVENTS === "undefined") return;
+  const upcoming = FRACCCTAL_EVENTS.filter(
+    (e) => e.status !== "cerrado" && e.dateSort && e.title
+  );
+  if (!upcoming.length) return;
+
+  const schema = upcoming.map((e) => ({
+    "@context": "https://schema.org",
+    "@type": "Event",
+    name: e.title,
+    startDate: e.dateSort,
+    eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+    eventStatus: "https://schema.org/EventScheduled",
+    location: {
+      "@type": "Place",
+      name: e.venue || e.city,
+      address: e.city,
+    },
+    description: e.description,
+    organizer: {
+      "@type": "Organization",
+      name: "Fraccctal",
+      url: "https://fraccctal.com/",
+    },
+  }));
+
+  const script = document.createElement("script");
+  script.type = "application/ld+json";
+  script.textContent = JSON.stringify(schema.length === 1 ? schema[0] : schema);
+  document.head.appendChild(script);
+}
+
 document.addEventListener("DOMContentLoaded", initNav);

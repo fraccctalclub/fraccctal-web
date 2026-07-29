@@ -5,9 +5,39 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fraccctal · Club · Comunidad · Cambio</title>
 <meta name="description" content="Fraccctal es un club de Madrid para una comunidad que está en una transición vital y no quiere atravesarla sola.">
+<link rel="canonical" href="https://fraccctal.com/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://fraccctal.com/">
+<meta property="og:title" content="Fraccctal · Club · Comunidad · Cambio">
+<meta property="og:description" content="Fraccctal es un club de Madrid para una comunidad que está en una transición vital y no quiere atravesarla sola.">
+<meta property="og:image" content="https://fraccctal.com/assets/img/og-image.png">
+<meta property="og:locale" content="es_ES">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Fraccctal · Club · Comunidad · Cambio">
+<meta name="twitter:description" content="Fraccctal es un club de Madrid para una comunidad que está en una transición vital y no quiere atravesarla sola.">
+<meta name="twitter:image" content="https://fraccctal.com/assets/img/og-image.png">
 <link rel="icon" type="image/png" href="assets/logo/favicon-32.png">
 <link rel="apple-touch-icon" href="assets/logo/favicon-180.png">
 <link rel="stylesheet" href="css/style.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Fraccctal",
+  "url": "https://fraccctal.com/",
+  "logo": "https://fraccctal.com/assets/logo/LOGO_BLACK.png",
+  "description": "Fraccctal es un club de Madrid para una comunidad que está en una transición vital y no quiere atravesarla sola.",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Madrid",
+    "addressCountry": "ES"
+  },
+  "sameAs": [
+    "https://instagram.com/fraccctal",
+    "https://substack.com/@fraccctal"
+  ]
+}
+</script>
 </head>
 <body>
 
@@ -151,6 +181,6 @@
 
 <script src="js/events.js"></script>
 <script src="js/main.js"></script>
-<script>renderFeaturedEvent("featured-event");</script>
+<script>renderFeaturedEvent("featured-event"); injectEventSchema();</script>
 </body>
 </html>
