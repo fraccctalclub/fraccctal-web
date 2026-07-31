@@ -13,6 +13,10 @@
  *                exacta para el DFOS y no mostrarla en la web)
  *   city         ciudad
  *   price        texto libre de precio, ej. "25-30€" o "Gratis"
+ *   founderPrice texto libre de precio solo para fundadoras, ej. "15€" (dejalo como ""
+ *                si este encuentro no tiene precio especial de preventa)
+ *   founderTicketsUrl  Payment Link de Stripe para el precio de fundadora (solo se
+ *                usa en preventa.html, dejalo como "" si no aplica)
  *   tag          "placer" | "movimiento" | "conocimiento" | "espiritualidad"
  *   facilitators texto libre, ej. "Julia Javkin" (deja "" si no aplica)
  *   description  1-2 frases, tono Fraccctal (sin épica, sin promesas)
@@ -31,6 +35,8 @@ const FRACCCTAL_EVENTS = [
     venue: "",
     city: "Madrid",
     price: "Early bird 20€ · General 25€",
+    founderPrice: "",
+    founderTicketsUrl: "",
     tag: "conocimiento",
     facilitators: "Marta Argüelles",
     description:

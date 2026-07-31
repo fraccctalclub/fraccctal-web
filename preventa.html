@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Preventa fundadoras · Fraccctal</title>
+<meta name="description" content="Preventa exclusiva para fundadoras de Fraccctal.">
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="assets/logo/favicon-32.png">
+<link rel="apple-touch-icon" href="assets/logo/favicon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:ital,wght@0,400;0,500;1,400;1,500&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <a class="nav__logo" href="index.html"><img src="assets/logo/LOGO_BLACK.png" alt="Fraccctal"></a>
+    <button class="nav__toggle" aria-label="Abrir menú" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav__links">
+      <li><a href="encuentros.html">Encuentros</a></li>
+      <li><a href="quienes-somos.html">Quiénes somos</a></li>
+      <li><a href="membresia.html">Membresía</a></li>
+      <li><a href="https://instagram.com/fraccctal" target="_blank" rel="noopener">Instagram</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero" style="padding-bottom:40px">
+  <div class="wrap">
+    <p class="hero__lockup">Solo para fundadoras</p>
+    <h1>Preventa</h1>
+    <p class="lede" style="margin-left:auto;margin-right:auto">Reservá tu lugar antes que nadie, a tu precio de fundadora.</p>
+  </div>
+</header>
+
+<section class="section--tight">
+  <div class="wrap">
+
+    <div id="login-gate" style="text-align:center; display:none">
+      <p class="eyebrow">Ingresá con tu email</p>
+      <h2 style="margin-bottom:24px">Te mandamos un link de acceso</h2>
+      <form id="login-form" class="form-inline">
+        <input type="email" id="login-email" placeholder="tu@email.com" required>
+        <button type="submit" class="btn btn--primary" id="login-submit">Enviarme el link</button>
+      </form>
+      <p id="login-mensaje" class="form-message" style="display:none"></p>
+    </div>
+
+    <div id="founder-content" style="display:none">
+      <div style="text-align:center; margin-bottom:32px">
+        <p class="eyebrow">Bienvenida</p>
+        <p style="margin:0"><span id="user-email"></span> · <a href="#" id="logout-link">cerrar sesión</a></p>
+      </div>
+      <div class="events" id="founder-events"></div>
+    </div>
+
+    <p id="loading-mensaje" style="text-align:center">Cargando…</p>
+    <p id="not-configured-mensaje" style="text-align:center; display:none">El sistema de membresía todavía no está conectado. Volvé más tarde.</p>
+
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <img src="assets/logo/LOGO_WHITE.png" alt="Fraccctal">
+      <p style="opacity:0.75;max-width:32ch">Un club con membresía, en Madrid.</p>
+    </div>
+    <ul class="footer__links">
+      <li><a href="encuentros.html">Encuentros</a></li>
+      <li><a href="quienes-somos.html">Quiénes somos</a></li>
+      <li><a href="membresia.html">Membresía</a></li>
+      <li><a href="mailto:fraccctal.contact@gmail.com">Contacto</a></li>
+    </ul>
+  </div>
+  <div class="footer__bottom">© 2026 Fraccctal. Madrid.</div>
+</footer>
+
+<script src="js/events.js"></script>
+<script src="js/main.js"></script>
+<script type="module">
+  import { sendMagicLink, getSession, signOut, isConfigured } from "./js/auth.js";
+
+  const loginGate = document.getElementById("login-gate");
+  const founderContent = document.getElementById("founder-content");
+  const loadingMensaje = document.getElementById("loading-mensaje");
+  const notConfiguredMensaje = document.getElementById("not-configured-mensaje");
+
+  async function render() {
+    loadingMensaje.style.display = "none";
+
+    if (!isConfigured) {
+      notConfiguredMensaje.style.display = "block";
+      return;
+    }
+
+    const session = await getSession();
+
+    if (session) {
+      loginGate.style.display = "none";
+      founderContent.style.display = "block";
+      document.getElementById("user-email").textContent = session.user.email;
+      renderFounderEvents("founder-events");
+    } else {
+      loginGate.style.display = "block";
+      founderContent.style.display = "none";
+    }
+  }
+
+  document.getElementById("login-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("login-email").value.trim();
+    const submitBtn = document.getElementById("login-submit");
+    const mensaje = document.getElementById("login-mensaje");
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Enviando…";
+
+    const { error } = await sendMagicLink(email);
+
+    mensaje.style.display = "block";
+    if (error) {
+      mensaje.className = "form-message form-message--error";
+      mensaje.textContent = "No pudimos mandar el link. Probá de nuevo.";
+    } else {
+      mensaje.className = "form-message";
+      mensaje.textContent = "Revisá tu email y hacé clic en el link para entrar.";
+    }
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Enviarme el link";
+  });
+
+  document.getElementById("logout-link").addEventListener("click", async (e) => {
+    e.preventDefault();
+    await signOut();
+    render();
+  });
+
+  render();
+</script>
+</body>
+</html>

@@ -92,18 +92,16 @@
 <section>
   <div class="wrap" style="text-align:center">
     <p class="eyebrow">¿Te apuntas?</p>
-    <h2 style="margin-bottom:24px">Cuéntanos y te avisamos cuando abra el cupo</h2>
+    <h2 style="margin-bottom:24px">Anotate como fundadora</h2>
+    <p class="lede" style="margin:0 auto 24px">No te cobramos nada hoy. El cobro de 11€/mes recién empieza el 3 de enero de 2027, para todas las fundadoras por igual.</p>
 
-    <!--
-      Reemplazar este bloque por el embed de tu Google Form cuando lo tengas
-      (instrucciones en README.md → "Formulario de interés fundadora"):
+    <form id="fundadora-form" class="form-inline">
+      <input type="email" id="fundadora-email" placeholder="tu@email.com" required>
+      <button type="submit" class="btn btn--primary" id="fundadora-submit">Quiero ser fundadora</button>
+    </form>
+    <p id="fundadora-mensaje" class="form-message" style="display:none"></p>
 
-      <iframe src="PEGAR_AQUI_TU_LINK_DE_GOOGLE_FORM?embedded=true"
-        width="640" height="640" style="max-width:100%; border:none;">
-        Cargando…
-      </iframe>
-    -->
-    <a class="btn btn--primary" href="mailto:fraccctal.contact@gmail.com?subject=Quiero%20ser%20fundadora%20de%20Fraccctal">Quiero ser fundadora</a>
+    <p style="margin-top:24px"><a href="mailto:fraccctal.contact@gmail.com?subject=Quiero%20ser%20fundadora%20de%20Fraccctal">¿Preferís escribirnos directamente?</a></p>
   </div>
 </section>
 
@@ -126,5 +124,59 @@
 </footer>
 
 <script src="js/main.js"></script>
+<script>
+  (function () {
+    const form = document.getElementById("fundadora-form");
+    const submitBtn = document.getElementById("fundadora-submit");
+    const mensaje = document.getElementById("fundadora-mensaje");
+
+    function showMessage(text, isError) {
+      mensaje.textContent = text;
+      mensaje.className = "form-message" + (isError ? " form-message--error" : "");
+      mensaje.style.display = "block";
+    }
+
+    // Si volvemos desde Stripe con ?fundadora=ok o =cancelado, avisamos.
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("fundadora") === "ok") {
+      showMessage("¡Listo! Revisá tu email: ahí te llega tu primer acceso a la preventa.", false);
+    } else if (params.get("fundadora") === "cancelado") {
+      showMessage("Quedó cancelado, no se procesó ningún pago.", false);
+    }
+
+    if (!form) return;
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("fundadora-email").value.trim();
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Un momento…";
+      showMessage("", false);
+      mensaje.style.display = "none";
+
+      try {
+        const res = await fetch("/.netlify/functions/create-checkout-session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+        const data = await res.json();
+
+        if (res.status === 409 && data.error === "cupo_completo") {
+          showMessage("El cupo de 20 fundadoras ya se completó. Escribinos si querés que te avisemos de la membresía general.", true);
+        } else if (!res.ok) {
+          showMessage(data.error || "Algo salió mal, intentá de nuevo.", true);
+        } else {
+          window.location.href = data.url;
+          return;
+        }
+      } catch {
+        showMessage("No pudimos conectar. Intentá de nuevo en un momento.", true);
+      }
+
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Quiero ser fundadora";
+    });
+  })();
+</script>
 </body>
 </html>

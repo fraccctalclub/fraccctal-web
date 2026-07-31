@@ -68,6 +68,44 @@ function pastCardHTML(event) {
   `;
 }
 
+function founderCardHTML(event) {
+  const tagClass = event.tag === "reflexion" ? " tag--reflexion" : "";
+  const metaParts = [event.venue, event.city].filter(Boolean);
+  const hasFounderPrice = Boolean(event.founderPrice);
+  const priceLine = hasFounderPrice
+    ? `<span class="tag">Precio fundadora: ${event.founderPrice}</span>`
+    : `<span class="tag">${event.price || "Precio fundadora próximamente"}</span>`;
+  const hasFounderLink = event.founderTicketsUrl && event.founderTicketsUrl !== "";
+  const action = hasFounderLink
+    ? `<a class="btn btn--primary" href="${event.founderTicketsUrl}" target="_blank" rel="noopener">Reservar con precio fundadora</a>`
+    : `<span class="btn btn--disabled">Preventa próximamente</span>`;
+  return `
+    <article class="event-card">
+      <div class="event-card__date">
+        ${event.dateLabel}
+        <span>${event.dateMonth}</span>
+      </div>
+      <div class="event-card__body">
+        <span class="tag${tagClass}">${event.tag}</span>
+        <h3>${event.title}</h3>
+        <p class="event-card__meta">${metaParts.join(" · ")}</p>
+        <p>${event.description}</p>
+        <p style="margin-top:10px">${priceLine}</p>
+      </div>
+      <div class="event-card__action">${action}</div>
+    </article>
+  `;
+}
+
+function renderFounderEvents(containerId) {
+  const el = document.getElementById(containerId);
+  if (!el || typeof FRACCCTAL_EVENTS === "undefined") return;
+  const upcoming = FRACCCTAL_EVENTS.filter((e) => e.status !== "cerrado");
+  el.innerHTML = upcoming.length
+    ? upcoming.map(founderCardHTML).join("")
+    : `<p>Todavía no hay encuentros abiertos para preventa.</p>`;
+}
+
 function renderFeaturedEvent(containerId) {
   const el = document.getElementById(containerId);
   if (!el || typeof FRACCCTAL_EVENTS === "undefined") return;

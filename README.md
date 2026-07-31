@@ -53,6 +53,87 @@ de Stripe.
 Cuando decidan activar el cobro de la membresía (enero 2027), el mismo mecanismo sirve
 para una suscripción recurrente: Stripe Payment Links soporta pagos únicos y recurrentes.
 
+## Membresía fundadora (pago diferido + login + preventa)
+
+Esto sí necesita un poquito de backend (a diferencia del resto del sitio), pero corre como
+**Netlify Functions** — no hace falta servidor propio ni Node instalado en tu computadora,
+Netlify lo corre todo en su nube. Cuando alguien se anota en `membresia.html`:
+
+1. Se crea una suscripción de Stripe de 11€/mes que **no cobra nada hoy** — el cobro real
+   arranca el 3 de enero de 2027 para todas las fundadoras por igual, sin importar el día
+   en que se anotaron.
+2. Al confirmarse el pago, Stripe le avisa a nuestra función `stripe-webhook`, que guarda a
+   la persona en Supabase y le manda su primer **magic link** (login sin contraseña) para
+   entrar a `preventa.html`, donde ve los encuentros con su precio de fundadora.
+
+### Paso 1 — Crear el proyecto de Supabase (gratis)
+
+1. Entra a [supabase.com](https://supabase.com) y crea una cuenta con tu email.
+2. Creá un proyecto nuevo (cualquier nombre, por ejemplo "fraccctal").
+3. En el **SQL Editor** del proyecto, pega y ejecutá esto para crear la tabla de fundadoras:
+
+```sql
+create table founders (
+  id uuid primary key default gen_random_uuid(),
+  email text unique not null,
+  stripe_customer_id text,
+  stripe_subscription_id text,
+  status text default 'active',
+  created_at timestamptz default now()
+);
+```
+
+4. En **Project Settings → API**, copiá dos valores:
+   - `Project URL` → esto es `SUPABASE_URL`
+   - `anon public key` → esto es `SUPABASE_ANON_KEY`
+   - `service_role key` (está más abajo, marcada como secreta) → esto es
+     `SUPABASE_SERVICE_ROLE_KEY`
+
+5. Pegá `SUPABASE_URL` y `SUPABASE_ANON_KEY` directamente en [`js/auth.js`](js/auth.js),
+   reemplazando `PEGAR_URL_DE_SUPABASE` y `PEGAR_ANON_KEY_DE_SUPABASE` (estas dos son
+   públicas a propósito, no hay problema en que estén en el código).
+
+### Paso 2 — Crear el producto en Stripe (empezar en modo test)
+
+**Importante:** el modo test de Stripe funciona ya mismo, sin esperar a que la asociación
+cultural esté aprobada — esa aprobación solo hace falta para el modo *live* (cobrar plata
+real). Armamos y probamos todo esto en modo test primero.
+
+1. En el [Dashboard de Stripe](https://dashboard.stripe.com), asegurate de estar en modo
+   **Test** (interruptor arriba a la derecha).
+2. Productos → Crear producto: "Membresía Fundadora", precio 11€, recurrente mensual.
+   Copiá el **Price ID** (empieza con `price_...`) → esto es `STRIPE_FOUNDER_PRICE_ID`.
+3. Developers → API keys → copiá la **Secret key** de test (`sk_test_...`) → esto es
+   `STRIPE_SECRET_KEY`.
+4. Developers → Webhooks → Add endpoint:
+   - URL: `https://fraccctal.com/.netlify/functions/stripe-webhook`
+   - Evento a escuchar: `checkout.session.completed`
+   - Copiá el **Signing secret** (`whsec_...`) → esto es `STRIPE_WEBHOOK_SECRET`.
+
+### Paso 3 — Cargar las variables de entorno en Netlify
+
+En Netlify: tu sitio → **Site configuration → Environment variables** → agregá una por una:
+
+`STRIPE_SECRET_KEY`, `STRIPE_FOUNDER_PRICE_ID`, `STRIPE_WEBHOOK_SECRET`, `SUPABASE_URL`,
+`SUPABASE_SERVICE_ROLE_KEY`.
+
+Después de cargarlas, hay que volver a desplegar para que las funciones las lean (con
+arrastrar la carpeta de nuevo alcanza).
+
+### Cuando llegue la aprobación de la asociación (pasar a modo live)
+
+Repetís el Paso 2 pero con el interruptor en modo **Live** en vez de Test, y reemplazás las
+tres variables de Stripe (`STRIPE_SECRET_KEY`, `STRIPE_FOUNDER_PRICE_ID`,
+`STRIPE_WEBHOOK_SECRET`) por las nuevas de modo live en Netlify. No hay que tocar ni una
+línea de código.
+
+### Precio de fundadora por encuentro (preventa)
+
+En cada encuentro de [`js/events.js`](js/events.js) hay dos campos opcionales:
+`founderPrice` (el precio especial, ej. `"15€"`) y `founderTicketsUrl` (su Payment Link de
+Stripe aparte, si querés un precio distinto al público). Mientras estén vacíos, la preventa
+muestra el precio público con el botón deshabilitado.
+
 ## Publicar el sitio (fraccctal.com)
 
 Recomendado: **Vercel** o **Netlify**, ambos gratuitos para un sitio estático como este.
@@ -79,8 +160,6 @@ poner las fotos reales:
 ## Qué falta (a propósito, para v1)
 
 - Pegar los Payment Links reales de Stripe en `js/events.js`.
-- Sumar fotos reales del equipo (ver arriba) y de encuentros pasados en `assets/img/`.
-- Confirmar fecha/venue/precio del encuentro de septiembre en `js/events.js`
-  (hoy está como placeholder, marcado `[EDITAR]`).
-- Si quieren un embed real de Substack en vez del botón que linkea afuera, pásame la URL
-  exacta de la publicación (`https://TUPUBLICACION.substack.com`).
+- Crear la cuenta de Supabase y el producto de Stripe para la membresía (ver sección de
+  arriba) y cargar las variables de entorno en Netlify.
+- Confirmar fecha/venue/precio del encuentro de septiembre en `js/events.js`.
