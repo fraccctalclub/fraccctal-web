@@ -9,8 +9,8 @@
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const SUPABASE_URL = "PEGAR_URL_DE_SUPABASE";
-const SUPABASE_ANON_KEY = "PEGAR_ANON_KEY_DE_SUPABASE";
+const SUPABASE_URL = "https://hvxjahxcbnaumnfsnywf.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2eGphaHhjYm5hdW1uZnNueXdmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0OTc3MzksImV4cCI6MjEwMTA3MzczOX0.MnQNDGhr9ePdtOTn-bXaHZyvk3-AIvRcAOaAG69_ASc";
 
 export const isConfigured =
   SUPABASE_URL !== "PEGAR_URL_DE_SUPABASE" && SUPABASE_ANON_KEY !== "PEGAR_ANON_KEY_DE_SUPABASE";
