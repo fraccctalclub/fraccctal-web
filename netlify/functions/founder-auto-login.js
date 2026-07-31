@@ -32,7 +32,7 @@ exports.handler = async (event) => {
 
   const redirectTo = `${SITE_URL}/preventa.html`;
   const linkRes = await fetch(
-    `${SUPABASE_URL}/auth/v1/admin/generate_link`,
+    `${SUPABASE_URL}/auth/v1/admin/generate_link?redirect_to=${encodeURIComponent(redirectTo)}`,
     {
       method: "POST",
       headers: {
@@ -43,7 +43,7 @@ exports.handler = async (event) => {
       body: JSON.stringify({
         type: "magiclink",
         email,
-        options: { redirect_to: redirectTo },
+        redirect_to: redirectTo,
       }),
     }
   );
