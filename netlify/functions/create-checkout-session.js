@@ -56,7 +56,7 @@ exports.handler = async (event) => {
     "line_items[0][price]": STRIPE_FOUNDER_PRICE_ID,
     "line_items[0][quantity]": "1",
     "subscription_data[trial_end]": String(TRIAL_END_TIMESTAMP),
-    success_url: `${origin}/membresia.html?fundadora=ok`,
+    success_url: `${origin}/.netlify/functions/founder-auto-login?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${origin}/membresia.html?fundadora=cancelado`,
   });
 

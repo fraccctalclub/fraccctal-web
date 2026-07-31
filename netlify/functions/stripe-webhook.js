@@ -74,8 +74,11 @@ exports.handler = async (event) => {
         }),
       });
 
-      // Disparar el primer magic link de acceso a la preventa.
-      await fetch(`${SUPABASE_URL}/auth/v1/otp`, {
+      // Disparar un magic link de respaldo (por si vuelve otro día desde otro
+      // dispositivo). El primer acceso normalmente ya lo dio founder-auto-login.js
+      // directo desde el pago, sin pasar por el email.
+      const redirectTo = encodeURIComponent("https://fraccctal.com/preventa.html");
+      await fetch(`${SUPABASE_URL}/auth/v1/otp?redirect_to=${redirectTo}`, {
         method: "POST",
         headers: {
           apikey: SUPABASE_SERVICE_ROLE_KEY,
