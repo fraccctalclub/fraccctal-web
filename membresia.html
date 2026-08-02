@@ -93,11 +93,79 @@
   <div class="wrap" style="text-align:center">
     <p class="eyebrow">¿Te apuntas?</p>
     <h2 style="margin-bottom:24px">Anotate como fundadora</h2>
-    <p class="lede" style="margin:0 auto 24px">No te cobramos nada hoy. El cobro de 11€/mes recién empieza el 3 de enero de 2027, para todas las fundadoras por igual.</p>
+    <p class="lede" style="margin:0 auto 24px">Contanos quién sos antes de confirmar tu lugar.</p>
 
-    <form id="fundadora-form" class="form-inline">
-      <input type="email" id="fundadora-email" placeholder="tu@email.com" required>
-      <button type="submit" class="btn btn--primary" id="fundadora-submit">Quiero ser fundadora</button>
+    <form id="fundadora-form" class="form-full">
+      <div class="field-row">
+        <div class="field">
+          <label for="f-nombre">Nombre</label>
+          <input type="text" id="f-nombre" required>
+        </div>
+        <div class="field">
+          <label for="f-apellido">Apellido</label>
+          <input type="text" id="f-apellido" required>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="f-email">Email</label>
+          <input type="email" id="f-email" required>
+        </div>
+        <div class="field">
+          <label for="f-telefono">Teléfono</label>
+          <input type="tel" id="f-telefono" required>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="f-edad">Edad</label>
+          <input type="number" id="f-edad" min="18" max="99" required>
+        </div>
+        <div class="field">
+          <label for="f-ciudad">Ciudad</label>
+          <input type="text" id="f-ciudad" value="Madrid" required>
+        </div>
+        <div class="field">
+          <label for="f-barrio">Barrio</label>
+          <input type="text" id="f-barrio">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="f-que-trae">¿Qué te trae a Fraccctal?</label>
+        <textarea id="f-que-trae" required></textarea>
+      </div>
+
+      <div class="field">
+        <label for="f-expectativa">¿Cuál es tu expectativa sobre este espacio?</label>
+        <textarea id="f-expectativa" required></textarea>
+      </div>
+
+      <div class="field">
+        <label for="f-compartir">Algo que quieras compartir sobre vos o tu proceso (opcional)</label>
+        <textarea id="f-compartir"></textarea>
+      </div>
+
+      <div class="field">
+        <label for="f-entero">¿Cómo te enteraste de Fraccctal?</label>
+        <input type="text" id="f-entero" required>
+      </div>
+
+      <div class="checkbox-field">
+        <input type="checkbox" id="f-privacidad" required>
+        <label for="f-privacidad">Acepto la <a href="privacidad.html" target="_blank">política de privacidad</a> de Fraccctal.</label>
+      </div>
+
+      <div class="checkbox-field">
+        <input type="checkbox" id="f-codigo" required>
+        <label for="f-codigo">Acepto cumplir el <a href="codigo-conducta.html" target="_blank">código de conducta</a> de Fraccctal.</label>
+      </div>
+
+      <p class="submit-note">No se te va a cobrar nada hasta el 3 de enero de 2027. Podés darte de baja cuando quieras.</p>
+
+      <button type="submit" class="btn btn--primary" id="fundadora-submit" style="width:100%">Iniciar membresía</button>
     </form>
     <p id="fundadora-mensaje" class="form-message" style="display:none"></p>
 
@@ -147,17 +215,32 @@
     if (!form) return;
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const email = document.getElementById("fundadora-email").value.trim();
       submitBtn.disabled = true;
       submitBtn.textContent = "Un momento…";
       showMessage("", false);
       mensaje.style.display = "none";
 
+      const payload = {
+        email: document.getElementById("f-email").value.trim(),
+        nombre: document.getElementById("f-nombre").value.trim(),
+        apellido: document.getElementById("f-apellido").value.trim(),
+        telefono: document.getElementById("f-telefono").value.trim(),
+        edad: document.getElementById("f-edad").value,
+        ciudad: document.getElementById("f-ciudad").value.trim(),
+        barrio: document.getElementById("f-barrio").value.trim(),
+        que_te_trae: document.getElementById("f-que-trae").value.trim(),
+        expectativa: document.getElementById("f-expectativa").value.trim(),
+        compartir: document.getElementById("f-compartir").value.trim(),
+        como_te_entero: document.getElementById("f-entero").value.trim(),
+        acepta_privacidad: document.getElementById("f-privacidad").checked,
+        acepta_codigo_conducta: document.getElementById("f-codigo").checked,
+      };
+
       try {
         const res = await fetch("/.netlify/functions/create-checkout-session", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email }),
+          body: JSON.stringify(payload),
         });
         const data = await res.json();
 
@@ -174,7 +257,7 @@
       }
 
       submitBtn.disabled = false;
-      submitBtn.textContent = "Quiero ser fundadora";
+      submitBtn.textContent = "Iniciar membresía";
     });
   })();
 </script>
