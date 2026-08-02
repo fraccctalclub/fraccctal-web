@@ -5,7 +5,7 @@
 // Variables de entorno necesarias (configurar en Netlify, nunca en el repo):
 //   STRIPE_SECRET_KEY, STRIPE_FOUNDER_PRICE_ID, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
 
-const FOUNDER_CAP = 20;
+const FOUNDER_CAP = 1; // TEMPORAL: bajado para probar el rechazo por cupo completo, volver a 20
 
 // 3 de enero de 2027, 00:00 hora de Madrid (CET = UTC+1 en enero) = 2027-01-02T23:00:00Z
 const TRIAL_END_TIMESTAMP = Math.floor(Date.parse("2027-01-02T23:00:00Z") / 1000);
