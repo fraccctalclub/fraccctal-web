@@ -25,6 +25,8 @@
       <li><a href="encuentros.html">Encuentros</a></li>
       <li><a href="quienes-somos.html">Quiénes somos</a></li>
       <li><a href="membresia.html">Membresía</a></li>
+      <li><a href="preventa.html" aria-current="page">Para socixs</a></li>
+      <li><a href="index.html#newsletter">Newsletter</a></li>
       <li><a href="https://instagram.com/fraccctal" target="_blank" rel="noopener">Instagram</a></li>
     </ul>
   </div>
@@ -61,6 +63,7 @@
 
     <p id="loading-mensaje" style="text-align:center">Cargando…</p>
     <p id="not-configured-mensaje" style="text-align:center; display:none">El sistema de membresía todavía no está conectado. Volvé más tarde.</p>
+    <p id="no-membership-mensaje" class="form-message form-message--error" style="text-align:center; display:none">Esa sesión no corresponde a ninguna membresía activa.</p>
 
   </div>
 </section>
@@ -84,15 +87,17 @@
 <script src="js/events.js"></script>
 <script src="js/main.js"></script>
 <script type="module">
-  import { sendMagicLink, getSession, signOut, isConfigured } from "./js/auth.js";
+  import { sendMagicLink, getSession, signOut, isConfigured, checkMembership } from "./js/auth.js";
 
   const loginGate = document.getElementById("login-gate");
   const founderContent = document.getElementById("founder-content");
   const loadingMensaje = document.getElementById("loading-mensaje");
   const notConfiguredMensaje = document.getElementById("not-configured-mensaje");
+  const noMembershipMensaje = document.getElementById("no-membership-mensaje");
 
   async function render() {
     loadingMensaje.style.display = "none";
+    noMembershipMensaje.style.display = "none";
 
     if (!isConfigured) {
       notConfiguredMensaje.style.display = "block";
@@ -102,6 +107,18 @@
     const session = await getSession();
 
     if (session) {
+      // Que haya una sesión de Supabase no alcanza: cualquier email puede
+      // pedirse un magic link. Confirmamos que sea una fundadora o miembro
+      // activa antes de mostrar nada.
+      const isMember = await checkMembership(session.user.email);
+      if (!isMember) {
+        await signOut();
+        loginGate.style.display = "block";
+        founderContent.style.display = "none";
+        noMembershipMensaje.style.display = "block";
+        return;
+      }
+
       loginGate.style.display = "none";
       founderContent.style.display = "block";
       document.getElementById("user-email").textContent = session.user.email;
@@ -124,7 +141,10 @@
     const { error } = await sendMagicLink(email);
 
     mensaje.style.display = "block";
-    if (error) {
+    if (error?.message === "no_es_socia") {
+      mensaje.className = "form-message form-message--error";
+      mensaje.textContent = "No encontramos ninguna membresía activa con ese email. Si ya pagaste, escribinos a fraccctal.contact@gmail.com.";
+    } else if (error) {
       mensaje.className = "form-message form-message--error";
       mensaje.textContent = "No pudimos enviar el enlace. Inténtalo de nuevo.";
     } else {

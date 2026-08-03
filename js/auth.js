@@ -17,8 +17,30 @@ export const isConfigured =
 
 export const supabase = isConfigured ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
+// Antes de mandar el magic link (y de que Supabase cree una cuenta para ese
+// email), chequeamos que sea una fundadora o miembro activa. Sin esto,
+// cualquier email podría pedirse un link y entrar a preventa.html.
+export async function checkMembership(email) {
+  try {
+    const res = await fetch("/.netlify/functions/check-membership", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    if (!res.ok) return false;
+    const data = await res.json();
+    return !!data.isMember;
+  } catch {
+    return false;
+  }
+}
+
 export async function sendMagicLink(email) {
   if (!isConfigured) return { error: { message: "not_configured" } };
+
+  const isMember = await checkMembership(email);
+  if (!isMember) return { error: { message: "no_es_socia" } };
+
   const { error } = await supabase.auth.signInWithOtp({
     email,
     options: { emailRedirectTo: `${window.location.origin}/preventa.html` },

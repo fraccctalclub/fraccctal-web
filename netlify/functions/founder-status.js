@@ -5,7 +5,7 @@
 // Variables de entorno necesarias:
 //   SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
 
-const FOUNDER_CAP = 0; // TEMPORAL: para probar la membresía general, volver a 20
+const FOUNDER_CAP = 20;
 
 exports.handler = async () => {
   const { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY } = process.env;
