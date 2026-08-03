@@ -36,6 +36,7 @@
       <li><a href="encuentros.html">Encuentros</a></li>
       <li><a href="quienes-somos.html">Quiénes somos</a></li>
       <li><a href="membresia.html" aria-current="page">Membresía</a></li>
+      <li><a href="preventa.html">Fundadoras</a></li>
       <li><a href="index.html#newsletter">Newsletter</a></li>
       <li><a href="https://instagram.com/fraccctal" target="_blank" rel="noopener">Instagram</a></li>
     </ul>
@@ -67,18 +68,19 @@
         <p class="eyebrow">Cupo cerrado · 20 personas</p>
         <h3>Fundadorx</h3>
         <p class="tier__price">11€ <small>/ mes, vitalicio</small></p>
-        <ul>
+        <ul id="tier-founder-list">
           <li>Gratis de septiembre a diciembre de 2026</li>
           <li>Precio fundadora para siempre, aunque el precio general suba</li>
           <li>Todo lo del tier Miembro</li>
         </ul>
         <button type="button" class="btn btn--primary" id="apuntarme-btn" style="margin-top:20px;width:100%">Apúntate como fundadora</button>
+        <p id="tier-founder-cerrado" style="display:none;margin-top:20px">El cupo de fundadoras ya se completó. Escríbenos si quieres que te avisemos de la membresía general.</p>
       </div>
     </div>
   </div>
 </section>
 
-<section class="section--dark">
+<section class="section--dark" id="founder-explainer-section">
   <div class="wrap two-col">
     <div>
       <p class="eyebrow">Por qué gratis primero</p>
@@ -206,6 +208,31 @@
     }
 
     document.getElementById("tier-founder-card")?.addEventListener("click", showForm);
+
+    // A partir del 1 de enero de 2027 (hora de Madrid) o si ya se llenó el
+    // cupo, se cierra la anotación: se oculta el botón y toda la info de
+    // fundadora, y se muestra el mensaje de cupo completo.
+    function closeFounderSignup() {
+      document.getElementById("tier-founder-list").style.display = "none";
+      document.getElementById("apuntarme-btn").style.display = "none";
+      document.getElementById("tier-founder-cerrado").style.display = "block";
+      document.getElementById("founder-explainer-section").style.display = "none";
+      document.getElementById("tier-founder-card").style.cursor = "default";
+      document.getElementById("tier-founder-card")?.removeEventListener("click", showForm);
+      formSection.style.display = "none";
+    }
+
+    const CUPO_CIERRA = new Date("2027-01-01T00:00:00+01:00");
+    if (new Date() >= CUPO_CIERRA) {
+      closeFounderSignup();
+    } else {
+      fetch("/.netlify/functions/founder-status")
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.capReached) closeFounderSignup();
+        })
+        .catch(() => {});
+    }
 
     function showMessage(text, isError) {
       mensaje.textContent = text;

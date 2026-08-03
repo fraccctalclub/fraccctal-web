@@ -1,7 +1,8 @@
 // Recibe la confirmación de pago de Stripe (checkout.session.completed), guarda
 // a la fundadora en Supabase, le manda su primer magic link de acceso (de
-// respaldo, el acceso principal ya lo dio founder-auto-login.js) y el email
-// de bienvenida con la carta de las fundadoras y los links a la comunidad.
+// respaldo, el acceso principal ya lo dio founder-auto-login.js), el email
+// de bienvenida con la carta de las fundadoras y los links a la comunidad, y
+// una notificación interna a NOTIFICACION_EMAIL con los datos de la aplicación.
 //
 // Configurar en el dashboard de Stripe (modo test primero): Developers → Webhooks →
 // Add endpoint → https://fraccctal.com/.netlify/functions/stripe-webhook
@@ -14,16 +15,17 @@ const crypto = require("crypto");
 
 const WHATSAPP_LINK = "https://chat.whatsapp.com/L1smx4zOpzUEgVl2fWbKRD";
 const DFOS_LINK = "https://app.dfos.com/j/9crkn9827dc9kzzc22z9ha";
+const NOTIFICACION_EMAIL = "fraccctal.contact@gmail.com";
 
 // Carta de bienvenida de las fundadoras. El saludo con el nombre se arma aparte
 // en sendWelcomeEmail, tomando el nombre guardado en founder_applications.
 const CARTA_FUNDADORAS = `
   <p>Somos Irina y Nat. Te escribimos porque acabas de convertirte en una de las veinte fundadoras de Fraccctal, y eso no queríamos resolverlo con un correo automático.</p>
-  <p>Hasta hace nada Fraccctal éramos dos personas hablando de lo que echábamos en falta en Madrid: un sitio al que ir sin tener que llegar bien. Sin gurú, sin promesas de transformación, sin networking disfrazado de otra cosa. Lo que hay hoy: los encuentros, la gente, esta lista; existe porque unas cuantas dijisteis que sí cuando todavía no había nada que enseñar. Eso no se nos olvida y no se nos va a olvidar.</p>
+  <p>Hasta hace nada Fraccctal éramos dos personas hablando de lo que echábamos en falta en Madrid: un sitio al que ir sin tener que llegar con respuestas. Sin gurú, sin promesas de transformación, sin networking disfrazado de otra cosa. Lo que hay hoy: los encuentros, la gente, esta lista; existe porque unas cuantas dijisteis que sí cuando todavía no había nada que enseñar. Eso no se nos olvida y no se nos va a olvidar.</p>
   <p>Ser fundadora significa dos cosas concretas.</p>
   <p>La primera: hasta el 31 de diciembre no pagas nada, y desde enero de 2027 tu cuota es de 11 € al mes (la mitad de la general) para siempre. Te lo contamos ahora, con cinco meses de antelación, porque no queremos que en enero te llegue ninguna sorpresa.</p>
   <p>La segunda: sois veinte y no habrá más. En enero se cierra el cupo y la palabra fundadora deja de estar disponible.</p>
-  <p>Y te pedimos algo a cambio, porque esto lo estamos construyendo con vosotras y no para vosotras: que nos digas qué funciona y qué no. Después de cada encuentro te va a llegar una encuesta corta. Contéstala aunque sea mal. Sobre todo si es mal. Y cuando algo te parezca lo bastante bueno, tráete a alguien.</p>
+  <p>Y te pedimos algo a cambio, porque esto lo estamos construyendo con vosotras y no para vosotras: que nos digas qué funciona y qué no. Después de cada encuentro te va a llegar una encuesta corta. Contéstala siempre: queremos escucharte, sobre todo en lo que creas que podemos mejorar. Y cuando algo te parezca lo bastante bueno, tráete a alguien.</p>
   <p>Debajo te dejamos los primeros pasos.</p>
   <p>Nos vemos pronto, en persona.</p>
   <p>Irina y Nat<br>Fraccctal · club, comunidad, cambio</p>
@@ -56,13 +58,10 @@ function verifyStripeSignature(rawBody, signatureHeader, secret) {
   return age <= 300;
 }
 
-async function sendWelcomeEmail(email, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY) {
-  if (!RESEND_API_KEY) return;
-
-  let nombre = "";
+async function getApplication(email, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY) {
   try {
     const appRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/founder_applications?select=nombre&email=eq.${encodeURIComponent(email)}&order=created_at.desc&limit=1`,
+      `${SUPABASE_URL}/rest/v1/founder_applications?select=*&email=eq.${encodeURIComponent(email)}&order=created_at.desc&limit=1`,
       {
         headers: {
           apikey: SUPABASE_SERVICE_ROLE_KEY,
@@ -71,20 +70,13 @@ async function sendWelcomeEmail(email, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, 
       }
     );
     const rows = await appRes.json();
-    nombre = rows[0]?.nombre || "";
+    return rows[0] || null;
   } catch {
-    // Si falla, mandamos el email igual sin el nombre.
+    return null;
   }
+}
 
-  const saludo = nombre ? `Hola, ${nombre}:` : "Hola:";
-
-  const html = `
-    <p>${saludo}</p>
-    ${CARTA_FUNDADORAS}
-    <p><a href="${WHATSAPP_LINK}">Súmate al canal de difusión de WhatsApp</a>, ahí vamos a avisar las novedades y fechas.</p>
-    <p><a href="${DFOS_LINK}">Crea tu cuenta en el DFOS</a>, nuestro espacio de comunidad online donde vamos a seguir en contacto entre encuentro y encuentro.</p>
-  `;
-
+async function sendEmail(RESEND_API_KEY, { to, subject, html }) {
   await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
@@ -93,10 +85,52 @@ async function sendWelcomeEmail(email, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, 
     },
     body: JSON.stringify({
       from: "Fraccctal <hola@fraccctal.com>",
-      to: email,
-      subject: "Bienvenida a Fraccctal",
+      reply_to: NOTIFICACION_EMAIL,
+      to,
+      subject,
       html,
     }),
+  });
+}
+
+async function sendWelcomeEmail(email, application, RESEND_API_KEY) {
+  if (!RESEND_API_KEY) return;
+
+  const nombre = application?.nombre || "";
+  const saludo = nombre ? `Hola, ${nombre}:` : "Hola:";
+
+  const html = `
+    <p>${saludo}</p>
+    ${CARTA_FUNDADORAS}
+    <p><strong><a href="${WHATSAPP_LINK}">Súmate al canal de difusión de WhatsApp</a></strong>, ahí vamos a avisar las novedades y fechas.</p>
+    <p><strong><a href="${DFOS_LINK}">Crea tu cuenta en el DFOS</a></strong>, nuestro espacio de comunidad online. Ahí también podrás comunicarte con el resto de miembros de la comunidad: hay distintos canales de conversación según el tema.</p>
+  `;
+
+  await sendEmail(RESEND_API_KEY, { to: email, subject: "Bienvenida a Fraccctal", html });
+}
+
+async function sendInternalNotification(email, application, RESEND_API_KEY) {
+  if (!RESEND_API_KEY) return;
+
+  const a = application || {};
+  const html = `
+    <p>Nueva fundadora: <strong>${a.nombre || ""} ${a.apellido || ""}</strong></p>
+    <ul>
+      <li>Email: ${email}</li>
+      <li>Teléfono: ${a.telefono || "-"}</li>
+      <li>Edad: ${a.edad ?? "-"}</li>
+      <li>Ciudad: ${a.ciudad || "-"} ${a.barrio ? `(${a.barrio})` : ""}</li>
+      <li>Qué la trae: ${a.que_te_trae || "-"}</li>
+      <li>Expectativa: ${a.expectativa || "-"}</li>
+      <li>Quiere compartir: ${a.compartir || "-"}</li>
+      <li>Cómo se enteró: ${a.como_te_entero || "-"}</li>
+    </ul>
+  `;
+
+  await sendEmail(RESEND_API_KEY, {
+    to: NOTIFICACION_EMAIL,
+    subject: `Nueva fundadora: ${a.nombre || email}`,
+    html,
   });
 }
 
@@ -152,7 +186,9 @@ exports.handler = async (event) => {
         body: JSON.stringify({ email, create_user: true }),
       });
 
-      await sendWelcomeEmail(email, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY);
+      const application = await getApplication(email, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+      await sendWelcomeEmail(email, application, RESEND_API_KEY);
+      await sendInternalNotification(email, application, RESEND_API_KEY);
     }
   }
 
