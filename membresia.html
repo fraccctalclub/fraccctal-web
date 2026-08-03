@@ -36,7 +36,7 @@
       <li><a href="encuentros.html">Encuentros</a></li>
       <li><a href="quienes-somos.html">Quiénes somos</a></li>
       <li><a href="membresia.html" aria-current="page">Membresía</a></li>
-      <li><a href="preventa.html">Fundadoras</a></li>
+      <li><a href="preventa.html">Para socixs</a></li>
       <li><a href="index.html#newsletter">Newsletter</a></li>
       <li><a href="https://instagram.com/fraccctal" target="_blank" rel="noopener">Instagram</a></li>
     </ul>
@@ -54,7 +54,7 @@
 <section class="section--tight">
   <div class="wrap">
     <div class="tiers">
-      <div class="tier">
+      <div class="tier" id="tier-member-card">
         <p class="eyebrow">Desde enero 2027</p>
         <h3>Miembro</h3>
         <p class="tier__price">22€ <small>/ mes</small></p>
@@ -63,6 +63,7 @@
           <li>Acceso al Círculo Íntimo</li>
           <li>Plaza prioritaria en los clubes recurrentes</li>
         </ul>
+        <button type="button" class="btn btn--ghost" id="apuntarme-miembro-btn" style="display:none;margin-top:20px;width:100%">Apúntate como miembro</button>
       </div>
       <div class="tier tier--founder" id="tier-founder-card">
         <p class="eyebrow">Cupo cerrado · 20 personas</p>
@@ -176,6 +177,90 @@
   </div>
 </section>
 
+<section id="miembro-form-section" style="display:none">
+  <div class="wrap" style="text-align:center">
+    <p class="eyebrow">¿Te apuntas?</p>
+    <h2 style="margin-bottom:24px">Apúntate como miembro</h2>
+    <p class="lede" style="margin:0 auto 24px">Cuéntanos quién eres antes de confirmar tu plaza.</p>
+
+    <form id="miembro-form" class="form-full">
+      <div class="field-row">
+        <div class="field">
+          <label for="m-nombre">Nombre</label>
+          <input type="text" id="m-nombre" required>
+        </div>
+        <div class="field">
+          <label for="m-apellido">Apellido</label>
+          <input type="text" id="m-apellido" required>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="m-email">Email</label>
+          <input type="email" id="m-email" required>
+        </div>
+        <div class="field">
+          <label for="m-telefono">Teléfono</label>
+          <input type="tel" id="m-telefono" required>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="m-edad">Edad</label>
+          <input type="number" id="m-edad" min="18" max="99" required>
+        </div>
+        <div class="field">
+          <label for="m-ciudad">Ciudad</label>
+          <input type="text" id="m-ciudad" value="Madrid" required>
+        </div>
+        <div class="field">
+          <label for="m-barrio">Barrio</label>
+          <input type="text" id="m-barrio">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="m-que-trae">¿Qué te trae a Fraccctal?</label>
+        <textarea id="m-que-trae" required></textarea>
+      </div>
+
+      <div class="field">
+        <label for="m-expectativa">¿Cuál es tu expectativa sobre este espacio?</label>
+        <textarea id="m-expectativa" required></textarea>
+      </div>
+
+      <div class="field">
+        <label for="m-compartir">Algo que quieras compartir sobre ti o tu proceso (opcional)</label>
+        <textarea id="m-compartir"></textarea>
+      </div>
+
+      <div class="field">
+        <label for="m-entero">¿Cómo te enteraste de Fraccctal?</label>
+        <input type="text" id="m-entero" required>
+      </div>
+
+      <div class="checkbox-field">
+        <input type="checkbox" id="m-privacidad" required>
+        <label for="m-privacidad">Acepto la <a href="privacidad.html" target="_blank">política de privacidad</a> de Fraccctal.</label>
+      </div>
+
+      <div class="checkbox-field">
+        <input type="checkbox" id="m-codigo" required>
+        <label for="m-codigo">Acepto cumplir el <a href="codigo-conducta.html" target="_blank">código de conducta</a> de Fraccctal.</label>
+      </div>
+
+      <p class="submit-note">Los primeros 20 días son gratis. Después se cobran 22€/mes. Puedes darte de baja cuando quieras.</p>
+
+      <button type="submit" class="btn btn--primary" id="miembro-submit" style="width:100%">Iniciar membresía</button>
+    </form>
+    <p id="miembro-mensaje" class="form-message" style="display:none"></p>
+
+    <p style="margin-top:24px"><a href="mailto:fraccctal.contact@gmail.com?subject=Quiero%20ser%20miembro%20de%20Fraccctal">¿Preferís escribirnos directamente?</a></p>
+  </div>
+</section>
+
 <footer>
   <div class="wrap">
     <div>
@@ -202,16 +287,27 @@
     const mensaje = document.getElementById("fundadora-mensaje");
     const formSection = document.getElementById("fundadora-form-section");
 
+    const memberForm = document.getElementById("miembro-form");
+    const memberSubmitBtn = document.getElementById("miembro-submit");
+    const memberMensaje = document.getElementById("miembro-mensaje");
+    const memberFormSection = document.getElementById("miembro-form-section");
+
     function showForm() {
       formSection.style.display = "block";
       formSection.scrollIntoView({ behavior: "smooth" });
     }
 
+    function showMemberForm() {
+      memberFormSection.style.display = "block";
+      memberFormSection.scrollIntoView({ behavior: "smooth" });
+    }
+
     document.getElementById("tier-founder-card")?.addEventListener("click", showForm);
 
     // A partir del 1 de enero de 2027 (hora de Madrid) o si ya se llenó el
-    // cupo, se cierra la anotación: se oculta el botón y toda la info de
-    // fundadora, y se muestra el mensaje de cupo completo.
+    // cupo, se cierra la anotación de fundadora: se oculta el botón y toda su
+    // info, se muestra el mensaje de cupo completo, y se activa en su lugar
+    // el botón de membresía general.
     function closeFounderSignup() {
       document.getElementById("tier-founder-list").style.display = "none";
       document.getElementById("apuntarme-btn").style.display = "none";
@@ -220,6 +316,12 @@
       document.getElementById("tier-founder-card").style.cursor = "default";
       document.getElementById("tier-founder-card")?.removeEventListener("click", showForm);
       formSection.style.display = "none";
+
+      const memberBtn = document.getElementById("apuntarme-miembro-btn");
+      const memberCard = document.getElementById("tier-member-card");
+      memberBtn.style.display = "block";
+      memberCard.style.cursor = "pointer";
+      memberCard.addEventListener("click", showMemberForm);
     }
 
     const CUPO_CIERRA = new Date("2027-01-01T00:00:00+01:00");
@@ -240,7 +342,13 @@
       mensaje.style.display = "block";
     }
 
-    // Si volvemos desde Stripe con ?fundadora=ok o =cancelado, avisamos.
+    function showMemberMessage(text, isError) {
+      memberMensaje.textContent = text;
+      memberMensaje.className = "form-message" + (isError ? " form-message--error" : "");
+      memberMensaje.style.display = "block";
+    }
+
+    // Si volvemos desde Stripe con ?fundadora=ok/cancelado o ?miembro=ok/cancelado, avisamos.
     const params = new URLSearchParams(window.location.search);
     if (params.get("fundadora") === "ok") {
       showForm();
@@ -248,6 +356,12 @@
     } else if (params.get("fundadora") === "cancelado") {
       showForm();
       showMessage("Quedó cancelado, no se procesó ningún pago.", false);
+    } else if (params.get("miembro") === "ok") {
+      showMemberForm();
+      showMemberMessage("¡Listo! Revisa tu email: ahí te llega tu primer acceso a la preventa.", false);
+    } else if (params.get("miembro") === "cancelado") {
+      showMemberForm();
+      showMemberMessage("Quedó cancelado, no se procesó ningún pago.", false);
     }
 
     if (!form) return;
@@ -285,17 +399,63 @@
         if (res.status === 409 && data.error === "cupo_completo") {
           showMessage("El cupo de 20 fundadoras ya se completó. Escríbenos si quieres que te avisemos de la membresía general.", true);
         } else if (!res.ok) {
-          showMessage(data.error || "Algo salió mal, intentá de nuevo.", true);
+          showMessage(data.error || "Algo salió mal, inténtalo de nuevo.", true);
         } else {
           window.location.href = data.url;
           return;
         }
       } catch {
-        showMessage("No pudimos conectar. Intentá de nuevo en un momento.", true);
+        showMessage("No pudimos conectar. Inténtalo de nuevo en un momento.", true);
       }
 
       submitBtn.disabled = false;
       submitBtn.textContent = "Iniciar membresía";
+    });
+
+    if (!memberForm) return;
+    memberForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      memberSubmitBtn.disabled = true;
+      memberSubmitBtn.textContent = "Un momento…";
+      showMemberMessage("", false);
+      memberMensaje.style.display = "none";
+
+      const payload = {
+        email: document.getElementById("m-email").value.trim(),
+        nombre: document.getElementById("m-nombre").value.trim(),
+        apellido: document.getElementById("m-apellido").value.trim(),
+        telefono: document.getElementById("m-telefono").value.trim(),
+        edad: document.getElementById("m-edad").value,
+        ciudad: document.getElementById("m-ciudad").value.trim(),
+        barrio: document.getElementById("m-barrio").value.trim(),
+        que_te_trae: document.getElementById("m-que-trae").value.trim(),
+        expectativa: document.getElementById("m-expectativa").value.trim(),
+        compartir: document.getElementById("m-compartir").value.trim(),
+        como_te_entero: document.getElementById("m-entero").value.trim(),
+        acepta_privacidad: document.getElementById("m-privacidad").checked,
+        acepta_codigo_conducta: document.getElementById("m-codigo").checked,
+      };
+
+      try {
+        const res = await fetch("/.netlify/functions/create-membership-session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          showMemberMessage(data.error || "Algo salió mal, inténtalo de nuevo.", true);
+        } else {
+          window.location.href = data.url;
+          return;
+        }
+      } catch {
+        showMemberMessage("No pudimos conectar. Inténtalo de nuevo en un momento.", true);
+      }
+
+      memberSubmitBtn.disabled = false;
+      memberSubmitBtn.textContent = "Iniciar membresía";
     });
   })();
 </script>

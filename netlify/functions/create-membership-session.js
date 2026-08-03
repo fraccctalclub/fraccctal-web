@@ -1,15 +1,12 @@
-// Guarda la aplicación de la fundadora y crea una Stripe Checkout Session de
-// suscripción para la membresía. No cobra nada hoy: el cobro real empieza el
-// 3 de enero de 2027 para todas, sin importar el día en que cada una se anota
-// (subscription_data.trial_end fijo).
+// Guarda la aplicación de la miembro general y crea una Stripe Checkout
+// Session de suscripción (22€/mes, 20 días de período de prueba). A diferencia
+// de la fundadora, esta no tiene cupo ni fecha de cobro fija: el cobro
+// arranca 20 días después de que cada quien se anota (trial_period_days).
 //
-// Variables de entorno necesarias (configurar en Netlify, nunca en el repo):
-//   STRIPE_SECRET_KEY, STRIPE_FOUNDER_PRICE_ID, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
+// Variables de entorno necesarias:
+//   STRIPE_SECRET_KEY, STRIPE_MEMBER_PRICE_ID, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
 
-const FOUNDER_CAP = 20;
-
-// 3 de enero de 2027, 00:00 hora de Madrid (CET = UTC+1 en enero) = 2027-01-02T23:00:00Z
-const TRIAL_END_TIMESTAMP = Math.floor(Date.parse("2027-01-02T23:00:00Z") / 1000);
+const TRIAL_DAYS = 20;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const REQUIRED_TEXT_FIELDS = [
@@ -27,7 +24,7 @@ exports.handler = async (event) => {
     return { statusCode: 405, body: JSON.stringify({ error: "Método no permitido" }) };
   }
 
-  const { STRIPE_SECRET_KEY, STRIPE_FOUNDER_PRICE_ID, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY } =
+  const { STRIPE_SECRET_KEY, STRIPE_MEMBER_PRICE_ID, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY } =
     process.env;
 
   let body;
@@ -52,26 +49,8 @@ exports.handler = async (event) => {
     };
   }
 
-  // 1. Chequear el cupo: contar fundadoras ya activas en Supabase.
-  const countRes = await fetch(
-    `${SUPABASE_URL}/rest/v1/founders?select=id&status=eq.active`,
-    {
-      headers: {
-        apikey: SUPABASE_SERVICE_ROLE_KEY,
-        Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
-      },
-    }
-  );
-  if (!countRes.ok) {
-    return { statusCode: 500, body: JSON.stringify({ error: "No se pudo consultar el cupo" }) };
-  }
-  const founders = await countRes.json();
-  if (founders.length >= FOUNDER_CAP) {
-    return { statusCode: 409, body: JSON.stringify({ error: "cupo_completo" }) };
-  }
-
-  // 2. Guardar la aplicación (quién es, qué la trae) antes de ir a pagar.
-  await fetch(`${SUPABASE_URL}/rest/v1/founder_applications`, {
+  // Guardar la aplicación (quién es, qué la trae) antes de ir a pagar.
+  await fetch(`${SUPABASE_URL}/rest/v1/member_applications`, {
     method: "POST",
     headers: {
       apikey: SUPABASE_SERVICE_ROLE_KEY,
@@ -95,17 +74,17 @@ exports.handler = async (event) => {
     }),
   });
 
-  // 3. Crear la Checkout Session en Stripe (API REST directa, sin el SDK de Stripe).
+  // Crear la Checkout Session en Stripe (API REST directa, sin el SDK de Stripe).
   const origin = event.headers.origin || "https://fraccctal.com";
   const params = new URLSearchParams({
     mode: "subscription",
     customer_email: email,
-    "line_items[0][price]": STRIPE_FOUNDER_PRICE_ID,
+    "line_items[0][price]": STRIPE_MEMBER_PRICE_ID,
     "line_items[0][quantity]": "1",
-    "subscription_data[trial_end]": String(TRIAL_END_TIMESTAMP),
-    "metadata[tier]": "founder",
-    success_url: `${origin}/.netlify/functions/founder-auto-login?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${origin}/membresia.html?fundadora=cancelado`,
+    "subscription_data[trial_period_days]": String(TRIAL_DAYS),
+    "metadata[tier]": "member",
+    success_url: `${origin}/.netlify/functions/member-auto-login?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${origin}/membresia.html?miembro=cancelado`,
   });
 
   const sessionRes = await fetch("https://api.stripe.com/v1/checkout/sessions", {

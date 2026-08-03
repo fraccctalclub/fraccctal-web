@@ -1,7 +1,9 @@
-// Recibe la confirmación de pago de Stripe (checkout.session.completed), guarda
-// a la fundadora en Supabase, le manda su primer magic link de acceso (de
-// respaldo, el acceso principal ya lo dio founder-auto-login.js), el email
-// de bienvenida con la carta de las fundadoras y los links a la comunidad, y
+// Recibe la confirmación de pago de Stripe (checkout.session.completed), tanto
+// de fundadoras como de miembros generales (se distingue por session.metadata.tier,
+// seteado en create-checkout-session.js / create-membership-session.js). Guarda
+// a la persona en Supabase, le manda su magic link de acceso de respaldo (el
+// acceso principal ya lo dio founder-auto-login.js / member-auto-login.js), el
+// email de bienvenida con la carta correspondiente y los links a la comunidad, y
 // una notificación interna a NOTIFICACION_EMAIL con los datos de la aplicación.
 //
 // Configurar en el dashboard de Stripe (modo test primero): Developers → Webhooks →
@@ -31,6 +33,12 @@ const CARTA_FUNDADORAS = `
   <p>Irina y Nat<br>Fraccctal · club, comunidad, cambio</p>
 `;
 
+// EDITAR: carta de bienvenida para la membresía general (no fundadora).
+// Reemplazar por el texto definitivo cuando lo tengan.
+const CARTA_MIEMBROS = `
+  <p>[PEGAR AQUÍ LA CARTA DE BIENVENIDA PARA MIEMBROS GENERALES]</p>
+`;
+
 function verifyStripeSignature(rawBody, signatureHeader, secret) {
   if (!signatureHeader) return false;
 
@@ -58,10 +66,10 @@ function verifyStripeSignature(rawBody, signatureHeader, secret) {
   return age <= 300;
 }
 
-async function getApplication(email, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY) {
+async function getApplication(email, table, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY) {
   try {
     const appRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/founder_applications?select=*&email=eq.${encodeURIComponent(email)}&order=created_at.desc&limit=1`,
+      `${SUPABASE_URL}/rest/v1/${table}?select=*&email=eq.${encodeURIComponent(email)}&order=created_at.desc&limit=1`,
       {
         headers: {
           apikey: SUPABASE_SERVICE_ROLE_KEY,
@@ -93,15 +101,16 @@ async function sendEmail(RESEND_API_KEY, { to, subject, html }) {
   });
 }
 
-async function sendWelcomeEmail(email, application, RESEND_API_KEY) {
+async function sendWelcomeEmail(email, application, RESEND_API_KEY, tier) {
   if (!RESEND_API_KEY) return;
 
   const nombre = application?.nombre || "";
   const saludo = nombre ? `Hola, ${nombre}:` : "Hola:";
+  const carta = tier === "member" ? CARTA_MIEMBROS : CARTA_FUNDADORAS;
 
   const html = `
     <p>${saludo}</p>
-    ${CARTA_FUNDADORAS}
+    ${carta}
     <p><strong><a href="${WHATSAPP_LINK}">Súmate al canal de difusión de WhatsApp</a></strong>, ahí vamos a avisar las novedades y fechas.</p>
     <p><strong><a href="${DFOS_LINK}">Crea tu cuenta en el DFOS</a></strong>, nuestro espacio de comunidad online. Ahí también podrás comunicarte con el resto de miembros de la comunidad: hay distintos canales de conversación según el tema.</p>
   `;
@@ -109,12 +118,13 @@ async function sendWelcomeEmail(email, application, RESEND_API_KEY) {
   await sendEmail(RESEND_API_KEY, { to: email, subject: "Bienvenida a Fraccctal", html });
 }
 
-async function sendInternalNotification(email, application, RESEND_API_KEY) {
+async function sendInternalNotification(email, application, RESEND_API_KEY, tier) {
   if (!RESEND_API_KEY) return;
 
   const a = application || {};
+  const etiqueta = tier === "member" ? "Nueva miembro general" : "Nueva fundadora";
   const html = `
-    <p>Nueva fundadora: <strong>${a.nombre || ""} ${a.apellido || ""}</strong></p>
+    <p>${etiqueta}: <strong>${a.nombre || ""} ${a.apellido || ""}</strong></p>
     <ul>
       <li>Email: ${email}</li>
       <li>Teléfono: ${a.telefono || "-"}</li>
@@ -129,7 +139,7 @@ async function sendInternalNotification(email, application, RESEND_API_KEY) {
 
   await sendEmail(RESEND_API_KEY, {
     to: NOTIFICACION_EMAIL,
-    subject: `Nueva fundadora: ${a.nombre || email}`,
+    subject: `${etiqueta}: ${a.nombre || email}`,
     html,
   });
 }
@@ -152,11 +162,14 @@ exports.handler = async (event) => {
   if (stripeEvent.type === "checkout.session.completed") {
     const session = stripeEvent.data.object;
     const email = session.customer_email || (session.customer_details && session.customer_details.email);
+    const tier = session.metadata?.tier === "member" ? "member" : "founder";
+    const accountTable = tier === "member" ? "members" : "founders";
+    const applicationTable = tier === "member" ? "member_applications" : "founder_applications";
 
     if (email) {
-      // Guardar (o actualizar) la fila de la fundadora. Requiere que la columna
+      // Guardar (o actualizar) la fila de la persona. Requiere que la columna
       // "email" tenga una restricción UNIQUE en Supabase para que el upsert funcione.
-      await fetch(`${SUPABASE_URL}/rest/v1/founders`, {
+      await fetch(`${SUPABASE_URL}/rest/v1/${accountTable}`, {
         method: "POST",
         headers: {
           apikey: SUPABASE_SERVICE_ROLE_KEY,
@@ -173,8 +186,8 @@ exports.handler = async (event) => {
       });
 
       // Disparar un magic link de respaldo (por si vuelve otro día desde otro
-      // dispositivo). El primer acceso normalmente ya lo dio founder-auto-login.js
-      // directo desde el pago, sin pasar por el email.
+      // dispositivo). El primer acceso normalmente ya lo dio founder-auto-login.js /
+      // member-auto-login.js directo desde el pago, sin pasar por el email.
       const redirectTo = encodeURIComponent("https://fraccctal.com/preventa.html");
       await fetch(`${SUPABASE_URL}/auth/v1/otp?redirect_to=${redirectTo}`, {
         method: "POST",
@@ -186,9 +199,14 @@ exports.handler = async (event) => {
         body: JSON.stringify({ email, create_user: true }),
       });
 
-      const application = await getApplication(email, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-      await sendWelcomeEmail(email, application, RESEND_API_KEY);
-      await sendInternalNotification(email, application, RESEND_API_KEY);
+      const application = await getApplication(
+        email,
+        applicationTable,
+        SUPABASE_URL,
+        SUPABASE_SERVICE_ROLE_KEY
+      );
+      await sendWelcomeEmail(email, application, RESEND_API_KEY, tier);
+      await sendInternalNotification(email, application, RESEND_API_KEY, tier);
     }
   }
 
