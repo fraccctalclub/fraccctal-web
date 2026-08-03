@@ -63,7 +63,7 @@
           <li>Plaza prioritaria en los clubes recurrentes</li>
         </ul>
       </div>
-      <div class="tier tier--founder">
+      <div class="tier tier--founder" id="tier-founder-card">
         <p class="eyebrow">Cupo cerrado · 20 personas</p>
         <h3>Fundadorx</h3>
         <p class="tier__price">11€ <small>/ mes, vitalicio</small></p>
@@ -72,6 +72,7 @@
           <li>Precio fundadora para siempre, aunque el precio general suba</li>
           <li>Todo lo del tier Miembro</li>
         </ul>
+        <button type="button" class="btn btn--primary" id="apuntarme-btn" style="margin-top:20px;width:100%">Apúntate como fundadora</button>
       </div>
     </div>
   </div>
@@ -89,11 +90,11 @@
   </div>
 </section>
 
-<section>
+<section id="fundadora-form-section" style="display:none">
   <div class="wrap" style="text-align:center">
     <p class="eyebrow">¿Te apuntas?</p>
-    <h2 style="margin-bottom:24px">Anotate como fundadora</h2>
-    <p class="lede" style="margin:0 auto 24px">Contanos quién sos antes de confirmar tu lugar.</p>
+    <h2 style="margin-bottom:24px">Apúntate como fundadora</h2>
+    <p class="lede" style="margin:0 auto 24px">Cuéntanos quién eres antes de confirmar tu plaza.</p>
 
     <form id="fundadora-form" class="form-full">
       <div class="field-row">
@@ -144,7 +145,7 @@
       </div>
 
       <div class="field">
-        <label for="f-compartir">Algo que quieras compartir sobre vos o tu proceso (opcional)</label>
+        <label for="f-compartir">Algo que quieras compartir sobre ti o tu proceso (opcional)</label>
         <textarea id="f-compartir"></textarea>
       </div>
 
@@ -163,7 +164,7 @@
         <label for="f-codigo">Acepto cumplir el <a href="codigo-conducta.html" target="_blank">código de conducta</a> de Fraccctal.</label>
       </div>
 
-      <p class="submit-note">No se te va a cobrar nada hasta el 3 de enero de 2027. Podés darte de baja cuando quieras.</p>
+      <p class="submit-note">No se te va a cobrar nada hasta el 3 de enero de 2027. Puedes darte de baja cuando quieras.</p>
 
       <button type="submit" class="btn btn--primary" id="fundadora-submit" style="width:100%">Iniciar membresía</button>
     </form>
@@ -197,6 +198,14 @@
     const form = document.getElementById("fundadora-form");
     const submitBtn = document.getElementById("fundadora-submit");
     const mensaje = document.getElementById("fundadora-mensaje");
+    const formSection = document.getElementById("fundadora-form-section");
+
+    function showForm() {
+      formSection.style.display = "block";
+      formSection.scrollIntoView({ behavior: "smooth" });
+    }
+
+    document.getElementById("tier-founder-card")?.addEventListener("click", showForm);
 
     function showMessage(text, isError) {
       mensaje.textContent = text;
@@ -207,8 +216,10 @@
     // Si volvemos desde Stripe con ?fundadora=ok o =cancelado, avisamos.
     const params = new URLSearchParams(window.location.search);
     if (params.get("fundadora") === "ok") {
-      showMessage("¡Listo! Revisá tu email: ahí te llega tu primer acceso a la preventa.", false);
+      showForm();
+      showMessage("¡Listo! Revisa tu email: ahí te llega tu primer acceso a la preventa.", false);
     } else if (params.get("fundadora") === "cancelado") {
+      showForm();
       showMessage("Quedó cancelado, no se procesó ningún pago.", false);
     }
 
@@ -245,7 +256,7 @@
         const data = await res.json();
 
         if (res.status === 409 && data.error === "cupo_completo") {
-          showMessage("El cupo de 20 fundadoras ya se completó. Escribinos si querés que te avisemos de la membresía general.", true);
+          showMessage("El cupo de 20 fundadoras ya se completó. Escríbenos si quieres que te avisemos de la membresía general.", true);
         } else if (!res.ok) {
           showMessage(data.error || "Algo salió mal, intentá de nuevo.", true);
         } else {

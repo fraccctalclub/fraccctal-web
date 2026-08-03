@@ -12,8 +12,8 @@
 
 const crypto = require("crypto");
 
-// EDITAR: pegar acá el link del canal de difusión de WhatsApp y el link para
-// crear la cuenta en el DFOS (con una frase corta de qué es cada cosa, si querés
+// EDITAR: pegar aquí el link del canal de difusión de WhatsApp y el link para
+// crear la cuenta en el DFOS (con una frase corta de qué es cada cosa, si quieres
 // cambiar el texto de abajo también se puede).
 const WHATSAPP_LINK = "PEGAR_LINK_WHATSAPP_AQUI";
 const DFOS_LINK = "PEGAR_LINK_DFOS_AQUI";
@@ -22,7 +22,7 @@ const DFOS_LINK = "PEGAR_LINK_DFOS_AQUI";
 // texto por el definitivo — se manda tal cual, en HTML simple (un <p> por
 // párrafo).
 const CARTA_FUNDADORAS = `
-  <p>[PEGAR ACÁ LA CARTA DE LAS FUNDADORAS]</p>
+  <p>[PEGAR AQUÍ LA CARTA DE LAS FUNDADORAS]</p>
 `;
 
 function verifyStripeSignature(rawBody, signatureHeader, secret) {
@@ -76,10 +76,10 @@ async function sendWelcomeEmail(email, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, 
 
   const html = `
     <p>${saludo}</p>
-    <p>¡Bienvenida a Fraccctal! Ya sos fundadora.</p>
+    <p>¡Bienvenida a Fraccctal! Ya eres fundadora.</p>
     ${CARTA_FUNDADORAS}
-    <p><a href="${WHATSAPP_LINK}">Sumate al canal de difusión de WhatsApp</a>, ahí vamos a avisar las novedades y fechas.</p>
-    <p><a href="${DFOS_LINK}">Creá tu cuenta en el DFOS</a>, nuestro espacio de comunidad online donde vamos a seguir en contacto entre encuentro y encuentro.</p>
+    <p><a href="${WHATSAPP_LINK}">Súmate al canal de difusión de WhatsApp</a>, ahí vamos a avisar las novedades y fechas.</p>
+    <p><a href="${DFOS_LINK}">Crea tu cuenta en el DFOS</a>, nuestro espacio de comunidad online donde vamos a seguir en contacto entre encuentro y encuentro.</p>
     <p>Cualquier cosa, respondé este email.</p>
   `;
 

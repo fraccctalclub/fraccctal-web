@@ -391,7 +391,13 @@ section { padding: 96px 0; }
   background: var(--ink);
   color: var(--bg);
   border-color: var(--ink);
+  cursor: pointer;
+  transition: transform 0.15s ease;
 }
+
+.tier--founder:hover { transform: translateY(-2px); }
+
+.tier--founder .btn--primary { background: var(--bg); color: var(--ink); }
 
 .tier__price {
   font-family: var(--serif);

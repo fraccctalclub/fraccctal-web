@@ -2,7 +2,7 @@
 // Se importa como módulo ES desde un CDN — no hace falta build ni npm para esto,
 // corre directo en el navegador.
 //
-// EDITAR: pegar acá la URL y la anon key de tu proyecto de Supabase
+// EDITAR: pegar aquí la URL y la anon key de tu proyecto de Supabase
 // (Project Settings → API). La anon key es pública a propósito: no sirve para
 // escribir datos, solo para pedir el login — la protección real vive en las
 // políticas de Supabase y en las Netlify Functions.
