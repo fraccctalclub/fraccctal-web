@@ -12,17 +12,21 @@
 
 const crypto = require("crypto");
 
-// EDITAR: pegar aquí el link del canal de difusión de WhatsApp y el link para
-// crear la cuenta en el DFOS (con una frase corta de qué es cada cosa, si quieres
-// cambiar el texto de abajo también se puede).
-const WHATSAPP_LINK = "PEGAR_LINK_WHATSAPP_AQUI";
-const DFOS_LINK = "PEGAR_LINK_DFOS_AQUI";
+const WHATSAPP_LINK = "https://chat.whatsapp.com/L1smx4zOpzUEgVl2fWbKRD";
+const DFOS_LINK = "https://app.dfos.com/j/9crkn9827dc9kzzc22z9ha";
 
-// EDITAR: esta es la carta de bienvenida de las fundadoras. Reemplazar este
-// texto por el definitivo — se manda tal cual, en HTML simple (un <p> por
-// párrafo).
+// Carta de bienvenida de las fundadoras. El saludo con el nombre se arma aparte
+// en sendWelcomeEmail, tomando el nombre guardado en founder_applications.
 const CARTA_FUNDADORAS = `
-  <p>[PEGAR AQUÍ LA CARTA DE LAS FUNDADORAS]</p>
+  <p>Somos Irina y Nat. Te escribimos porque acabas de convertirte en una de las veinte fundadoras de Fraccctal, y eso no queríamos resolverlo con un correo automático.</p>
+  <p>Hasta hace nada Fraccctal éramos dos personas hablando de lo que echábamos en falta en Madrid: un sitio al que ir sin tener que llegar bien. Sin gurú, sin promesas de transformación, sin networking disfrazado de otra cosa. Lo que hay hoy: los encuentros, la gente, esta lista; existe porque unas cuantas dijisteis que sí cuando todavía no había nada que enseñar. Eso no se nos olvida y no se nos va a olvidar.</p>
+  <p>Ser fundadora significa dos cosas concretas.</p>
+  <p>La primera: hasta el 31 de diciembre no pagas nada, y desde enero de 2027 tu cuota es de 11 € al mes (la mitad de la general) para siempre. Te lo contamos ahora, con cinco meses de antelación, porque no queremos que en enero te llegue ninguna sorpresa.</p>
+  <p>La segunda: sois veinte y no habrá más. En enero se cierra el cupo y la palabra fundadora deja de estar disponible.</p>
+  <p>Y te pedimos algo a cambio, porque esto lo estamos construyendo con vosotras y no para vosotras: que nos digas qué funciona y qué no. Después de cada encuentro te va a llegar una encuesta corta. Contéstala aunque sea mal. Sobre todo si es mal. Y cuando algo te parezca lo bastante bueno, tráete a alguien.</p>
+  <p>Debajo te dejamos los primeros pasos.</p>
+  <p>Nos vemos pronto, en persona.</p>
+  <p>Irina y Nat<br>Fraccctal · club, comunidad, cambio</p>
 `;
 
 function verifyStripeSignature(rawBody, signatureHeader, secret) {
@@ -72,15 +76,13 @@ async function sendWelcomeEmail(email, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, 
     // Si falla, mandamos el email igual sin el nombre.
   }
 
-  const saludo = nombre ? `Hola ${nombre},` : "Hola,";
+  const saludo = nombre ? `Hola, ${nombre}:` : "Hola:";
 
   const html = `
     <p>${saludo}</p>
-    <p>¡Bienvenida a Fraccctal! Ya eres fundadora.</p>
     ${CARTA_FUNDADORAS}
     <p><a href="${WHATSAPP_LINK}">Súmate al canal de difusión de WhatsApp</a>, ahí vamos a avisar las novedades y fechas.</p>
     <p><a href="${DFOS_LINK}">Crea tu cuenta en el DFOS</a>, nuestro espacio de comunidad online donde vamos a seguir en contacto entre encuentro y encuentro.</p>
-    <p>Cualquier cosa, respondé este email.</p>
   `;
 
   await fetch("https://api.resend.com/emails", {
