@@ -537,6 +537,29 @@ section { padding: 96px 0; }
   margin-bottom: 16px;
 }
 
+/* ---------- Tablas (páginas legales) ---------- */
+
+.legal-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0 32px;
+  font-size: 0.88rem;
+}
+
+.legal-table th,
+.legal-table td {
+  border: 1px solid var(--line);
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.legal-table th {
+  background: var(--bg-alt);
+  font-family: var(--sans);
+  font-weight: 600;
+}
+
 /* ---------- Equipo ---------- */
 
 .team {

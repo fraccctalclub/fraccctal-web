@@ -158,6 +158,11 @@
       </div>
 
       <div class="checkbox-field">
+        <input type="checkbox" id="f-condiciones" required>
+        <label for="f-condiciones">He leído y acepto las <a href="condiciones.html" target="_blank">condiciones de contratación</a> de la membresía.</label>
+      </div>
+
+      <div class="checkbox-field">
         <input type="checkbox" id="f-privacidad" required>
         <label for="f-privacidad">Acepto la <a href="privacidad.html" target="_blank">política de privacidad</a> de Fraccctal.</label>
       </div>
@@ -242,6 +247,11 @@
       </div>
 
       <div class="checkbox-field">
+        <input type="checkbox" id="m-condiciones" required>
+        <label for="m-condiciones">He leído y acepto las <a href="condiciones.html" target="_blank">condiciones de contratación</a> de la membresía.</label>
+      </div>
+
+      <div class="checkbox-field">
         <input type="checkbox" id="m-privacidad" required>
         <label for="m-privacidad">Acepto la <a href="privacidad.html" target="_blank">política de privacidad</a> de Fraccctal.</label>
       </div>
@@ -276,7 +286,12 @@
       <li><a href="mailto:fraccctal.contact@gmail.com">Contacto</a></li>
     </ul>
   </div>
-  <div class="footer__bottom">© 2026 Fraccctal. Madrid.</div>
+  <div class="footer__bottom">
+    © 2026 Fraccctal. Madrid. ·
+    <a href="aviso-legal.html">Aviso legal</a> ·
+    <a href="privacidad.html">Privacidad</a> ·
+    <a href="condiciones.html">Condiciones</a>
+  </div>
 </footer>
 
 <script src="js/main.js"></script>
@@ -384,6 +399,7 @@
         expectativa: document.getElementById("f-expectativa").value.trim(),
         compartir: document.getElementById("f-compartir").value.trim(),
         como_te_entero: document.getElementById("f-entero").value.trim(),
+        acepta_condiciones: document.getElementById("f-condiciones").checked,
         acepta_privacidad: document.getElementById("f-privacidad").checked,
         acepta_codigo_conducta: document.getElementById("f-codigo").checked,
       };
@@ -432,6 +448,7 @@
         expectativa: document.getElementById("m-expectativa").value.trim(),
         compartir: document.getElementById("m-compartir").value.trim(),
         como_te_entero: document.getElementById("m-entero").value.trim(),
+        acepta_condiciones: document.getElementById("m-condiciones").checked,
         acepta_privacidad: document.getElementById("m-privacidad").checked,
         acepta_codigo_conducta: document.getElementById("m-codigo").checked,
       };

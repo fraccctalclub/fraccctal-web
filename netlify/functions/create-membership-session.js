@@ -8,6 +8,11 @@
 
 const TRIAL_DAYS = 20;
 
+// Versión del texto de condiciones.html que se le pide aceptar a cada
+// miembro. Debe coincidir con LEGAL.CONDICIONES_VERSION en
+// js/legal-config.js — subirla ahí cuando cambie el contenido legal.
+const CONDICIONES_VERSION = "2026-08-v1";
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const REQUIRED_TEXT_FIELDS = [
   "nombre",
@@ -34,7 +39,8 @@ exports.handler = async (event) => {
     return { statusCode: 400, body: JSON.stringify({ error: "Body inválido" }) };
   }
 
-  const { email, edad, barrio, compartir, acepta_privacidad, acepta_codigo_conducta } = body;
+  const { email, edad, barrio, compartir, acepta_condiciones, acepta_privacidad, acepta_codigo_conducta } =
+    body;
 
   if (!email || !EMAIL_RE.test(email)) {
     return { statusCode: 400, body: JSON.stringify({ error: "Email inválido" }) };
@@ -42,10 +48,12 @@ exports.handler = async (event) => {
   if (REQUIRED_TEXT_FIELDS.some((field) => !body[field])) {
     return { statusCode: 400, body: JSON.stringify({ error: "Faltan campos obligatorios" }) };
   }
-  if (!acepta_privacidad || !acepta_codigo_conducta) {
+  if (!acepta_condiciones || !acepta_privacidad || !acepta_codigo_conducta) {
     return {
       statusCode: 400,
-      body: JSON.stringify({ error: "Hay que aceptar la privacidad y el código de conducta" }),
+      body: JSON.stringify({
+        error: "Hay que aceptar las condiciones, la privacidad y el código de conducta",
+      }),
     };
   }
 
@@ -69,8 +77,10 @@ exports.handler = async (event) => {
       expectativa: body.expectativa,
       compartir: compartir || null,
       como_te_entero: body.como_te_entero,
+      acepta_condiciones: true,
       acepta_privacidad: true,
       acepta_codigo_conducta: true,
+      condiciones_version: CONDICIONES_VERSION,
     }),
   });
 
