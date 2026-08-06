@@ -4,3 +4,14 @@
 
 [functions]
   node_bundler = "esbuild"
+
+# Revisa el Substack y suma cartas nuevas una vez por semana, sin intervención manual.
+[functions."sync-substack"]
+  schedule = "@weekly"
+
+# URLs lindas para las cartas: /cartas/el-mito-de-la-desconexion en vez de
+# /carta.html?c=el-mito-de-la-desconexion (mejor para SEO y para compartir).
+[[redirects]]
+  from = "/cartas/:slug"
+  to = "/carta.html?c=:slug"
+  status = 200

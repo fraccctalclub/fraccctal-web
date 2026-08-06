@@ -3,9 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Aviso legal · Fraccctal</title>
-<meta name="description" content="Aviso legal de Fraccctal, en cumplimiento del artículo 10 de la LSSI-CE.">
-<link rel="canonical" href="https://fraccctal.com/aviso-legal.html">
+<title>Cartas · Fraccctal</title>
+<meta name="description" content="Cartas semanales de Fraccctal: reflexiones sobre soledad adulta, comunidad y cambio, escritas por Irina y Nat.">
+<link rel="canonical" href="https://fraccctal.com/cartas.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://fraccctal.com/cartas.html">
+<meta property="og:title" content="Cartas · Fraccctal">
+<meta property="og:description" content="Cartas semanales de Fraccctal: reflexiones sobre soledad adulta, comunidad y cambio, escritas por Irina y Nat.">
+<meta property="og:image" content="https://fraccctal.com/assets/img/og-image.png">
+<meta property="og:site_name" content="Fraccctal">
+<meta property="og:locale" content="es_ES">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Cartas · Fraccctal">
+<meta name="twitter:description" content="Cartas semanales de Fraccctal: reflexiones sobre soledad adulta, comunidad y cambio, escritas por Irina y Nat.">
+<meta name="twitter:image" content="https://fraccctal.com/assets/img/og-image.png">
 <link rel="icon" type="image/png" href="assets/logo/favicon-32.png">
 <link rel="apple-touch-icon" href="assets/logo/favicon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,7 +37,7 @@
       <li><a href="quienes-somos.html">Quiénes somos</a></li>
       <li><a href="membresia.html">Membresía</a></li>
       <li><a href="preventa.html">Para socixs</a></li>
-      <li><a href="cartas.html">Cartas</a></li>
+      <li><a href="cartas.html" aria-current="page">Cartas</a></li>
       <li><a href="index.html#newsletter">Newsletter</a></li>
       <li><a href="https://instagram.com/fraccctal" target="_blank" rel="noopener">Instagram</a></li>
     </ul>
@@ -35,37 +46,20 @@
 
 <header class="hero" style="padding-bottom:40px">
   <div class="wrap">
-    <p class="hero__lockup">Legal</p>
-    <h1>Aviso legal</h1>
+    <p class="hero__lockup">Bitácora del club</p>
+    <h1>Cartas de Fraccctal</h1>
+    <p class="lede" style="margin-left:auto;margin-right:auto">Reflexiones semanales sobre soledad adulta, comunidad y cambio. Publicadas primero en Substack, y acá para siempre.</p>
+    <div class="hero__actions">
+      <a class="btn btn--ghost" href="https://fraccctal.substack.com" target="_blank" rel="noopener">Suscribirme en Substack</a>
+    </div>
   </div>
 </header>
 
 <section class="section--tight">
-  <div class="wrap" style="max-width:65ch">
-
-    <h3>Titularidad del sitio</h3>
-    <p>En cumplimiento del artículo 10 de la Ley 34/2002, de servicios de la sociedad de la información y de comercio electrónico, se informa de lo siguiente:</p>
-    <ul>
-      <li><strong>Titular:</strong> <span data-legal="RAZON_SOCIAL"></span></li>
-      <li><strong>NIF:</strong> <span data-legal="NIF"></span></li>
-      <li><strong>Correo electrónico:</strong> <span data-legal="EMAIL"></span></li>
-      <li><strong>Inscripción:</strong> <span data-legal="REGISTRO"></span></li>
-      <li><strong>Naturaleza:</strong> asociación sin ánimo de lucro constituida al amparo de la Ley Orgánica 1/2002, de 22 de marzo, reguladora del Derecho de Asociación</li>
-    </ul>
-
-    <h3 style="margin-top:32px">Objeto</h3>
-    <p>Este sitio web tiene por finalidad informar sobre las actividades de la Asociación y permitir la inscripción y el pago de las mismas.</p>
-
-    <h3 style="margin-top:32px">Condiciones de uso</h3>
-    <p>El acceso al sitio es gratuito. La persona usuaria se compromete a hacer un uso adecuado de los contenidos y a no emplearlos con fines ilícitos o lesivos para terceros.</p>
-
-    <h3 style="margin-top:32px">Propiedad intelectual</h3>
-    <p>Los contenidos de este sitio —textos, imágenes, identidad visual y código— son titularidad de la Asociación o se utilizan con autorización. Queda prohibida su reproducción sin consentimiento expreso.</p>
-    <p>Las metodologías y contenidos propios de las personas que imparten los encuentros son de su exclusiva titularidad.</p>
-
-    <h3 style="margin-top:32px">Legislación aplicable</h3>
-    <p>Este aviso legal se rige por la legislación española.</p>
-
+  <div class="wrap" style="max-width:760px">
+    <div class="cartas-grid" id="cartas-grid">
+      <p style="text-align:center">Cargando…</p>
+    </div>
   </div>
 </section>
 
@@ -91,6 +85,7 @@
 </footer>
 
 <script src="js/main.js"></script>
-<script src="js/legal-config.js"></script>
+<script src="js/cartas.js"></script>
+<script>renderCartasList("cartas-grid");</script>
 </body>
 </html>
