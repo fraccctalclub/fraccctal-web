@@ -36,7 +36,7 @@ const FRACCCTAL_EVENTS = [
     city: "Madrid",
     price: "Early bird 20€ · General 25€",
     founderPrice: "",
-    founderTicketsUrl: "",
+    founderTicketsUrl: "/encuentros/una-vida-de-fantasia",
     tag: "conocimiento",
     facilitators: "Marta Argüelles",
     description:

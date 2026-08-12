@@ -78,8 +78,11 @@ function founderCardHTML(event) {
     ? `<span class="tag">Precio fundadora: ${event.founderPrice}</span>`
     : `<span class="tag">${event.price || "Precio fundadora próximamente"}</span>`;
   const hasFounderLink = event.founderTicketsUrl && event.founderTicketsUrl !== "";
+  const isExternalFounderLink = hasFounderLink && event.founderTicketsUrl.startsWith("http");
+  const founderAttrs = isExternalFounderLink ? ' target="_blank" rel="noopener"' : "";
+  const founderLabel = hasFounderPrice ? "Reservar con precio fundadora" : "Ver entradas";
   const action = hasFounderLink
-    ? `<a class="btn btn--primary" href="${event.founderTicketsUrl}" target="_blank" rel="noopener">Reservar con precio fundadora</a>`
+    ? `<a class="btn btn--primary" href="${event.founderTicketsUrl}"${founderAttrs}>${founderLabel}</a>`
     : `<span class="btn btn--disabled">Preventa próximamente</span>`;
   return `
     <article class="event-card">
