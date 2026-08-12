@@ -10,8 +10,8 @@
 const EVENT_ID = "una-vida-de-fantasia-2026-09";
 
 const TIERS = {
-  early: { price: "price_1U3ctnCYD2PjyybiZbCg8QLC", cap: 4 },
-  general: { price: "price_1U3ctoCYD2PjyybiNYSOYNe4", cap: 12 },
+  early: { price: "price_1U3d6yCYD2PjyybiCY6yxF0l", cap: 4 },
+  general: { price: "price_1U3d6zCYD2Pjyybiz6N4KB4B", cap: 12 },
 };
 
 exports.handler = async (event) => {
