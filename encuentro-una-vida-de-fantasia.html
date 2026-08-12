@@ -55,7 +55,18 @@
 <section class="section--tight">
   <div class="wrap" style="max-width:65ch">
 
-    <div id="tickets-box" style="background:var(--bg-alt); border:1px solid var(--line); border-radius:18px; padding:28px 30px; margin-bottom:48px">
+    <div id="acceso-gate" style="background:var(--bg-alt); border:1px solid var(--line); border-radius:18px; padding:28px 30px; margin-bottom:48px; display:none">
+      <p class="eyebrow" style="margin-bottom:16px">Preventa exclusiva para socias</p>
+      <p style="margin-top:0">Durante agosto, las entradas de este taller solo se pueden comprar siendo socia (fundadora o miembro). Desde el 1 de septiembre se abre a todo el mundo.</p>
+      <form id="acceso-form" class="form-inline" style="margin-top:16px">
+        <input type="email" id="acceso-email" placeholder="tu@email.com" required>
+        <button type="submit" class="btn btn--primary" id="acceso-submit">Verificar</button>
+      </form>
+      <p id="acceso-mensaje" class="form-message" style="display:none; margin-top:12px"></p>
+      <p style="margin:16px 0 0; font-size:0.9rem"><a href="/membresia.html">¿Todavía no eres socia? Súmate aquí →</a></p>
+    </div>
+
+    <div id="tickets-box" style="background:var(--bg-alt); border:1px solid var(--line); border-radius:18px; padding:28px 30px; margin-bottom:48px; display:none">
       <p class="eyebrow" style="margin-bottom:16px">Entradas</p>
       <div style="display:grid; gap:14px">
         <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap">
@@ -167,7 +178,18 @@
 </footer>
 
 <script src="/js/main.js"></script>
-<script>
+<script type="module">
+  import { checkMembership } from "/js/auth.js";
+
+  const MEMBERS_ONLY_UNTIL = new Date("2026-09-01T00:00:00+02:00");
+  const gated = new Date() < MEMBERS_ONLY_UNTIL;
+
+  const accesoGate = document.getElementById("acceso-gate");
+  const ticketsBox = document.getElementById("tickets-box");
+  const accesoForm = document.getElementById("acceso-form");
+  const accesoMensaje = document.getElementById("acceso-mensaje");
+  let verifiedEmail = null;
+
   const btnEarly = document.getElementById("btn-early");
   const btnGeneral = document.getElementById("btn-general");
   const earlyQuedan = document.getElementById("early-quedan");
@@ -175,15 +197,53 @@
   const mensaje = document.getElementById("tickets-mensaje");
 
   const params = new URLSearchParams(location.search);
-  if (params.get("compra") === "ok") {
+  const vieneDeCompra = params.get("compra") === "ok" || params.get("compra") === "cancelado";
+
+  if (vieneDeCompra) {
+    // Ya pasó por Stripe (haya salido bien o mal): mostramos el resultado
+    // directo, sin volver a pedirle el gate de socia.
+    ticketsBox.style.display = "block";
+    accesoGate.style.display = "none";
     mensaje.style.display = "block";
-    mensaje.className = "form-message";
-    mensaje.textContent = "¡Listo! Tu entrada quedó confirmada — revisá tu email.";
-  } else if (params.get("compra") === "cancelado") {
-    mensaje.style.display = "block";
-    mensaje.className = "form-message form-message--error";
-    mensaje.textContent = "El pago no se completó. Puedes volver a intentarlo cuando quieras.";
+    if (params.get("compra") === "ok") {
+      mensaje.className = "form-message";
+      mensaje.textContent = "¡Listo! Tu entrada quedó confirmada — revisá tu email.";
+    } else {
+      mensaje.className = "form-message form-message--error";
+      mensaje.textContent = "El pago no se completó. Puedes volver a intentarlo cuando quieras.";
+    }
+    cargarDisponibilidad();
+  } else if (gated) {
+    accesoGate.style.display = "block";
+  } else {
+    ticketsBox.style.display = "block";
+    cargarDisponibilidad();
   }
+
+  accesoForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("acceso-email").value.trim();
+    const submitBtn = document.getElementById("acceso-submit");
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Verificando…";
+    accesoMensaje.style.display = "none";
+
+    const isMember = await checkMembership(email);
+
+    if (isMember) {
+      verifiedEmail = email;
+      accesoGate.style.display = "none";
+      ticketsBox.style.display = "block";
+      cargarDisponibilidad();
+    } else {
+      accesoMensaje.style.display = "block";
+      accesoMensaje.className = "form-message form-message--error";
+      accesoMensaje.textContent = "No encontramos ninguna membresía activa con ese email.";
+    }
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Verificar";
+  });
 
   async function cargarDisponibilidad() {
     try {
@@ -213,7 +273,7 @@
       const res = await fetch("/.netlify/functions/create-event-checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tier }),
+        body: JSON.stringify({ tier, email: verifiedEmail }),
       });
       const data = await res.json();
       if (res.ok && data.url) {
@@ -224,6 +284,8 @@
       mensaje.className = "form-message form-message--error";
       mensaje.textContent = data.error === "agotado"
         ? "Justo se acaba de agotar este cupo. Prueba con la otra entrada."
+        : data.error === "solo_socias"
+        ? "Esta preventa es exclusiva para socias. Verificá tu email de nuevo."
         : "No pudimos iniciar la compra. Inténtalo de nuevo.";
     } catch {
       mensaje.style.display = "block";
@@ -238,8 +300,6 @@
 
   btnEarly.addEventListener("click", () => comprar("early", btnEarly));
   btnGeneral.addEventListener("click", () => comprar("general", btnGeneral));
-
-  cargarDisponibilidad();
 </script>
 </body>
 </html>

@@ -4,15 +4,38 @@
 // cada uno con su propio cupo, chequeado contra Supabase antes de crear la
 // sesión.
 //
+// Durante agosto de 2026 la compra es exclusiva para socias (fundadora o
+// miembro): hay que mandar el email verificado y se chequea contra Supabase
+// acá mismo, server-side (no alcanza con que el frontend lo haya validado).
+// Desde el 1 de septiembre se abre a cualquiera, sin email ni membresía.
+//
 // Variables de entorno necesarias:
 //   STRIPE_SECRET_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
 
 const EVENT_ID = "una-vida-de-fantasia-2026-09";
+const MEMBERS_ONLY_UNTIL = new Date("2026-09-01T00:00:00+02:00");
 
 const TIERS = {
   early: { price: "price_1U3d6yCYD2PjyybiCY6yxF0l", cap: 4 },
   general: { price: "price_1U3d6zCYD2Pjyybiz6N4KB4B", cap: 12 },
 };
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+async function existsActive(table, email, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY) {
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/${table}?select=id&status=eq.active&email=eq.${encodeURIComponent(email)}`,
+    {
+      headers: {
+        apikey: SUPABASE_SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+      },
+    }
+  );
+  if (!res.ok) return false;
+  const rows = await res.json();
+  return rows.length > 0;
+}
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
@@ -32,6 +55,21 @@ exports.handler = async (event) => {
   const config = TIERS[tier];
   if (!config) {
     return { statusCode: 400, body: JSON.stringify({ error: "Tier inválido" }) };
+  }
+
+  let email = null;
+  if (new Date() < MEMBERS_ONLY_UNTIL) {
+    email = (body.email || "").trim().toLowerCase();
+    if (!email || !EMAIL_RE.test(email)) {
+      return { statusCode: 400, body: JSON.stringify({ error: "Email inválido" }) };
+    }
+    const [isFounder, isMember] = await Promise.all([
+      existsActive("founders", email, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY),
+      existsActive("members", email, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY),
+    ]);
+    if (!isFounder && !isMember) {
+      return { statusCode: 403, body: JSON.stringify({ error: "solo_socias" }) };
+    }
   }
 
   // Chequear cupo: contar entradas ya pagadas de este tier.
@@ -63,6 +101,9 @@ exports.handler = async (event) => {
     success_url: `${origin}/encuentros/una-vida-de-fantasia?compra=ok`,
     cancel_url: `${origin}/encuentros/una-vida-de-fantasia?compra=cancelado`,
   });
+  if (email) {
+    params.set("customer_email", email);
+  }
 
   const sessionRes = await fetch("https://api.stripe.com/v1/checkout/sessions", {
     method: "POST",
