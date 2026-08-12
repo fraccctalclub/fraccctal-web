@@ -41,7 +41,7 @@ const FRACCCTAL_EVENTS = [
     facilitators: "Marta Argüelles",
     description:
       "Taller de escritura para recuperar la imaginación, la curiosidad y el asombro propios de la infancia. No hace falta saber escribir, solo curiosidad.",
-    ticketsUrl: "PEGAR_AQUI_EL_LINK_DE_STRIPE",
+    ticketsUrl: "/encuentros/una-vida-de-fantasia",
     lumaUrl: "",
     status: "abierto",
   },

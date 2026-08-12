@@ -22,7 +22,9 @@ function ticketButton(event) {
   if (!hasLink) {
     return `<span class="btn btn--disabled">Entradas próximamente</span>`;
   }
-  return `<a class="btn btn--primary" href="${event.ticketsUrl}" target="_blank" rel="noopener">Reservar</a>`;
+  const isExternal = event.ticketsUrl.startsWith("http");
+  const attrs = isExternal ? ' target="_blank" rel="noopener"' : "";
+  return `<a class="btn btn--primary" href="${event.ticketsUrl}"${attrs}>Reservar</a>`;
 }
 
 function upcomingCardHTML(event) {

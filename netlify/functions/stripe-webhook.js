@@ -144,6 +144,54 @@ async function sendInternalNotification(email, application, RESEND_API_KEY, tier
   });
 }
 
+// Entrada a un encuentro puntual (taller, etc.) — no crea cuenta ni socia,
+// solo confirma el pago, suma la fila en event_tickets (para el cupo) y
+// manda la confirmación por email.
+async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY }) {
+  const eventId = session.metadata?.event_id || "";
+  const ticketTier = session.metadata?.ticket_tier || "";
+  if (!email || !eventId || !ticketTier) return;
+
+  await fetch(`${SUPABASE_URL}/rest/v1/event_tickets`, {
+    method: "POST",
+    headers: {
+      apikey: SUPABASE_SERVICE_ROLE_KEY,
+      Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+      "Content-Type": "application/json",
+      Prefer: "resolution=ignore-duplicates",
+    },
+    body: JSON.stringify({
+      event_id: eventId,
+      ticket_tier: ticketTier,
+      email,
+      stripe_session_id: session.id,
+      status: "paid",
+    }),
+  });
+
+  const precio = ticketTier === "early" ? "20€ (early bird)" : "25€";
+  const html = `
+    <p>¡Hola!</p>
+    <p>Tu entrada para <strong>Una vida de fantasía</strong>, el taller de escritura con Marta Argüelles, está confirmada.</p>
+    <ul>
+      <li><strong>Fecha:</strong> sábado 26 de septiembre de 2026, 11:00–14:00 h</li>
+      <li><strong>Lugar:</strong> Rito · Lavapiés, Madrid</li>
+      <li><strong>Entrada:</strong> ${precio}</li>
+    </ul>
+    <p>Qué traer: bolígrafo, lápiz o cualquier otro utensilio para escribir, y un cuaderno (también puedes traer tu ordenador). No hace falta ninguna experiencia previa.</p>
+    <p>Después del taller vas a tener acceso a una semana de escritura en <strong><a href="${DFOS_LINK}">DFOS</a></strong>, nuestra comunidad digital, incluida en tu entrada.</p>
+    <p>Cualquier duda, responde a este mismo correo.</p>
+    <p>Nos vemos pronto.<br>Fraccctal</p>
+  `;
+  await sendEmail(RESEND_API_KEY, { to: email, subject: "Tu entrada — Una vida de fantasía", html });
+
+  await sendEmail(RESEND_API_KEY, {
+    to: NOTIFICACION_EMAIL,
+    subject: `Nueva entrada (${ticketTier}): ${email}`,
+    html: `<p>Nueva entrada vendida para ${eventId}.</p><ul><li>Tier: ${ticketTier}</li><li>Email: ${email}</li><li>Sesión: ${session.id}</li></ul>`,
+  });
+}
+
 exports.handler = async (event) => {
   const { STRIPE_WEBHOOK_SECRET, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY } =
     process.env;
@@ -162,6 +210,12 @@ exports.handler = async (event) => {
   if (stripeEvent.type === "checkout.session.completed") {
     const session = stripeEvent.data.object;
     const email = session.customer_email || (session.customer_details && session.customer_details.email);
+
+    if (session.metadata?.tier === "event") {
+      await handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY });
+      return { statusCode: 200, body: "ok" };
+    }
+
     const tier = session.metadata?.tier === "member" ? "member" : "founder";
     const accountTable = tier === "member" ? "members" : "founders";
     const applicationTable = tier === "member" ? "member_applications" : "founder_applications";

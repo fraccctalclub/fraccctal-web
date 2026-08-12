@@ -15,3 +15,9 @@
   from = "/cartas/:slug"
   to = "/carta.html?c=:slug"
   status = 200
+
+# URL linda para el taller "Una vida de fantasía".
+[[redirects]]
+  from = "/encuentros/una-vida-de-fantasia"
+  to = "/encuentro-una-vida-de-fantasia.html"
+  status = 200
