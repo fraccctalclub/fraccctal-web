@@ -172,18 +172,37 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
   const precio = ticketTier === "early" ? "20€ (early bird)" : "25€";
   const html = `
     <p>¡Hola!</p>
-    <p>Tu entrada para <strong>Una vida de fantasía</strong>, el taller de escritura con Marta Argüelles, está confirmada.</p>
+    <p>Ya está: tu plaza para <strong>Una vida de fantasía; o cómo avistar lo extraordinario en lo cotidiano</strong> está reservada. Somos dieciséis, y tú eres una de ellas.</p>
+    <p>Gracias por venir. Fraccctal es una asociación muy joven —nació en Madrid este año— y cada entrada que se vende es lo que nos permite seguir programando. No lo decimos por cortesía: lo decimos porque es literal.</p>
+
+    <p><strong>Los datos</strong></p>
     <ul>
-      <li><strong>Fecha:</strong> sábado 26 de septiembre de 2026, 11:00–14:00 h</li>
-      <li><strong>Lugar:</strong> Rito · Lavapiés, Madrid</li>
-      <li><strong>Entrada:</strong> ${precio}</li>
+      <li><strong>Una vida de fantasía; o cómo avistar lo extraordinario en lo cotidiano.</strong> Taller de escritura y juego con Marta Argüelles.</li>
+      <li>Sábado 26 de septiembre de 2026, de 11:00 a 14:00 h (abrimos la sala a las 10:45).</li>
+      <li>Rito · Lavapiés, Madrid — C. de Tribulete, 21, Centro, 28012 Madrid.</li>
+      <li>Tu entrada: ${precio}</li>
     </ul>
-    <p>Qué traer: bolígrafo, lápiz o cualquier otro utensilio para escribir, y un cuaderno (también puedes traer tu ordenador). No hace falta ninguna experiencia previa.</p>
-    <p>Después del taller vas a tener acceso a una semana de escritura en <strong><a href="${DFOS_LINK}">DFOS</a></strong>, nuestra comunidad digital, incluida en tu entrada.</p>
-    <p>Cualquier duda, responde a este mismo correo.</p>
-    <p>Nos vemos pronto.<br>Fraccctal</p>
+
+    <p><strong>Qué traer</strong></p>
+    <p>Bolígrafo, lápiz o cualquier otro utensilio para escribir, y un cuaderno. También puedes traer tu ordenador, si prefieres escribir ahí. Y nada más: no hace falta ningún tipo de experiencia previa, ni haber escrito nunca, ni llegar inspirada — de eso se encargan las consignas. El foco está siempre en el proceso, nunca en el resultado. Nadie corrige nada, y nadie tiene que leer en voz alta si no le apetece.</p>
+
+    <p><strong>Súmate a nuestra comunidad digital</strong></p>
+    <p>Todo lo que tiene que ver con tu entrada pasa por ahí, no por email: actualizaciones del encuentro, y la posibilidad de conocer al resto de asistentes antes del sábado si te apetece — llegar a Rito con algunas caras ya vistas cambia bastante la experiencia. Es también el lugar donde seguimos encontrándonos y compartiendo reflexiones después de cada taller, y donde vas a tener acceso a precio preferente para los próximos encuentros.</p>
+    <p><strong><a href="${DFOS_LINK}">Súmate a DFOS</a></strong> (toma dos minutos) y <strong><a href="${WHATSAPP_LINK}">al canal de difusión de WhatsApp</a></strong>, donde avisamos las novedades.</p>
+
+    <p><strong>Si necesitas cancelar</strong></p>
+    <p>Las entradas no tienen devolución. Si no puedes venir, escríbenos a fraccctal.contact@gmail.com y vemos cómo resolverlo entre todas.</p>
+
+    <p>Somos dieciséis y las plazas se llenan por el boca a boca — si se te ocurre alguien a quien esto le vendría bien, reenvíale este correo o pásale el enlace: https://fraccctal.com/encuentros/una-vida-de-fantasia</p>
+
+    <p>Cualquier duda, responde a este mismo correo y te contestamos nosotras directamente. Somos dos personas, no un buzón automático.</p>
+
+    <p>Nos vemos el 26.</p>
+    <p>Irina y Nat<br>Fraccctal</p>
+
+    <p style="color:#57554a; font-size:0.9rem; margin-top:24px">Fraccctal es una asociación cultural nacida en Madrid en 2026. Creamos espacios para personas en tránsito — las que tienen la vida más o menos en orden pero sienten que algo no encaja. Cuatro pilares: placer, movimiento, conocimiento y espiritualidad sin etiquetas.</p>
   `;
-  await sendEmail(RESEND_API_KEY, { to: email, subject: "Tu entrada — Una vida de fantasía", html });
+  await sendEmail(RESEND_API_KEY, { to: email, subject: "Tu plaza — Una vida de fantasía", html });
 
   await sendEmail(RESEND_API_KEY, {
     to: NOTIFICACION_EMAIL,
