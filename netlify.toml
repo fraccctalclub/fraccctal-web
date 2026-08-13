@@ -9,6 +9,10 @@
 [functions."sync-substack"]
   schedule = "@weekly"
 
+# Actualiza la BBDD de Notion (socias y compras) una vez por semana.
+[functions."sync-bbdd"]
+  schedule = "@weekly"
+
 # URLs lindas para las cartas: /cartas/el-mito-de-la-desconexion en vez de
 # /carta.html?c=el-mito-de-la-desconexion (mejor para SEO y para compartir).
 [[redirects]]
