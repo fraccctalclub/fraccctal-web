@@ -6,6 +6,44 @@ const NOTION_DATABASE_ID = "bf454ec2-7ada-47e1-9f6f-ed06874e8046";
 const NOTION_VERSION = "2022-06-28";
 const EVENT_NAMES = { "una-vida-de-fantasia-2026-09": "Una vida de fantasía" };
 
+// Trae todos los cargos exitosos y no reembolsados de Stripe (incluye ventas
+// viejas de "Una Voz Posible" y "Un Cuerpo Expresivo", vendidas antes de que
+// existiera este sistema — la fuente de verdad ahí es Stripe, no Supabase).
+async function getStripeCharges(STRIPE_SECRET_KEY) {
+  const charges = [];
+  let startingAfter = "";
+  for (let i = 0; i < 10; i++) {
+    const params = new URLSearchParams({ limit: "100" });
+    if (startingAfter) params.set("starting_after", startingAfter);
+    const res = await fetch(`https://api.stripe.com/v1/charges?${params.toString()}`, {
+      headers: { Authorization: `Bearer ${STRIPE_SECRET_KEY}` },
+    });
+    const data = await res.json();
+    if (!res.ok) break;
+    charges.push(...data.data);
+    if (!data.has_more || data.data.length === 0) break;
+    startingAfter = data.data[data.data.length - 1].id;
+  }
+  return charges.filter((c) => (c.status === "succeeded" || c.paid) && !c.refunded);
+}
+
+// De una descripción tipo `"Un Cuerpo Expresivo" Taller de práctica...`
+// se queda solo con el nombre entre comillas. Si no hay comillas, usa la
+// descripción completa; si no hay descripción, arma un label genérico.
+function compraLabelDeCargo(charge) {
+  const desc = charge.description || "";
+  const match = desc.match(/^"([^"]+)"/);
+  if (match) return match[1];
+  if (desc) return desc;
+  return `Pago Stripe (${(charge.amount / 100).toFixed(2)}€)`;
+}
+
+function splitNombre(fullName) {
+  if (!fullName) return { nombre: "", apellido: "" };
+  const [nombre, ...resto] = fullName.trim().split(/\s+/);
+  return { nombre, apellido: resto.join(" ") };
+}
+
 async function getAllSupabase(table, select, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?select=${select}`, {
     headers: {
@@ -19,13 +57,14 @@ async function getAllSupabase(table, select, SUPABASE_URL, SUPABASE_SERVICE_ROLE
 
 // Arma { email, nombre, apellido, telefono, compras: [] } por cada persona
 // activa (fundadora, miembro, o con alguna entrada pagada).
-async function buildPersonas(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY) {
-  const [founders, members, founderApps, memberApps, tickets] = await Promise.all([
+async function buildPersonas(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, STRIPE_SECRET_KEY) {
+  const [founders, members, founderApps, memberApps, tickets, stripeCharges] = await Promise.all([
     getAllSupabase("founders", "email,status,created_at", SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY),
     getAllSupabase("members", "email,status,created_at", SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY),
     getAllSupabase("founder_applications", "email,nombre,apellido,telefono,created_at", SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY),
     getAllSupabase("member_applications", "email,nombre,apellido,telefono,created_at", SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY),
     getAllSupabase("event_tickets", "email,event_id,ticket_tier,status,created_at", SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY),
+    STRIPE_SECRET_KEY ? getStripeCharges(STRIPE_SECRET_KEY) : Promise.resolve([]),
   ]);
 
   function latestByEmail(rows) {
@@ -77,6 +116,23 @@ async function buildPersonas(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY) {
     const nombreEvento = EVENT_NAMES[t.event_id] || t.event_id;
     const tierLabel = t.ticket_tier === "early" ? "early bird" : t.ticket_tier;
     p.compras.push(`${nombreEvento} (${tierLabel})`);
+  }
+
+  // Ventas viejas hechas directo en Stripe, de antes de que existiera este
+  // sistema (Una Voz Posible, Un Cuerpo Expresivo). Salteamos las que ya
+  // vienen del taller nuevo (esas ya están arriba, vía event_tickets).
+  for (const c of stripeCharges) {
+    const email = c.billing_details?.email || c.receipt_email;
+    if (!email) continue;
+    if (c.description && c.description.startsWith("Una vida de fantasía —")) continue;
+    const p = ensurePerson(email);
+    if (!p.nombre && !p.apellido) {
+      const { nombre, apellido } = splitNombre(c.billing_details?.name);
+      p.nombre = p.nombre || nombre;
+      p.apellido = p.apellido || apellido;
+    }
+    const label = compraLabelDeCargo(c);
+    if (!p.compras.includes(label)) p.compras.push(label);
   }
 
   return Object.values(people);
@@ -173,8 +229,8 @@ async function syncPersonaToNotion(persona, existingPage, NOTION_TOKEN) {
   return "actualizada";
 }
 
-async function runBbddSync({ SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, NOTION_TOKEN }) {
-  const personas = await buildPersonas(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+async function runBbddSync({ SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, NOTION_TOKEN, STRIPE_SECRET_KEY }) {
+  const personas = await buildPersonas(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, STRIPE_SECRET_KEY);
   const existingByEmail = await fetchExistingRows(NOTION_TOKEN);
 
   const resumen = { creadas: 0, actualizadas: 0, sin_cambios: 0 };
