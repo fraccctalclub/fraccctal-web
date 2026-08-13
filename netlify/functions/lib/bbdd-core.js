@@ -24,7 +24,24 @@ async function getStripeCharges(STRIPE_SECRET_KEY) {
     if (!data.has_more || data.data.length === 0) break;
     startingAfter = data.data[data.data.length - 1].id;
   }
-  return charges.filter((c) => (c.status === "succeeded" || c.paid) && !c.refunded);
+  const succeeded = charges.filter((c) => (c.status === "succeeded" || c.paid) && !c.refunded);
+
+  // Algunos cargos viejos (Payment Links) no traen el email en el propio
+  // cargo — hay que ir a buscarlo al customer asociado.
+  const customerEmailCache = {};
+  for (const c of succeeded) {
+    if (c.billing_details?.email || c.receipt_email || !c.customer) continue;
+    if (customerEmailCache[c.customer] === undefined) {
+      const res = await fetch(`https://api.stripe.com/v1/customers/${c.customer}`, {
+        headers: { Authorization: `Bearer ${STRIPE_SECRET_KEY}` },
+      });
+      const data = await res.json();
+      customerEmailCache[c.customer] = res.ok ? data.email : null;
+    }
+    c._customerEmail = customerEmailCache[c.customer];
+  }
+
+  return succeeded;
 }
 
 // De una descripción tipo `"Un Cuerpo Expresivo" Taller de práctica...`
@@ -122,7 +139,7 @@ async function buildPersonas(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, STRIPE_SEC
   // sistema (Una Voz Posible, Un Cuerpo Expresivo). Salteamos las que ya
   // vienen del taller nuevo (esas ya están arriba, vía event_tickets).
   for (const c of stripeCharges) {
-    const email = c.billing_details?.email || c.receipt_email;
+    const email = c.billing_details?.email || c.receipt_email || c._customerEmail;
     if (!email) continue;
     if (c.description && c.description.startsWith("Una vida de fantasía —")) continue;
     const p = ensurePerson(email);
