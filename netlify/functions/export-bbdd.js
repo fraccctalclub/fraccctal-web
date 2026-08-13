@@ -1,8 +1,9 @@
-// TEMPORAL — arma un resumen consolidado por persona (nombre, apellido,
-// email, teléfono, y qué compró: membresía y/o entradas a encuentros) para
-// volcarlo a la BBDD de Notion. Borrar después de usarlo.
+// Arma un resumen consolidado por persona (nombre, apellido, email,
+// teléfono, y qué compró: membresía y/o entradas a encuentros). Lo usa el
+// agente programado semanalmente para actualizar la BBDD de Notion
+// ("Socias y compras", dentro de la página BBDD del workspace de Fraccctal).
 //
-// Uso: https://fraccctal.com/.netlify/functions/temp-export-bbdd?secret=TU_SYNC_SECRET
+// Uso: https://fraccctal.com/.netlify/functions/export-bbdd?secret=TU_SYNC_SECRET
 
 async function getAll(table, select, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?select=${select}`, {
