@@ -98,6 +98,7 @@ exports.handler = async (event) => {
     "metadata[tier]": "event",
     "metadata[event_id]": EVENT_ID,
     "metadata[ticket_tier]": tier,
+    "payment_intent_data[description]": `Una vida de fantasía — entrada ${tier === "early" ? "early bird" : "general"}`,
     success_url: `${origin}/encuentros/una-vida-de-fantasia?compra=ok`,
     cancel_url: `${origin}/encuentros/una-vida-de-fantasia?compra=cancelado`,
   });
