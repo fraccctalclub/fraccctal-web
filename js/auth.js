@@ -20,7 +20,12 @@ export const supabase = isConfigured ? createClient(SUPABASE_URL, SUPABASE_ANON_
 // Antes de mandar el magic link (y de que Supabase cree una cuenta para ese
 // email), chequeamos que sea una fundadora o miembro activa. Sin esto,
 // cualquier email podría pedirse un link y entrar a preventa.html.
-export async function checkMembership(email) {
+//
+// Reintenta con una pequeña espera: justo después de pagar, la persona puede
+// llegar acá (o al gate de un encuentro) antes de que el webhook de Stripe
+// termine de escribir su fila en Supabase — sin esto, ese primer chequeo le
+// da "no sos socia" aunque el pago ya se haya confirmado.
+async function checkMembershipOnce(email) {
   try {
     const res = await fetch("/.netlify/functions/check-membership", {
       method: "POST",
@@ -33,6 +38,16 @@ export async function checkMembership(email) {
   } catch {
     return false;
   }
+}
+
+export async function checkMembership(email, { retries = 2, delayMs = 1500 } = {}) {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    if (await checkMembershipOnce(email)) return true;
+    if (attempt < retries) {
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+    }
+  }
+  return false;
 }
 
 export async function sendMagicLink(email) {
