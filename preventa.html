@@ -58,6 +58,8 @@
       <div style="text-align:center; margin-bottom:32px">
         <p class="eyebrow">Bienvenida</p>
         <p style="margin:0"><span id="user-email"></span> · <a href="#" id="logout-link">cerrar sesión</a></p>
+        <p style="margin:8px 0 0"><a href="#" id="portal-link">Gestionar mi membresía</a></p>
+        <p id="portal-mensaje" class="form-message form-message--error" style="display:none"></p>
       </div>
       <div class="events" id="founder-events"></div>
     </div>
@@ -166,6 +168,36 @@
     e.preventDefault();
     await signOut();
     render();
+  });
+
+  document.getElementById("portal-link").addEventListener("click", async (e) => {
+    e.preventDefault();
+    const link = e.currentTarget;
+    const portalMensaje = document.getElementById("portal-mensaje");
+    const textoOriginal = link.textContent;
+    link.textContent = "Abriendo…";
+    portalMensaje.style.display = "none";
+
+    try {
+      const session = await getSession();
+      const res = await fetch("/.netlify/functions/create-portal-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: session.user.email }),
+      });
+      const data = await res.json();
+      if (res.ok && data.url) {
+        location.href = data.url;
+        return;
+      }
+      portalMensaje.style.display = "block";
+      portalMensaje.textContent = "No pudimos abrir la gestión de tu membresía. Escríbenos a fraccctal.contact@gmail.com.";
+    } catch {
+      portalMensaje.style.display = "block";
+      portalMensaje.textContent = "No pudimos abrir la gestión de tu membresía. Escríbenos a fraccctal.contact@gmail.com.";
+    }
+
+    link.textContent = textoOriginal;
   });
 
   render();
