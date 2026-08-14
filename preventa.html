@@ -12,8 +12,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:ital,wght@0,400;0,500;1,400;1,500&display=swap">
 <link rel="stylesheet" href="css/style.css">
-<script defer src="https://cloud.umami.is/script.js" data-website-id="e087ac58-dba3-4486-9c45-344e54c3a58d"></script>
-
 </head>
 <body>
 
@@ -104,6 +102,20 @@
   const loadingMensaje = document.getElementById("loading-mensaje");
   const notConfiguredMensaje = document.getElementById("not-configured-mensaje");
   const noMembershipMensaje = document.getElementById("no-membership-mensaje");
+
+  // El link mágico llega con el token de sesión pegado en el hash de la URL
+  // (#access_token=...). Lo limpiamos antes que nada, y recién después
+  // cargamos Umami con JS (en vez de un <script> fijo) — así nos aseguramos
+  // de que ningún script de analítica llegue a ver el token en la URL,
+  // sin depender de en qué orden decida el navegador correr los scripts.
+  if (location.hash.includes("access_token")) {
+    history.replaceState(null, "", location.pathname + location.search);
+  }
+  const umamiScript = document.createElement("script");
+  umamiScript.defer = true;
+  umamiScript.src = "https://cloud.umami.is/script.js";
+  umamiScript.setAttribute("data-website-id", "e087ac58-dba3-4486-9c45-344e54c3a58d");
+  document.head.appendChild(umamiScript);
 
   async function render() {
     loadingMensaje.style.display = "none";
