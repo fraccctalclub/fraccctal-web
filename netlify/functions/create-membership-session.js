@@ -1,11 +1,16 @@
 // Guarda la aplicación de la miembro general y crea una Stripe Checkout
-// Session de suscripción (22€/mes, 20 días de período de prueba). A diferencia
-// de la fundadora, esta no tiene cupo ni fecha de cobro fija: el cobro
-// arranca 20 días después de que cada quien se anota (trial_period_days).
+// Session de suscripción (22€/mes). Hasta el 3 de enero de 2027, gratis
+// hasta esa fecha —igual que la fundadora, mismo trial_end fijo—, para que
+// cualquiera que se asocie ahora no pague nada hasta entonces. Pasada esa
+// fecha (cuando ya no tiene sentido "gratis hasta enero"), vuelve a un
+// período de prueba normal de 20 días.
 //
 // Variables de entorno necesarias:
 //   STRIPE_SECRET_KEY, STRIPE_MEMBER_PRICE_ID, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
 
+// 3 de enero de 2027, 00:00 hora de Madrid (CET = UTC+1 en enero) = 2027-01-02T23:00:00Z.
+// Mismo timestamp que usa create-checkout-session.js para las fundadoras.
+const FREE_UNTIL_TIMESTAMP = Math.floor(Date.parse("2027-01-02T23:00:00Z") / 1000);
 const TRIAL_DAYS = 20;
 
 // Versión del texto de condiciones.html que se le pide aceptar a cada
@@ -91,11 +96,18 @@ exports.handler = async (event) => {
     customer_email: email,
     "line_items[0][price]": STRIPE_MEMBER_PRICE_ID,
     "line_items[0][quantity]": "1",
-    "subscription_data[trial_period_days]": String(TRIAL_DAYS),
     "metadata[tier]": "member",
     success_url: `${origin}/.netlify/functions/member-auto-login?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${origin}/membresia.html?miembro=cancelado`,
   });
+
+  // Antes del 3 de enero de 2027: gratis hasta esa fecha fija (como fundadora).
+  // Después: prueba normal de 20 días desde el alta.
+  if (Math.floor(Date.now() / 1000) < FREE_UNTIL_TIMESTAMP) {
+    params.set("subscription_data[trial_end]", String(FREE_UNTIL_TIMESTAMP));
+  } else {
+    params.set("subscription_data[trial_period_days]", String(TRIAL_DAYS));
+  }
 
   const sessionRes = await fetch("https://api.stripe.com/v1/checkout/sessions", {
     method: "POST",
