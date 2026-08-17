@@ -74,12 +74,12 @@ async function renderCartaDetail(containerId) {
   if (!el) return;
   const slug = getSlugFromUrl();
   if (!slug) {
-    el.innerHTML = '<p style="text-align:center">No encontramos esa carta. <a href="cartas.html">Ver todas las cartas →</a></p>';
+    el.innerHTML = '<p style="text-align:center">No encontramos esa carta. <a href="/cartas.html">Ver todas las cartas →</a></p>';
     return;
   }
   const carta = await fetchCarta(slug);
   if (!carta) {
-    el.innerHTML = '<p style="text-align:center">No encontramos esa carta. <a href="cartas.html">Ver todas las cartas →</a></p>';
+    el.innerHTML = '<p style="text-align:center">No encontramos esa carta. <a href="/cartas.html">Ver todas las cartas →</a></p>';
     return;
   }
 
@@ -102,7 +102,7 @@ async function renderCartaDetail(containerId) {
     <h1>${escapeHtml(carta.title)}</h1>
     <div class="carta-detail__body">${carta.content_html}</div>
     <div class="carta-nav">
-      <a href="cartas.html">← Todas las cartas</a>
+      <a href="/cartas.html">← Todas las cartas</a>
       <a href="https://fraccctal.substack.com" target="_blank" rel="noopener">Suscribirme en Substack →</a>
     </div>
   `;
