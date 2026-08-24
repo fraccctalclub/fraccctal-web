@@ -120,12 +120,17 @@
           <input type="email" id="f-email" required>
         </div>
         <div class="field">
+          <label for="f-email-confirm">Confirmá tu email</label>
+          <input type="email" id="f-email-confirm" required onpaste="return false" autocomplete="off">
+        </div>
+      </div>
+      <p id="f-email-error" class="form-message form-message--error" style="display:none;font-size:0.9em;margin-top:-12px">Los dos emails no coinciden.</p>
+
+      <div class="field-row">
+        <div class="field">
           <label for="f-telefono">Teléfono</label>
           <input type="tel" id="f-telefono" required>
         </div>
-      </div>
-
-      <div class="field-row">
         <div class="field">
           <label for="f-edad">Edad</label>
           <input type="number" id="f-edad" min="18" max="99" required>
@@ -209,12 +214,17 @@
           <input type="email" id="m-email" required>
         </div>
         <div class="field">
+          <label for="m-email-confirm">Confirmá tu email</label>
+          <input type="email" id="m-email-confirm" required onpaste="return false" autocomplete="off">
+        </div>
+      </div>
+      <p id="m-email-error" class="form-message form-message--error" style="display:none;font-size:0.9em;margin-top:-12px">Los dos emails no coinciden.</p>
+
+      <div class="field-row">
+        <div class="field">
           <label for="m-telefono">Teléfono</label>
           <input type="tel" id="m-telefono" required>
         </div>
-      </div>
-
-      <div class="field-row">
         <div class="field">
           <label for="m-edad">Edad</label>
           <input type="number" id="m-edad" min="18" max="99" required>
@@ -385,13 +395,26 @@
     if (!form) return;
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
+
+      const emailField = document.getElementById("f-email");
+      const emailConfirmField = document.getElementById("f-email-confirm");
+      const emailError = document.getElementById("f-email-error");
+      const email = emailField.value.trim();
+      const emailConfirm = emailConfirmField.value.trim();
+      if (email.toLowerCase() !== emailConfirm.toLowerCase()) {
+        emailError.style.display = "block";
+        emailConfirmField.focus();
+        return;
+      }
+      emailError.style.display = "none";
+
       submitBtn.disabled = true;
       submitBtn.textContent = "Un momento…";
       showMessage("", false);
       mensaje.style.display = "none";
 
       const payload = {
-        email: document.getElementById("f-email").value.trim(),
+        email: emailField.value.trim(),
         nombre: document.getElementById("f-nombre").value.trim(),
         apellido: document.getElementById("f-apellido").value.trim(),
         telefono: document.getElementById("f-telefono").value.trim(),
@@ -434,13 +457,26 @@
     if (!memberForm) return;
     memberForm.addEventListener("submit", async (e) => {
       e.preventDefault();
+
+      const memberEmailField = document.getElementById("m-email");
+      const memberEmailConfirmField = document.getElementById("m-email-confirm");
+      const memberEmailError = document.getElementById("m-email-error");
+      const memberEmail = memberEmailField.value.trim();
+      const memberEmailConfirm = memberEmailConfirmField.value.trim();
+      if (memberEmail.toLowerCase() !== memberEmailConfirm.toLowerCase()) {
+        memberEmailError.style.display = "block";
+        memberEmailConfirmField.focus();
+        return;
+      }
+      memberEmailError.style.display = "none";
+
       memberSubmitBtn.disabled = true;
       memberSubmitBtn.textContent = "Un momento…";
       showMemberMessage("", false);
       memberMensaje.style.display = "none";
 
       const payload = {
-        email: document.getElementById("m-email").value.trim(),
+        email: memberEmailField.value.trim(),
         nombre: document.getElementById("m-nombre").value.trim(),
         apellido: document.getElementById("m-apellido").value.trim(),
         telefono: document.getElementById("m-telefono").value.trim(),
