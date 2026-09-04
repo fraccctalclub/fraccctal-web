@@ -47,7 +47,7 @@ exports.handler = async (event) => {
     },
     body: JSON.stringify({
       email,
-      attributes: { FIRSTNAME: nombre, LASTNAME: apellido },
+      attributes: { NOMBRE: nombre, APELLIDOS: apellido },
       listIds: [Number(BREVO_LIST_ID)],
       updateEnabled: true,
     }),
