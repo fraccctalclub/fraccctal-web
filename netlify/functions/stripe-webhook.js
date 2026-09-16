@@ -211,6 +211,54 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
   });
 }
 
+// Alta de socia (fundadora o miembro general): guarda la fila en Supabase,
+// dispara el magic link de respaldo, y manda el email de bienvenida + la
+// notificación interna. Compartido entre el alta "sola" (metadata.tier ===
+// "founder"/"member") y la combinada con entrada a un encuentro
+// (metadata.tier === "event_founder").
+async function handleMembershipAccount(session, email, tier, { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY }) {
+  if (!email) return;
+
+  const accountTable = tier === "member" ? "members" : "founders";
+  const applicationTable = tier === "member" ? "member_applications" : "founder_applications";
+
+  // Guardar (o actualizar) la fila de la persona. Requiere que la columna
+  // "email" tenga una restricción UNIQUE en Supabase para que el upsert funcione.
+  await fetch(`${SUPABASE_URL}/rest/v1/${accountTable}`, {
+    method: "POST",
+    headers: {
+      apikey: SUPABASE_SERVICE_ROLE_KEY,
+      Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+      "Content-Type": "application/json",
+      Prefer: "resolution=merge-duplicates",
+    },
+    body: JSON.stringify({
+      email,
+      stripe_customer_id: session.customer,
+      stripe_subscription_id: session.subscription,
+      status: "active",
+    }),
+  });
+
+  // Disparar un magic link de respaldo (por si vuelve otro día desde otro
+  // dispositivo). El primer acceso normalmente ya lo dio founder-auto-login.js /
+  // member-auto-login.js directo desde el pago, sin pasar por el email.
+  const redirectTo = encodeURIComponent("https://fraccctal.com/preventa.html");
+  await fetch(`${SUPABASE_URL}/auth/v1/otp?redirect_to=${redirectTo}`, {
+    method: "POST",
+    headers: {
+      apikey: SUPABASE_SERVICE_ROLE_KEY,
+      Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email, create_user: true }),
+  });
+
+  const application = await getApplication(email, applicationTable, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+  await sendWelcomeEmail(email, application, RESEND_API_KEY, tier);
+  await sendInternalNotification(email, application, RESEND_API_KEY, tier);
+}
+
 exports.handler = async (event) => {
   const { STRIPE_WEBHOOK_SECRET, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY } =
     process.env;
@@ -229,58 +277,25 @@ exports.handler = async (event) => {
   if (stripeEvent.type === "checkout.session.completed") {
     const session = stripeEvent.data.object;
     const email = session.customer_email || (session.customer_details && session.customer_details.email);
+    const deps = { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY };
 
     if (session.metadata?.tier === "event") {
-      await handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY });
+      await handleEventTicket(session, email, deps);
+      return { statusCode: 200, body: "ok" };
+    }
+
+    if (session.metadata?.tier === "event_founder") {
+      // Compró entrada Y se sumó como fundadora en la misma Checkout Session
+      // (mode:"subscription" con la entrada como line item de una sola vez).
+      // Se procesan las dos altas: la entrada al encuentro y la cuenta de
+      // fundadora, cada una con su propio email de confirmación.
+      await handleEventTicket(session, email, deps);
+      await handleMembershipAccount(session, email, "founder", deps);
       return { statusCode: 200, body: "ok" };
     }
 
     const tier = session.metadata?.tier === "member" ? "member" : "founder";
-    const accountTable = tier === "member" ? "members" : "founders";
-    const applicationTable = tier === "member" ? "member_applications" : "founder_applications";
-
-    if (email) {
-      // Guardar (o actualizar) la fila de la persona. Requiere que la columna
-      // "email" tenga una restricción UNIQUE en Supabase para que el upsert funcione.
-      await fetch(`${SUPABASE_URL}/rest/v1/${accountTable}`, {
-        method: "POST",
-        headers: {
-          apikey: SUPABASE_SERVICE_ROLE_KEY,
-          Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
-          "Content-Type": "application/json",
-          Prefer: "resolution=merge-duplicates",
-        },
-        body: JSON.stringify({
-          email,
-          stripe_customer_id: session.customer,
-          stripe_subscription_id: session.subscription,
-          status: "active",
-        }),
-      });
-
-      // Disparar un magic link de respaldo (por si vuelve otro día desde otro
-      // dispositivo). El primer acceso normalmente ya lo dio founder-auto-login.js /
-      // member-auto-login.js directo desde el pago, sin pasar por el email.
-      const redirectTo = encodeURIComponent("https://fraccctal.com/preventa.html");
-      await fetch(`${SUPABASE_URL}/auth/v1/otp?redirect_to=${redirectTo}`, {
-        method: "POST",
-        headers: {
-          apikey: SUPABASE_SERVICE_ROLE_KEY,
-          Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, create_user: true }),
-      });
-
-      const application = await getApplication(
-        email,
-        applicationTable,
-        SUPABASE_URL,
-        SUPABASE_SERVICE_ROLE_KEY
-      );
-      await sendWelcomeEmail(email, application, RESEND_API_KEY, tier);
-      await sendInternalNotification(email, application, RESEND_API_KEY, tier);
-    }
+    await handleMembershipAccount(session, email, tier, deps);
   }
 
   return { statusCode: 200, body: "ok" };
