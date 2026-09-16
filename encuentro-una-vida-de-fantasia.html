@@ -59,7 +59,7 @@
 
     <div id="acceso-gate" style="background:var(--bg-alt); border:1px solid var(--line); border-radius:18px; padding:28px 30px; margin-bottom:48px; display:none">
       <p class="eyebrow" style="margin-bottom:16px">Preventa exclusiva para socias</p>
-      <p style="margin-top:0">Durante agosto, las entradas de este taller solo se pueden comprar siendo socia (fundadora o miembro). Desde el 1 de septiembre se abre a todo el mundo.</p>
+      <p style="margin-top:0">Durante agosto, las entradas de este taller solo se pueden comprar siendo socix (fundadorx o miembro). Desde el 1 de septiembre se abre a todo el mundo.</p>
       <form id="acceso-form" class="form-inline" style="margin-top:16px">
         <input type="email" id="acceso-email" placeholder="tu@email.com" required>
         <button type="submit" class="btn btn--primary" id="acceso-submit">Verificar</button>
@@ -92,7 +92,7 @@
       <div style="margin-top:24px; padding-top:20px; border-top:1px solid var(--line)">
         <div class="checkbox-field">
           <input type="checkbox" id="fundadora-checkbox">
-          <label for="fundadora-checkbox">Sí, quiero hacerme socia fundadora — gratis hasta el 3 de enero de 2027</label>
+          <label for="fundadora-checkbox">Sí, quiero hacerme socix fundadorx — gratis hasta el 3 de enero de 2027</label>
         </div>
 
         <div id="fundadora-form-wrap" style="display:none; margin-top:16px">
@@ -364,10 +364,10 @@
     };
     const requeridos = ["email", "nombre", "apellido", "telefono", "ciudad", "que_te_trae", "expectativa", "como_te_entero"];
     if (requeridos.some((k) => !campos[k])) {
-      return { error: "Completa todos los campos para sumarte como fundadora, o desmarca la casilla si prefieres solo comprar la entrada." };
+      return { error: "Completa todos los campos para sumarte como fundadorx, o desmarca la casilla si prefieres solo comprar la entrada." };
     }
     if (!campos.acepta_condiciones || !campos.acepta_privacidad || !campos.acepta_codigo_conducta) {
-      return { error: "Hay que aceptar las condiciones, la privacidad y el código de conducta para sumarte como fundadora." };
+      return { error: "Hay que aceptar las condiciones, la privacidad y el código de conducta para sumarte como fundadorx." };
     }
     return { campos };
   }
@@ -409,7 +409,7 @@
         : data.error === "solo_socias"
         ? "Esta preventa es exclusiva para socias. Verificá tu email de nuevo."
         : data.error === "cupo_fundadoras_completo"
-        ? "El cupo de 20 fundadoras ya se completó — puedes seguir comprando la entrada sin marcar esa casilla."
+        ? "El cupo de 20 fundadorxs ya se completó — puedes seguir comprando la entrada sin marcar esa casilla."
         : "No pudimos iniciar la compra. Inténtalo de nuevo.";
     } catch {
       mensaje.style.display = "block";
