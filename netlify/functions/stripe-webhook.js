@@ -64,7 +64,7 @@ const EVENT_EMAIL_CONTENT = {
     typeLabel: "Taller teórico-práctico sobre vínculos, límites y buentrato",
     dateTimeLabel: "Sábado 24 de octubre de 2026, de 17:00 a 20:00 h",
     dayLabel: "24",
-    venueLabel: "Espacio en Blanco · Madrid",
+    venueLabel: "Espacio en Blanco · Madrid — C. de Mira el Sol, 5, Centro, 28005 Madrid",
     capacityWord: "dieciséis",
     queTraer:
       "Ropa cómoda que permita moverse, calcetines o pies descalzos, y una botella de agua. No hace falta ningún tipo de experiencia previa.",
@@ -218,6 +218,18 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
   const esAmigxs = ticketTier === "amigxs";
   const precio = ticketTier === "early" ? "20€ (early bird)" : esAmigxs ? "42€ (amigxs, 2 entradas)" : "25€";
   const plazaTexto = esAmigxs ? "tus dos plazas" : "tu plaza";
+
+  // Si ya se hizo fundadorx en esta misma compra, no le repetimos el pitch
+  // de la membresía acá — ya le llega su propia carta de bienvenida.
+  const esCombo = session.metadata?.tier === "event_founder";
+  const bloqueMembresia = esCombo
+    ? ""
+    : `
+    <p><strong>¿Y si te haces socixs?</strong></p>
+    <p>Ser socixs de Fraccctal implica esto: acceso a todos los talleres y encuentros (ya no los abrimos fuera de la comunidad), descuentos con nuestra red de terapeutas y talleristas, un merch de bienvenida, y tu lugar en la comunidad online donde la conversación sigue cada día. Y hoy es gratis: no se cobra nada hasta el 3 de enero de 2027.</p>
+    <p><strong><a href="https://fraccctal.com/membresia.html">Conocé la membresía →</a></strong></p>
+  `;
+
   const html = `
     <p>¡Hola!</p>
     <p>Ya está: ${plazaTexto} para <strong>${contenido.title}</strong> ${esAmigxs ? "están reservadas" : "está reservada"}. Somos ${contenido.capacityWord}, y ${esAmigxs ? "sois dos de ellas" : "tú eres una de ellas"}.</p>
@@ -237,7 +249,7 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
     <p><strong>Súmate a nuestra comunidad digital</strong></p>
     <p>Todo lo que tiene que ver con tu entrada pasa por ahí, no por email: actualizaciones del encuentro, y la posibilidad de conocer al resto de asistentes antes del taller si te apetece — llegar con algunas caras ya vistas cambia bastante la experiencia. Es también el lugar donde seguimos encontrándonos y compartiendo reflexiones después de cada taller, y donde vas a tener acceso a precio preferente para los próximos encuentros.</p>
     <p><strong><a href="${DFOS_LINK}">Súmate a DFOS</a></strong> (toma dos minutos) y <strong><a href="${WHATSAPP_LINK}">al canal de difusión de WhatsApp</a></strong>, donde avisamos las novedades.</p>
-
+    ${bloqueMembresia}
     <p><strong>Si necesitas cancelar</strong></p>
     <p>Las entradas no tienen devolución. Si no puedes venir, escríbenos a fraccctal.contact@gmail.com y vemos cómo resolverlo entre todas.</p>
 
