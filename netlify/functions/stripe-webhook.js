@@ -51,10 +51,10 @@ const EVENT_EMAIL_CONTENT = {
     typeLabel: "Taller de escritura y juego",
     dateTimeLabel: "Sábado 26 de septiembre de 2026, de 11:00 a 14:00 h (abrimos la sala a las 10:45)",
     dayLabel: "26",
-    venueLabel: "Rito · Lavapiés, Madrid — C. de Tribulete, 21, Centro, 28012 Madrid",
+    venueLabel: "Rito · Lavapiés, Madrid (C. de Tribulete, 21, Centro, 28012 Madrid)",
     capacityWord: "dieciséis",
     queTraer:
-      "Bolígrafo, lápiz o cualquier otro utensilio para escribir, y un cuaderno. También puedes traer tu ordenador, si prefieres escribir ahí. Y nada más: no hace falta ningún tipo de experiencia previa, ni haber escrito nunca, ni llegar inspirada — de eso se encargan las consignas. El foco está siempre en el proceso, nunca en el resultado. Nadie corrige nada, y nadie tiene que leer en voz alta si no le apetece.",
+      "Bolígrafo, lápiz o cualquier otro utensilio para escribir, y un cuaderno. También puedes traer tu ordenador, si prefieres escribir ahí. Y nada más: no hace falta ningún tipo de experiencia previa, ni haber escrito nunca, ni llegar inspirada, de eso se encargan las consignas. El foco está siempre en el proceso, nunca en el resultado. Nadie corrige nada, y nadie tiene que leer en voz alta si no le apetece.",
     pageUrl: "https://fraccctal.com/encuentros/una-vida-de-fantasia",
   },
   "la-erotica-del-buentrato-2026-10": {
@@ -64,10 +64,10 @@ const EVENT_EMAIL_CONTENT = {
     typeLabel: "Taller teórico-práctico sobre vínculos, límites y buentrato",
     dateTimeLabel: "Sábado 24 de octubre de 2026, de 17:00 a 20:00 h",
     dayLabel: "24",
-    venueLabel: "Espacio en Blanco · Madrid — C. de Mira el Sol, 5, Centro, 28005 Madrid",
+    venueLabel: "Espacio en Blanco · Madrid (C. de Mira el Sol, 5, Centro, 28005 Madrid)",
     capacityWord: "dieciséis",
     queTraer:
-      "Ropa cómoda que permita moverse, calcetines o pies descalzos, y una botella de agua. No hace falta ningún tipo de experiencia previa.",
+      "Ropa cómoda que permita moverse, calcetines o pies descalzos, una botella de agua y un cuaderno o algo para apuntar. No hace falta ningún tipo de experiencia previa.",
     pageUrl: "https://fraccctal.com/encuentros/la-erotica-del-buentrato",
   },
 };
@@ -226,14 +226,14 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
     ? ""
     : `
     <p><strong>¿Y si te haces socixs?</strong></p>
-    <p>Ser socixs de Fraccctal implica esto: acceso a todos los talleres y encuentros (ya no los abrimos fuera de la comunidad), descuentos con nuestra red de terapeutas y talleristas, un merch de bienvenida, y tu lugar en la comunidad online donde la conversación sigue cada día. Y hoy es gratis: no se cobra nada hasta el 3 de enero de 2027.</p>
-    <p><strong><a href="https://fraccctal.com/membresia.html">Conocé la membresía →</a></strong></p>
+    <p>Ser socixs de Fraccctal implica esto: acceso a todos los talleres y encuentros (ya no los abrimos fuera de la comunidad), descuentos con nuestra red de terapeutas y talleristas, un merch de bienvenida, y tu lugar en la comunidad online donde la conversación sigue cada día. Y hoy <strong>ES GRATIS</strong>: no se cobra nada hasta el 3 de enero de 2027.</p>
+    <p><strong><a href="https://fraccctal.com/membresia.html">Conoce la membresía →</a></strong></p>
   `;
 
   const html = `
     <p>¡Hola!</p>
     <p>Ya está: ${plazaTexto} para <strong>${contenido.title}</strong> ${esAmigxs ? "están reservadas" : "está reservada"}. Somos ${contenido.capacityWord}, y ${esAmigxs ? "sois dos de ellas" : "tú eres una de ellas"}.</p>
-    <p>Gracias por venir. Fraccctal es un club muy joven —nació en Madrid este año— y cada entrada que se vende es lo que nos permite seguir programando. No lo decimos por cortesía: lo decimos porque es literal.</p>
+    <p>Gracias por venir. Fraccctal es un club muy joven (nació en Madrid este año) y cada entrada que se vende es lo que nos permite seguir programando. No lo decimos por cortesía: lo decimos porque es literal.</p>
 
     <p><strong>Los datos</strong></p>
     <ul>
@@ -247,22 +247,22 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
     <p>${contenido.queTraer}</p>
 
     <p><strong>Súmate a nuestra comunidad digital</strong></p>
-    <p>Todo lo que tiene que ver con tu entrada pasa por ahí, no por email: actualizaciones del encuentro, y la posibilidad de conocer al resto de asistentes antes del taller si te apetece — llegar con algunas caras ya vistas cambia bastante la experiencia. Es también el lugar donde seguimos encontrándonos y compartiendo reflexiones después de cada taller, y donde vas a tener acceso a precio preferente para los próximos encuentros.</p>
+    <p>Todo lo que tiene que ver con tu entrada pasa por ahí, no por email: actualizaciones del encuentro, y la posibilidad de conocer al resto de asistentes antes del taller si te apetece. Llegar con algunas caras ya vistas cambia bastante la experiencia. Es también el lugar donde seguimos encontrándonos y compartiendo reflexiones después de cada taller, y donde vas a tener acceso a precio preferente para los próximos encuentros.</p>
     <p><strong><a href="${DFOS_LINK}">Súmate a DFOS</a></strong> (toma dos minutos) y <strong><a href="${WHATSAPP_LINK}">al canal de difusión de WhatsApp</a></strong>, donde avisamos las novedades.</p>
     ${bloqueMembresia}
     <p><strong>Si necesitas cancelar</strong></p>
     <p>Las entradas no tienen devolución. Si no puedes venir, escríbenos a fraccctal.contact@gmail.com y vemos cómo resolverlo entre todas.</p>
 
-    <p>Somos ${contenido.capacityWord} y las plazas se llenan por el boca a boca — si se te ocurre alguien a quien esto le vendría bien, reenvíale este correo o pásale el enlace: ${contenido.pageUrl}</p>
+    <p>Somos ${contenido.capacityWord} y las plazas se llenan por el boca a boca. Si se te ocurre alguien a quien esto le vendría bien, reenvíale este correo o pásale el enlace: ${contenido.pageUrl}</p>
 
     <p>Cualquier duda, responde a este mismo correo y te contestamos nosotras directamente. Somos dos personas, no un buzón automático.</p>
 
     <p>Nos vemos el ${contenido.dayLabel}.</p>
     <p>Irina y Nat<br>Fraccctal</p>
 
-    <p style="color:#57554a; font-size:0.9rem; margin-top:24px">Fraccctal es un club nacido en Madrid en 2026. Creamos espacios para personas en tránsito — las que tienen la vida más o menos en orden pero sienten que algo no encaja. Cuatro pilares: placer, movimiento, conocimiento y curiosidad espiritual.</p>
+    <p style="color:#57554a; font-size:0.9rem; margin-top:24px">Fraccctal es un club nacido en Madrid en 2026. Creamos espacios para personas en tránsito (las que tienen la vida más o menos en orden pero sienten que algo no encaja). Cuatro pilares: placer, movimiento, conocimiento y curiosidad espiritual.</p>
   `;
-  await sendEmail(RESEND_API_KEY, { to: email, subject: `Tu plaza — ${contenido.shortTitle}`, html });
+  await sendEmail(RESEND_API_KEY, { to: email, subject: `Tu plaza · ${contenido.shortTitle}`, html });
 
   await sendEmail(RESEND_API_KEY, {
     to: NOTIFICACION_EMAIL,
