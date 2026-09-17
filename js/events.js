@@ -17,7 +17,8 @@
  *                si este encuentro no tiene precio especial de preventa)
  *   founderTicketsUrl  Payment Link de Stripe para el precio de fundadora (solo se
  *                usa en preventa.html, déjalo como "" si no aplica)
- *   tag          "placer" | "movimiento" | "conocimiento" | "espiritualidad"
+ *   tag          "placer" | "movimiento" | "conocimiento" | "espiritualidad" —
+ *                puede ser uno solo o un array con varios, ej. ["placer", "conocimiento"]
  *   facilitators texto libre, ej. "Julia Javkin" (deja "" si no aplica)
  *   description  1-2 frases, tono Fraccctal (sin épica, sin promesas)
  *   ticketsUrl   pega aquí el Payment Link de Stripe cuando lo tengas (solo encuentros abiertos)
@@ -37,7 +38,7 @@ const FRACCCTAL_EVENTS = [
     price: "Early bird 20€ · General 25€",
     founderPrice: "",
     founderTicketsUrl: "/encuentros/la-erotica-del-buentrato",
-    tag: "placer",
+    tag: ["placer", "conocimiento"],
     facilitators: "Yaneli García Ríos",
     description:
       "Taller teórico-práctico sobre lo que nos enseñaron a erotizar en los vínculos y qué pasa si movemos el deseo de sitio. Con movimiento y dinámicas en grupo.",

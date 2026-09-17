@@ -15,6 +15,7 @@ const PRICE_OCT_AMIGXS = "price_1UGeEUCYD2Pjyybiu6zkPUyJ";
 
 const EVENTS = {
   "una-vida-de-fantasia-2026-09": {
+    title: "Una vida de fantasía",
     slug: "/encuentros/una-vida-de-fantasia",
     roomCap: 16,
     membersOnlyUntil: "2026-09-01T00:00:00+02:00",
@@ -25,6 +26,7 @@ const EVENTS = {
     },
   },
   "la-erotica-del-buentrato-2026-10": {
+    title: "La erótica del buentrato",
     slug: "/encuentros/la-erotica-del-buentrato",
     roomCap: 16,
     membersOnlyUntil: "2026-10-01T00:00:00+02:00",

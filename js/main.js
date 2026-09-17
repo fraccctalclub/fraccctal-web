@@ -27,8 +27,17 @@ function ticketButton(event) {
   return `<a class="btn btn--primary" href="${event.ticketsUrl}"${attrs}>Reservar</a>`;
 }
 
+// event.tag puede ser un string ("placer") o un array de varios
+// ("placer", "conocimiento") — se pinta un <span class="tag"> por cada uno.
+function tagsHTML(event) {
+  const tags = Array.isArray(event.tag) ? event.tag : [event.tag];
+  return tags
+    .filter(Boolean)
+    .map((t) => `<span class="tag${t === "reflexion" ? " tag--reflexion" : ""}">${t}</span>`)
+    .join("");
+}
+
 function upcomingCardHTML(event) {
-  const tagClass = event.tag === "reflexion" ? " tag--reflexion" : "";
   const metaParts = [event.venue, event.city, event.price].filter(Boolean);
   return `
     <article class="event-card">
@@ -37,7 +46,7 @@ function upcomingCardHTML(event) {
         <span>${event.dateMonth}</span>
       </div>
       <div class="event-card__body">
-        <span class="tag${tagClass}">${event.tag}</span>
+        ${tagsHTML(event)}
         <h3>${event.title}</h3>
         <p class="event-card__meta">${metaParts.join(" · ")}</p>
         <p>${event.description}</p>
@@ -48,7 +57,6 @@ function upcomingCardHTML(event) {
 }
 
 function pastCardHTML(event) {
-  const tagClass = event.tag === "reflexion" ? " tag--reflexion" : "";
   const credit = event.facilitators ? `Con ${event.facilitators} · ` : "";
   const action = event.lumaUrl
     ? `<a class="btn btn--ghost" href="${event.lumaUrl}" target="_blank" rel="noopener">Ver en Luma</a>`
@@ -60,7 +68,7 @@ function pastCardHTML(event) {
         <span>${event.dateMonth}</span>
       </div>
       <div class="event-card__body">
-        <span class="tag${tagClass}">${event.tag}</span>
+        ${tagsHTML(event)}
         <h3>${event.title}</h3>
         <p class="event-card__meta">${credit}${event.venue} · ${event.city}</p>
         <p>${event.description}</p>
@@ -71,7 +79,6 @@ function pastCardHTML(event) {
 }
 
 function founderCardHTML(event) {
-  const tagClass = event.tag === "reflexion" ? " tag--reflexion" : "";
   const metaParts = [event.venue, event.city].filter(Boolean);
   const hasFounderPrice = Boolean(event.founderPrice);
   const priceLine = hasFounderPrice
@@ -91,7 +98,7 @@ function founderCardHTML(event) {
         <span>${event.dateMonth}</span>
       </div>
       <div class="event-card__body">
-        <span class="tag${tagClass}">${event.tag}</span>
+        ${tagsHTML(event)}
         <h3>${event.title}</h3>
         <p class="event-card__meta">${metaParts.join(" · ")}</p>
         <p>${event.description}</p>

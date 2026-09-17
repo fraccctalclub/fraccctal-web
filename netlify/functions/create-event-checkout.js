@@ -241,7 +241,12 @@ exports.handler = async (event) => {
     params.set("mode", "payment");
     params.set("metadata[tier]", "event");
     const etiquetaTier = tier === "early" ? "early bird" : tier === "amigxs" ? "amigxs (2 entradas)" : "general";
-    params.set("payment_intent_data[description]", `${eventId} — entrada ${etiquetaTier}`);
+    params.set("payment_intent_data[description]", `${eventConfig.title} — entrada ${etiquetaTier}`);
+    // Copiar la metadata al Payment Intent además de la Checkout Session:
+    // así se ve de qué encuentro es cada cobro directo en el dashboard de
+    // Stripe, sin tener que entrar a la sesión.
+    params.set("payment_intent_data[metadata][event_id]", eventId);
+    params.set("payment_intent_data[metadata][ticket_tier]", tier);
     if (email) {
       params.set("customer_email", email);
     }
