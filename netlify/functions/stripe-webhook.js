@@ -169,10 +169,12 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
     }),
   });
 
-  const precio = ticketTier === "early" ? "20€ (early bird)" : "25€";
+  const esAmigxs = ticketTier === "amigxs";
+  const precio = ticketTier === "early" ? "20€ (early bird)" : esAmigxs ? "42€ (amigxs, 2 entradas)" : "25€";
+  const plazaTexto = esAmigxs ? "tus dos plazas" : "tu plaza";
   const html = `
     <p>¡Hola!</p>
-    <p>Ya está: tu plaza para <strong>Una vida de fantasía; o cómo avistar lo extraordinario en lo cotidiano</strong> está reservada. Somos dieciséis, y tú eres una de ellas.</p>
+    <p>Ya está: ${plazaTexto} para <strong>Una vida de fantasía; o cómo avistar lo extraordinario en lo cotidiano</strong> ${esAmigxs ? "están reservadas" : "está reservada"}. Somos dieciséis, y ${esAmigxs ? "sois dos de ellas" : "tú eres una de ellas"}.</p>
     <p>Gracias por venir. Fraccctal es una asociación muy joven —nació en Madrid este año— y cada entrada que se vende es lo que nos permite seguir programando. No lo decimos por cortesía: lo decimos porque es literal.</p>
 
     <p><strong>Los datos</strong></p>
@@ -180,7 +182,7 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
       <li><strong>Una vida de fantasía; o cómo avistar lo extraordinario en lo cotidiano.</strong> Taller de escritura y juego con Marta Argüelles.</li>
       <li>Sábado 26 de septiembre de 2026, de 11:00 a 14:00 h (abrimos la sala a las 10:45).</li>
       <li>Rito · Lavapiés, Madrid — C. de Tribulete, 21, Centro, 28012 Madrid.</li>
-      <li>Tu entrada: ${precio}</li>
+      <li>${esAmigxs ? "Tus entradas" : "Tu entrada"}: ${precio}</li>
     </ul>
 
     <p><strong>Qué traer</strong></p>

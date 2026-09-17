@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Una vida de fantasía · Taller con Marta Argüelles · Fraccctal</title>
-<meta name="description" content="Taller de escritura y juego con Marta Argüelles. Sábado 26 de septiembre, Madrid. Early bird 20€ (4 plazas) · General 25€ (12 plazas).">
+<meta name="description" content="Taller de escritura y juego con Marta Argüelles. Sábado 26 de septiembre, Madrid. Early bird 20€ · General 25€ · Amigxs 42€ (2 entradas).">
 <link rel="canonical" href="https://fraccctal.com/encuentros/una-vida-de-fantasia">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://fraccctal.com/encuentros/una-vida-de-fantasia">
@@ -84,6 +84,13 @@
             <p id="general-quedan" style="margin:2px 0 0; color:var(--ink-soft); font-size:0.9rem">Consultando disponibilidad…</p>
           </div>
           <button class="btn btn--primary" id="btn-general" disabled>Comprar</button>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; padding-top:14px; border-top:1px solid var(--line)">
+          <div>
+            <strong>Amigxs — 42€ (2 entradas)</strong>
+            <p id="amigxs-quedan" style="margin:2px 0 0; color:var(--ink-soft); font-size:0.9rem">Consultando disponibilidad…</p>
+          </div>
+          <button class="btn btn--primary" id="btn-amigxs" disabled>Comprar</button>
         </div>
       </div>
       <p id="tickets-mensaje" class="form-message" style="display:none; margin-top:16px"></p>
@@ -266,8 +273,10 @@
 
   const btnEarly = document.getElementById("btn-early");
   const btnGeneral = document.getElementById("btn-general");
+  const btnAmigxs = document.getElementById("btn-amigxs");
   const earlyQuedan = document.getElementById("early-quedan");
   const generalQuedan = document.getElementById("general-quedan");
+  const amigxsQuedan = document.getElementById("amigxs-quedan");
   const mensaje = document.getElementById("tickets-mensaje");
 
   const params = new URLSearchParams(location.search);
@@ -331,9 +340,14 @@
       generalQuedan.textContent = data.general.quedan > 0 ? `Quedan ${data.general.quedan} de ${data.general.cap}` : "Agotado";
       btnGeneral.disabled = data.general.quedan <= 0;
       btnGeneral.textContent = data.general.quedan > 0 ? "Comprar" : "Agotado";
+
+      amigxsQuedan.textContent = data.amigxs.quedan > 0 ? `Quedan ${data.amigxs.quedan} de ${data.amigxs.cap}` : "Agotado";
+      btnAmigxs.disabled = data.amigxs.quedan <= 0;
+      btnAmigxs.textContent = data.amigxs.quedan > 0 ? "Comprar" : "Agotado";
     } catch {
       earlyQuedan.textContent = "No pudimos consultar la disponibilidad.";
       generalQuedan.textContent = "No pudimos consultar la disponibilidad.";
+      amigxsQuedan.textContent = "No pudimos consultar la disponibilidad.";
     }
   }
 
@@ -424,6 +438,7 @@
 
   btnEarly.addEventListener("click", () => comprar("early", btnEarly));
   btnGeneral.addEventListener("click", () => comprar("general", btnGeneral));
+  btnAmigxs.addEventListener("click", () => comprar("amigxs", btnAmigxs));
 </script>
 </body>
 </html>

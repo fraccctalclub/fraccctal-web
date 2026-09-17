@@ -31,9 +31,14 @@ const CONDICIONES_VERSION = "2026-08-v1";
 // Debe coincidir con create-checkout-session.js.
 const TRIAL_END_TIMESTAMP = Math.floor(Date.parse("2027-01-02T23:00:00Z") / 1000);
 
+// La sala tiene 16 plazas (ROOM_CAP). "amigxs" vende 2 plazas por compra
+// (42€, dos entradas juntas) — el tope real, además del propio de cada
+// tier, es que entre todos los tiers no se superen las 16 plazas de la sala.
+const ROOM_CAP = 16;
 const TIERS = {
-  early: { price: "price_1U3d6yCYD2PjyybiCY6yxF0l", cap: 4 },
-  general: { price: "price_1U3d6zCYD2Pjyybiz6N4KB4B", cap: 12 },
+  early: { price: "price_1U3d6yCYD2PjyybiCY6yxF0l", cap: 4, seats: 1 },
+  general: { price: "price_1U3d6zCYD2Pjyybiz6N4KB4B", cap: 12, seats: 1 },
+  amigxs: { price: "price_1UGcXVCYD2Pjyybiwi8zI9sF", cap: 8, seats: 2 },
 };
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -145,9 +150,10 @@ exports.handler = async (event) => {
     }
   }
 
-  // Chequear cupo: contar entradas ya pagadas de este tier.
+  // Chequear cupo: cuántas entradas ya pagadas hay, de este tier y de todos
+  // (para el tope real de la sala, contando 2 plazas por cada "amigxs").
   const countTicketsRes = await fetch(
-    `${SUPABASE_URL}/rest/v1/event_tickets?select=id&event_id=eq.${EVENT_ID}&ticket_tier=eq.${tier}&status=eq.paid`,
+    `${SUPABASE_URL}/rest/v1/event_tickets?select=ticket_tier&event_id=eq.${EVENT_ID}&status=eq.paid`,
     {
       headers: {
         apikey: SUPABASE_SERVICE_ROLE_KEY,
@@ -158,8 +164,13 @@ exports.handler = async (event) => {
   if (!countTicketsRes.ok) {
     return { statusCode: 500, body: JSON.stringify({ error: "No se pudo consultar el cupo" }) };
   }
-  const sold = await countTicketsRes.json();
-  if (sold.length >= config.cap) {
+  const allSold = await countTicketsRes.json();
+  const soldPorTier = allSold.filter((t) => t.ticket_tier === tier).length;
+  if (soldPorTier >= config.cap) {
+    return { statusCode: 409, body: JSON.stringify({ error: "agotado" }) };
+  }
+  const plazasVendidas = allSold.reduce((sum, t) => sum + (TIERS[t.ticket_tier]?.seats || 1), 0);
+  if (plazasVendidas + config.seats > ROOM_CAP) {
     return { statusCode: 409, body: JSON.stringify({ error: "agotado" }) };
   }
 
@@ -213,10 +224,8 @@ exports.handler = async (event) => {
   } else {
     params.set("mode", "payment");
     params.set("metadata[tier]", "event");
-    params.set(
-      "payment_intent_data[description]",
-      `Una vida de fantasía — entrada ${tier === "early" ? "early bird" : "general"}`
-    );
+    const etiquetaTier = tier === "early" ? "early bird" : tier === "amigxs" ? "amigxs (2 entradas)" : "general";
+    params.set("payment_intent_data[description]", `Una vida de fantasía — entrada ${etiquetaTier}`);
     if (email) {
       params.set("customer_email", email);
     }
