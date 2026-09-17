@@ -29,3 +29,9 @@
   from = "/encuentros/una-vida-de-fantasia"
   to = "/encuentro-una-vida-de-fantasia.html"
   status = 200
+
+# URL linda para el taller "La erótica del buentrato".
+[[redirects]]
+  from = "/encuentros/la-erotica-del-buentrato"
+  to = "/encuentro-la-erotica-del-buentrato.html"
+  status = 200

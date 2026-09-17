@@ -1,12 +1,19 @@
-// Crea una Stripe Checkout Session para una entrada del taller "Una vida de
-// fantasía". Dos tiers disponibles en simultáneo desde el día uno (no se
-// desbloquea "general" recién cuando se agota "early") — cada uno con su
-// propio cupo, chequeado contra Supabase antes de crear la sesión.
+// Crea una Stripe Checkout Session para una entrada a un encuentro puntual.
+// El catálogo de encuentros (cupo de sala, precios, fecha de preventa) vive
+// en netlify/functions/lib/events.js — así se puede vender más de un
+// encuentro a la vez sin que se pisen los cupos ni las Checkout Sessions.
 //
-// Durante agosto de 2026 la compra es exclusiva para socias (fundadora o
-// miembro): hay que mandar el email verificado y se chequea contra Supabase
-// acá mismo, server-side (no alcanza con que el frontend lo haya validado).
-// Desde el 1 de septiembre se abre a cualquiera, sin email ni membresía.
+// El encuentro se indica con body.event; sin ese campo cae en
+// DEFAULT_EVENT_ID (compatibilidad con clientes viejos, ej. la página de
+// septiembre cacheada en algún navegador). Se valida contra el catálogo
+// antes que nada — nunca se construye una consulta a Supabase ni una sesión
+// de Stripe con un id que venga del cliente sin validar.
+//
+// Durante la preventa (membersOnlyUntil del catálogo, por evento) la compra
+// es exclusiva para socias (fundadora o miembro): hay que mandar el email
+// verificado y se chequea contra Supabase acá mismo, server-side (no
+// alcanza con que el frontend lo haya validado). Después se abre a
+// cualquiera.
 //
 // Además, quien compra una entrada puede sumarse de paso como fundadora sin
 // coste (body.hacerse_fundadora=true): en ese caso la Checkout Session pasa
@@ -14,14 +21,16 @@
 // cobra ya) y el precio fundadora (recurrente, en trial hasta el 3 de enero
 // de 2027, igual que en create-checkout-session.js). Stripe soporta mezclar
 // un ítem de una sola vez dentro de una sesión de suscripción: se factura
-// de inmediato aunque la suscripción esté en trial.
+// de inmediato aunque la suscripción esté en trial. El cupo de fundadoras
+// (FOUNDER_CAP) es global: no depende del encuentro, así que no vive en el
+// catálogo.
 //
 // Variables de entorno necesarias:
 //   STRIPE_SECRET_KEY, STRIPE_FOUNDER_PRICE_ID, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
 
-const EVENT_ID = "una-vida-de-fantasia-2026-09";
-const MEMBERS_ONLY_UNTIL = new Date("2026-09-01T00:00:00+02:00");
-const FOUNDER_CAP = 20;
+const { getEvent, DEFAULT_EVENT_ID, tiersReady } = require("./lib/events");
+
+const FOUNDER_CAP = 20; // global: no depende del encuentro
 
 // Debe coincidir con LEGAL.CONDICIONES_VERSION en js/legal-config.js y con
 // la misma constante en create-checkout-session.js.
@@ -30,16 +39,6 @@ const CONDICIONES_VERSION = "2026-08-v1";
 // 3 de enero de 2027, 00:00 hora de Madrid (CET = UTC+1 en enero) = 2027-01-02T23:00:00Z.
 // Debe coincidir con create-checkout-session.js.
 const TRIAL_END_TIMESTAMP = Math.floor(Date.parse("2027-01-02T23:00:00Z") / 1000);
-
-// La sala tiene 16 plazas (ROOM_CAP). "amigxs" vende 2 plazas por compra
-// (42€, dos entradas juntas) — el tope real, además del propio de cada
-// tier, es que entre todos los tiers no se superen las 16 plazas de la sala.
-const ROOM_CAP = 16;
-const TIERS = {
-  early: { price: "price_1U3d6yCYD2PjyybiCY6yxF0l", cap: 4, seats: 1 },
-  general: { price: "price_1U3d6zCYD2Pjyybiz6N4KB4B", cap: 12, seats: 1 },
-  amigxs: { price: "price_1UGcXVCYD2Pjyybiwi8zI9sF", cap: 8, seats: 2 },
-};
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const REQUIRED_FOUNDER_FIELDS = [
@@ -82,14 +81,30 @@ exports.handler = async (event) => {
     return { statusCode: 400, body: JSON.stringify({ error: "Body inválido" }) };
   }
 
+  // Validar el encuentro contra el catálogo antes que nada.
+  const eventId = body.event || DEFAULT_EVENT_ID;
+  const eventConfig = getEvent(eventId);
+  if (!eventConfig) {
+    return { statusCode: 400, body: JSON.stringify({ error: "evento_desconocido" }) };
+  }
+
   const tier = body.tier;
-  const config = TIERS[tier];
+  const config = eventConfig.tiers[tier];
   if (!config) {
     return { statusCode: 400, body: JSON.stringify({ error: "Tier inválido" }) };
   }
 
+  if (!tiersReady(eventConfig)) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: "Este encuentro todavía no tiene los precios de Stripe cargados" }),
+    };
+  }
+
+  const membersOnlyUntil = new Date(eventConfig.membersOnlyUntil);
+
   let email = null;
-  if (new Date() < MEMBERS_ONLY_UNTIL) {
+  if (new Date() < membersOnlyUntil) {
     email = (body.email || "").trim().toLowerCase();
     if (!email || !EMAIL_RE.test(email)) {
       return { statusCode: 400, body: JSON.stringify({ error: "Email inválido" }) };
@@ -150,10 +165,11 @@ exports.handler = async (event) => {
     }
   }
 
-  // Chequear cupo: cuántas entradas ya pagadas hay, de este tier y de todos
-  // (para el tope real de la sala, contando 2 plazas por cada "amigxs").
+  // Chequear cupo: cuántas entradas ya pagadas hay de este encuentro, por
+  // tier y en total (para el tope real de la sala, contando 2 plazas por
+  // cada "amigxs").
   const countTicketsRes = await fetch(
-    `${SUPABASE_URL}/rest/v1/event_tickets?select=ticket_tier&event_id=eq.${EVENT_ID}&status=eq.paid`,
+    `${SUPABASE_URL}/rest/v1/event_tickets?select=ticket_tier&event_id=eq.${eventId}&status=eq.paid`,
     {
       headers: {
         apikey: SUPABASE_SERVICE_ROLE_KEY,
@@ -169,8 +185,8 @@ exports.handler = async (event) => {
   if (soldPorTier >= config.cap) {
     return { statusCode: 409, body: JSON.stringify({ error: "agotado" }) };
   }
-  const plazasVendidas = allSold.reduce((sum, t) => sum + (TIERS[t.ticket_tier]?.seats || 1), 0);
-  if (plazasVendidas + config.seats > ROOM_CAP) {
+  const plazasVendidas = allSold.reduce((sum, t) => sum + (eventConfig.tiers[t.ticket_tier]?.seats || 1), 0);
+  if (plazasVendidas + config.seats > eventConfig.roomCap) {
     return { statusCode: 409, body: JSON.stringify({ error: "agotado" }) };
   }
 
@@ -208,10 +224,10 @@ exports.handler = async (event) => {
   const params = new URLSearchParams({
     "line_items[0][price]": config.price,
     "line_items[0][quantity]": "1",
-    "metadata[event_id]": EVENT_ID,
+    "metadata[event_id]": eventId,
     "metadata[ticket_tier]": tier,
-    success_url: `${origin}/encuentros/una-vida-de-fantasia?compra=ok`,
-    cancel_url: `${origin}/encuentros/una-vida-de-fantasia?compra=cancelado`,
+    success_url: `${origin}${eventConfig.slug}?compra=ok`,
+    cancel_url: `${origin}${eventConfig.slug}?compra=cancelado`,
   });
 
   if (hacerseFundadora) {
@@ -225,7 +241,7 @@ exports.handler = async (event) => {
     params.set("mode", "payment");
     params.set("metadata[tier]", "event");
     const etiquetaTier = tier === "early" ? "early bird" : tier === "amigxs" ? "amigxs (2 entradas)" : "general";
-    params.set("payment_intent_data[description]", `Una vida de fantasía — entrada ${etiquetaTier}`);
+    params.set("payment_intent_data[description]", `${eventId} — entrada ${etiquetaTier}`);
     if (email) {
       params.set("customer_email", email);
     }

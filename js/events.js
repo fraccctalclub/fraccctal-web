@@ -27,6 +27,25 @@
 
 const FRACCCTAL_EVENTS = [
   {
+    id: "la-erotica-del-buentrato-2026-10",
+    title: "La erótica del buentrato",
+    dateLabel: "24",
+    dateMonth: "OCT",
+    dateSort: "2026-10-24",
+    venue: "Espacio en Blanco",
+    city: "Madrid",
+    price: "Early bird 20€ · General 25€",
+    founderPrice: "",
+    founderTicketsUrl: "/encuentros/la-erotica-del-buentrato",
+    tag: "placer",
+    facilitators: "Yaneli García Ríos",
+    description:
+      "Taller teórico-práctico sobre lo que nos enseñaron a erotizar en los vínculos y qué pasa si movemos el deseo de sitio. Con movimiento y dinámicas en grupo.",
+    ticketsUrl: "/encuentros/la-erotica-del-buentrato",
+    lumaUrl: "",
+    status: "abierto",
+  },
+  {
     id: "una-vida-de-fantasia-2026-09",
     title: "Una vida de fantasía",
     dateLabel: "26",
