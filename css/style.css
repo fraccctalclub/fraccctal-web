@@ -428,8 +428,9 @@ section { padding: 96px 0; }
 
 .tiers {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1.12fr 1fr;
   gap: 24px;
+  align-items: start;
 }
 
 @media (max-width: 700px) { .tiers { grid-template-columns: 1fr; } }
@@ -439,6 +440,7 @@ section { padding: 96px 0; }
   border-radius: 20px;
   padding: 32px;
   background: var(--bg-alt);
+  transition: opacity 0.2s ease;
 }
 
 .tier--founder {
@@ -446,12 +448,29 @@ section { padding: 96px 0; }
   color: var(--bg);
   border-color: var(--ink);
   cursor: pointer;
-  transition: transform 0.15s ease;
+  transition: transform 0.15s ease, opacity 0.2s ease;
 }
 
 .tier--founder:hover { transform: translateY(-2px); }
 
 .tier--founder .btn--primary { background: var(--bg); color: var(--ink); }
+
+/* Tarjeta en estado bloqueado: la del Miembrx al inicio, y la del
+   Fundadorx una vez cerrado el cupo (closeFounderSignup() alterna cuál). */
+.tier--locked { opacity: 0.5; cursor: default; }
+.tier--locked:hover { transform: none; }
+
+.tier__lock-badge {
+  display: inline-block;
+  font-family: var(--sans);
+  font-size: 0.76rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--line);
+  margin: 0 0 16px;
+}
 
 .tier__price {
   font-family: var(--serif);
@@ -460,6 +479,41 @@ section { padding: 96px 0; }
 }
 
 .tier__price small { font-family: var(--sans); font-size: 1rem; }
+
+.tier__price--compound { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.tier__price-old { font-size: 1.5rem; text-decoration: line-through; color: #A9A79C; }
+.tier__price-new { font-size: 2.6rem; }
+
+.tier__price-note {
+  font-family: var(--sans);
+  font-size: 0.92rem;
+  line-height: 1.5;
+  margin: 6px 0;
+  color: #A9A79C;
+}
+
+.tier__fineprint {
+  font-family: var(--sans);
+  font-size: 0.8rem;
+  color: #A9A79C;
+  margin: 10px 0 0;
+}
+
+.tier-timeline {
+  list-style: none;
+  padding: 0;
+  margin: 22px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-family: var(--sans);
+  font-size: 0.9rem;
+  border-top: 1px solid rgba(237, 234, 225, 0.18);
+  padding-top: 18px;
+}
+
+.tier-timeline li { padding-left: 20px; position: relative; }
+.tier-timeline li::before { content: "•"; position: absolute; left: 0; color: var(--accent-yellow); }
 
 .tier ul { padding-left: 18px; margin: 18px 0 0; }
 .tier li { margin-bottom: 8px; }
