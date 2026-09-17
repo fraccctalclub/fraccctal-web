@@ -39,6 +39,39 @@ const CARTA_MIEMBROS = `
   <p>[PEGAR AQUÍ LA CARTA DE BIENVENIDA PARA MIEMBROS GENERALES]</p>
 `;
 
+// Contenido específico de cada encuentro para el email de confirmación de
+// entrada (handleEventTicket, más abajo). Al publicar un encuentro nuevo,
+// agregar acá sus datos — así el email nunca sale con el copy de otro
+// taller pegado.
+const EVENT_EMAIL_CONTENT = {
+  "una-vida-de-fantasia-2026-09": {
+    title: "Una vida de fantasía; o cómo avistar lo extraordinario en lo cotidiano",
+    shortTitle: "Una vida de fantasía",
+    facilitators: "Marta Argüelles",
+    typeLabel: "Taller de escritura y juego",
+    dateTimeLabel: "Sábado 26 de septiembre de 2026, de 11:00 a 14:00 h (abrimos la sala a las 10:45)",
+    dayLabel: "26",
+    venueLabel: "Rito · Lavapiés, Madrid — C. de Tribulete, 21, Centro, 28012 Madrid",
+    capacityWord: "dieciséis",
+    queTraer:
+      "Bolígrafo, lápiz o cualquier otro utensilio para escribir, y un cuaderno. También puedes traer tu ordenador, si prefieres escribir ahí. Y nada más: no hace falta ningún tipo de experiencia previa, ni haber escrito nunca, ni llegar inspirada — de eso se encargan las consignas. El foco está siempre en el proceso, nunca en el resultado. Nadie corrige nada, y nadie tiene que leer en voz alta si no le apetece.",
+    pageUrl: "https://fraccctal.com/encuentros/una-vida-de-fantasia",
+  },
+  "la-erotica-del-buentrato-2026-10": {
+    title: "La erótica del buentrato; habitando nuevas narrativas",
+    shortTitle: "La erótica del buentrato",
+    facilitators: "Yaneli García Ríos",
+    typeLabel: "Taller teórico-práctico sobre vínculos, límites y buentrato",
+    dateTimeLabel: "Sábado 24 de octubre de 2026, de 17:00 a 20:00 h",
+    dayLabel: "24",
+    venueLabel: "Espacio en Blanco · Madrid",
+    capacityWord: "dieciséis",
+    queTraer:
+      "Ropa cómoda que permita moverse, calcetines o pies descalzos, y una botella de agua. No hace falta ningún tipo de experiencia previa.",
+    pageUrl: "https://fraccctal.com/encuentros/la-erotica-del-buentrato",
+  },
+};
+
 function verifyStripeSignature(rawBody, signatureHeader, secret) {
   if (!signatureHeader) return false;
 
@@ -169,42 +202,55 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
     }),
   });
 
+  const contenido = EVENT_EMAIL_CONTENT[eventId];
+  if (!contenido) {
+    // Encuentro sin copy de email cargado todavía: no inventamos texto —
+    // avisamos internamente para completarlo a mano en vez de mandar algo
+    // con los datos de otro taller.
+    await sendEmail(RESEND_API_KEY, {
+      to: NOTIFICACION_EMAIL,
+      subject: `Falta el copy de email para ${eventId}`,
+      html: `<p>Se vendió una entrada de <strong>${eventId}</strong> (${email}) pero no hay contenido cargado en EVENT_EMAIL_CONTENT (stripe-webhook.js). Avisale a la persona a mano.</p>`,
+    });
+    return;
+  }
+
   const esAmigxs = ticketTier === "amigxs";
   const precio = ticketTier === "early" ? "20€ (early bird)" : esAmigxs ? "42€ (amigxs, 2 entradas)" : "25€";
   const plazaTexto = esAmigxs ? "tus dos plazas" : "tu plaza";
   const html = `
     <p>¡Hola!</p>
-    <p>Ya está: ${plazaTexto} para <strong>Una vida de fantasía; o cómo avistar lo extraordinario en lo cotidiano</strong> ${esAmigxs ? "están reservadas" : "está reservada"}. Somos dieciséis, y ${esAmigxs ? "sois dos de ellas" : "tú eres una de ellas"}.</p>
-    <p>Gracias por venir. Fraccctal es una asociación muy joven —nació en Madrid este año— y cada entrada que se vende es lo que nos permite seguir programando. No lo decimos por cortesía: lo decimos porque es literal.</p>
+    <p>Ya está: ${plazaTexto} para <strong>${contenido.title}</strong> ${esAmigxs ? "están reservadas" : "está reservada"}. Somos ${contenido.capacityWord}, y ${esAmigxs ? "sois dos de ellas" : "tú eres una de ellas"}.</p>
+    <p>Gracias por venir. Fraccctal es un club muy joven —nació en Madrid este año— y cada entrada que se vende es lo que nos permite seguir programando. No lo decimos por cortesía: lo decimos porque es literal.</p>
 
     <p><strong>Los datos</strong></p>
     <ul>
-      <li><strong>Una vida de fantasía; o cómo avistar lo extraordinario en lo cotidiano.</strong> Taller de escritura y juego con Marta Argüelles.</li>
-      <li>Sábado 26 de septiembre de 2026, de 11:00 a 14:00 h (abrimos la sala a las 10:45).</li>
-      <li>Rito · Lavapiés, Madrid — C. de Tribulete, 21, Centro, 28012 Madrid.</li>
+      <li><strong>${contenido.title}.</strong> ${contenido.typeLabel} con ${contenido.facilitators}.</li>
+      <li>${contenido.dateTimeLabel}.</li>
+      <li>${contenido.venueLabel}.</li>
       <li>${esAmigxs ? "Tus entradas" : "Tu entrada"}: ${precio}</li>
     </ul>
 
     <p><strong>Qué traer</strong></p>
-    <p>Bolígrafo, lápiz o cualquier otro utensilio para escribir, y un cuaderno. También puedes traer tu ordenador, si prefieres escribir ahí. Y nada más: no hace falta ningún tipo de experiencia previa, ni haber escrito nunca, ni llegar inspirada — de eso se encargan las consignas. El foco está siempre en el proceso, nunca en el resultado. Nadie corrige nada, y nadie tiene que leer en voz alta si no le apetece.</p>
+    <p>${contenido.queTraer}</p>
 
     <p><strong>Súmate a nuestra comunidad digital</strong></p>
-    <p>Todo lo que tiene que ver con tu entrada pasa por ahí, no por email: actualizaciones del encuentro, y la posibilidad de conocer al resto de asistentes antes del sábado si te apetece — llegar a Rito con algunas caras ya vistas cambia bastante la experiencia. Es también el lugar donde seguimos encontrándonos y compartiendo reflexiones después de cada taller, y donde vas a tener acceso a precio preferente para los próximos encuentros.</p>
+    <p>Todo lo que tiene que ver con tu entrada pasa por ahí, no por email: actualizaciones del encuentro, y la posibilidad de conocer al resto de asistentes antes del taller si te apetece — llegar con algunas caras ya vistas cambia bastante la experiencia. Es también el lugar donde seguimos encontrándonos y compartiendo reflexiones después de cada taller, y donde vas a tener acceso a precio preferente para los próximos encuentros.</p>
     <p><strong><a href="${DFOS_LINK}">Súmate a DFOS</a></strong> (toma dos minutos) y <strong><a href="${WHATSAPP_LINK}">al canal de difusión de WhatsApp</a></strong>, donde avisamos las novedades.</p>
 
     <p><strong>Si necesitas cancelar</strong></p>
     <p>Las entradas no tienen devolución. Si no puedes venir, escríbenos a fraccctal.contact@gmail.com y vemos cómo resolverlo entre todas.</p>
 
-    <p>Somos dieciséis y las plazas se llenan por el boca a boca — si se te ocurre alguien a quien esto le vendría bien, reenvíale este correo o pásale el enlace: https://fraccctal.com/encuentros/una-vida-de-fantasia</p>
+    <p>Somos ${contenido.capacityWord} y las plazas se llenan por el boca a boca — si se te ocurre alguien a quien esto le vendría bien, reenvíale este correo o pásale el enlace: ${contenido.pageUrl}</p>
 
     <p>Cualquier duda, responde a este mismo correo y te contestamos nosotras directamente. Somos dos personas, no un buzón automático.</p>
 
-    <p>Nos vemos el 26.</p>
+    <p>Nos vemos el ${contenido.dayLabel}.</p>
     <p>Irina y Nat<br>Fraccctal</p>
 
-    <p style="color:#57554a; font-size:0.9rem; margin-top:24px">Fraccctal es una asociación cultural nacida en Madrid en 2026. Creamos espacios para personas en tránsito — las que tienen la vida más o menos en orden pero sienten que algo no encaja. Cuatro pilares: placer, movimiento, conocimiento y espiritualidad sin etiquetas.</p>
+    <p style="color:#57554a; font-size:0.9rem; margin-top:24px">Fraccctal es un club nacido en Madrid en 2026. Creamos espacios para personas en tránsito — las que tienen la vida más o menos en orden pero sienten que algo no encaja. Cuatro pilares: placer, movimiento, conocimiento y curiosidad espiritual.</p>
   `;
-  await sendEmail(RESEND_API_KEY, { to: email, subject: "Tu plaza — Una vida de fantasía", html });
+  await sendEmail(RESEND_API_KEY, { to: email, subject: `Tu plaza — ${contenido.shortTitle}`, html });
 
   await sendEmail(RESEND_API_KEY, {
     to: NOTIFICACION_EMAIL,

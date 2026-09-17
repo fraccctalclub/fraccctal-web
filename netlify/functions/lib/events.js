@@ -9,9 +9,9 @@
 // función que lo use devuelve un error explícito en vez de vender con un
 // precio roto (ver tiersReady más abajo).
 
-const PRICE_OCT_EARLY = "TODO_PEGAR_PRICE_ID_OCT_EARLY";
-const PRICE_OCT_GENERAL = "TODO_PEGAR_PRICE_ID_OCT_GENERAL";
-const PRICE_OCT_AMIGXS = "TODO_PEGAR_PRICE_ID_OCT_AMIGXS";
+const PRICE_OCT_EARLY = "price_1UGeEUCYD2PjyybimcgEWon8";
+const PRICE_OCT_GENERAL = "price_1UGeEUCYD2PjyybiiwNjWzxP";
+const PRICE_OCT_AMIGXS = "price_1UGeEUCYD2Pjyybiu6zkPUyJ";
 
 const EVENTS = {
   "una-vida-de-fantasia-2026-09": {
