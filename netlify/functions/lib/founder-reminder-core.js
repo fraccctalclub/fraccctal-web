@@ -32,6 +32,7 @@ function reminderHtml(nombre) {
   return `
     <p>${saludo}</p>
     <p>Vimos que empezaste el alta como fundadora de Fraccctal hace unos días, pero el pago no llegó a completarse (a veces pasa: se cierra la pestaña, falla la conexión, cualquier cosa).</p>
+    <p>Este es un momento clave para sumarte: solo hay 20 lugares de fundadora en total, y no va a haber más. Quien entra ahora no solo se ahorra la cuota hasta enero, también va a participar en las decisiones sobre el club y a construirlo junto a nosotras.</p>
     <p>Tu lugar todavía está disponible, y te recordamos qué implica: no se cobra nada hasta el 3 de enero de 2027, y antes de esa fecha te vamos a volver a escribir para avisarte que empieza a correr el cobro. Desde entonces, la cuota de fundadora es de 11€/mes, para siempre.</p>
     <p>Ser fundadora también te da acceso anticipado a la preventa de los talleres (entras antes que el público general) y al club de lectura y al walking club, sin coste aparte. Y a partir de enero, los talleres van a ser exclusivos para socias: ya no los vamos a abrir por fuera de la comunidad.</p>
     <p>Si quieres retomar tu alta, puedes hacerlo aquí: <a href="https://fraccctal.com/membresia.html">https://fraccctal.com/membresia.html</a></p>
