@@ -17,6 +17,11 @@
 [functions."sync-brevo-socias"]
   schedule = "@weekly"
 
+# Recordatorio a quien empezó el alta de fundadora y no completó el pago,
+# un día después de haber empezado.
+[functions."remind-founder-applications"]
+  schedule = "@daily"
+
 # URLs lindas para las cartas: /cartas/el-mito-de-la-desconexion en vez de
 # /carta.html?c=el-mito-de-la-desconexion (mejor para SEO y para compartir).
 [[redirects]]
