@@ -247,8 +247,8 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
     <p>${contenido.queTraer}</p>
 
     <p><strong>Súmate a nuestra comunidad digital</strong></p>
-    <p>Todo lo que tiene que ver con tu entrada pasa por ahí, no por email: actualizaciones del encuentro, y la posibilidad de conocer al resto de asistentes antes del taller si te apetece. Llegar con algunas caras ya vistas cambia bastante la experiencia. Es también el lugar donde seguimos encontrándonos y compartiendo reflexiones después de cada taller, y donde vas a tener acceso a precio preferente para los próximos encuentros.</p>
-    <p><strong><a href="${DFOS_LINK}">Súmate a DFOS</a></strong> (toma dos minutos) y <strong><a href="${WHATSAPP_LINK}">al canal de difusión de WhatsApp</a></strong>, donde avisamos las novedades.</p>
+    <p>Todo lo que tiene que ver con tu entrada pasa por ahí, no por email: actualizaciones del encuentro, y la posibilidad de conocer al resto de asistentes antes del taller si te apetece. Llegar con algunas caras ya vistas cambia bastante la experiencia. Es también el lugar donde seguimos encontrándonos y compartiendo reflexiones después de cada taller, y donde vas a tener acceso anticipado a los próximos encuentros, antes de que se abran al público.</p>
+    <p><strong><a href="${DFOS_LINK}">Súmate al DFOS</a></strong>, el espacio digital de encuentro de la comunidad donde estamos todxs conectadxs (toma dos minutos), y <strong><a href="${WHATSAPP_LINK}">al canal de difusión de WhatsApp</a></strong>, donde avisamos las novedades.</p>
     ${bloqueMembresia}
     <p><strong>Si necesitas cancelar</strong></p>
     <p>Las entradas no tienen devolución. Si no puedes venir, escríbenos a fraccctal.contact@gmail.com y vemos cómo resolverlo entre todas.</p>
