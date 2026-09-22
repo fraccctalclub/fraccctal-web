@@ -17,7 +17,7 @@ const EVENTS = {
   "una-vida-de-fantasia-2026-09": {
     title: "Una vida de fantasía",
     slug: "/encuentros/una-vida-de-fantasia",
-    roomCap: 16,
+    roomCap: 17,
     membersOnlyUntil: "2026-09-01T00:00:00+02:00",
     tiers: {
       early: { price: "price_1U3d6yCYD2PjyybiCY6yxF0l", cap: 4, seats: 1 },
