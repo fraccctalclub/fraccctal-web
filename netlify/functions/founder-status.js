@@ -1,6 +1,8 @@
 // Endpoint público de solo lectura: dice si todavía quedan lugares de
 // fundadora. Lo usa membresia.html para ocultar el botón de anotarse una vez
 // que se llega al cupo (no expone datos personales, solo un conteo).
+// Solo cuentan las filas con counts_toward_cap = true: las altas manuales
+// (socias fundadoras del equipo, sin Stripe) se marcan false y no ocupan plaza.
 //
 // Variables de entorno necesarias:
 //   SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
@@ -11,7 +13,7 @@ exports.handler = async () => {
   const { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY } = process.env;
 
   const countRes = await fetch(
-    `${SUPABASE_URL}/rest/v1/founders?select=id&status=eq.active`,
+    `${SUPABASE_URL}/rest/v1/founders?select=id&status=eq.active&counts_toward_cap=is.true`,
     {
       headers: {
         apikey: SUPABASE_SERVICE_ROLE_KEY,
