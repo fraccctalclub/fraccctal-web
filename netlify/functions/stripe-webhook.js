@@ -52,7 +52,7 @@ const EVENT_EMAIL_CONTENT = {
     dateTimeLabel: "Sábado 26 de septiembre de 2026, de 11:00 a 14:00 h (abrimos la sala a las 10:45)",
     dayLabel: "26",
     venueLabel: "Rito · Lavapiés, Madrid (C. de Tribulete, 21, Centro, 28012 Madrid)",
-    capacityWord: "diecisiete",
+    capacityWord: "dieciséis",
     queTraer:
       "Bolígrafo, lápiz o cualquier otro utensilio para escribir, y un cuaderno. También puedes traer tu ordenador, si prefieres escribir ahí. Y nada más: no hace falta ningún tipo de experiencia previa, ni haber escrito nunca, ni llegar inspirada, de eso se encargan las consignas. El foco está siempre en el proceso, nunca en el resultado. Nadie corrige nada, y nadie tiene que leer en voz alta si no le apetece.",
     pageUrl: "https://fraccctal.com/encuentros/una-vida-de-fantasia",
