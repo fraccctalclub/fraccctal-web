@@ -146,7 +146,7 @@ exports.handler = async (event) => {
       hacerseFundadora = false; // ya es socia, no hace falta crear nada nuevo
     } else {
       const countRes = await fetch(
-        `${SUPABASE_URL}/rest/v1/founders?select=id&status=eq.active`,
+        `${SUPABASE_URL}/rest/v1/founders?select=id&status=eq.active&counts_toward_cap=is.true`,
         {
           headers: {
             apikey: SUPABASE_SERVICE_ROLE_KEY,

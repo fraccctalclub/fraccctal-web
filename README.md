@@ -127,6 +127,20 @@ tres variables de Stripe (`STRIPE_SECRET_KEY`, `STRIPE_FOUNDER_PRICE_ID`,
 `STRIPE_WEBHOOK_SECRET`) por las nuevas de modo live en Netlify. No hay que tocar ni una
 línea de código.
 
+### Alta manual de una fundadora sin plaza ni cobro
+
+Para dar de alta a alguien (por ejemplo, una socia fundadora del equipo) sin que ocupe una
+de las 20 plazas ni se le cobre la mensualidad, se inserta la fila directamente en Supabase
+(SQL Editor), sin pasar por Stripe:
+
+```sql
+insert into founders (email, status, counts_toward_cap)
+values ('email@ejemplo.com', 'active', false);
+```
+
+Al no tener suscripción de Stripe, nunca se le cobra nada. Con `counts_toward_cap = false`
+no cuenta para el cupo. Puede entrar a `preventa.html` pidiendo su magic link con ese email.
+
 ### Precio de fundadora por encuentro (preventa)
 
 En cada encuentro de [`js/events.js`](js/events.js) hay dos campos opcionales:
