@@ -58,7 +58,7 @@ const EVENT_EMAIL_CONTENT = {
     pageUrl: "https://fraccctal.com/encuentros/una-vida-de-fantasia",
   },
   "la-erotica-del-buentrato-2026-10": {
-    title: "La erótica del buentrato; habitando nuevas narrativas",
+    title: "La erótica del buentrato: Habitando nuevas narrativas",
     shortTitle: "La erótica del buentrato",
     facilitators: "Yaneli García Ríos",
     typeLabel: "Taller teórico-práctico sobre vínculos, límites y buentrato",
