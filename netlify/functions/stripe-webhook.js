@@ -15,7 +15,7 @@
 
 const crypto = require("crypto");
 
-const WHATSAPP_LINK = "https://chat.whatsapp.com/L1smx4zOpzUEgVl2fWbKRD";
+const WHATSAPP_LINK = "https://whatsapp.com/channel/0029Vb7tjMwGufIxndnWvc2J";
 const DFOS_LINK = "https://app.dfos.com/j/9crkn9827dc9kzzc22z9ha";
 const NOTIFICACION_EMAIL = "fraccctal.contact@gmail.com";
 
