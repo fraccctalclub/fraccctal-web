@@ -328,7 +328,7 @@ section { padding: 96px 0; }
 
 .event-card {
   display: grid;
-  grid-template-columns: 120px 1fr auto;
+  grid-template-columns: 148px 1fr auto;
   gap: 24px;
   align-items: center;
   background: var(--bg-alt);
@@ -343,6 +343,21 @@ section { padding: 96px 0; }
     text-align: left;
     gap: 14px;
   }
+}
+
+.event-card__datewrap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.event-card__thumb {
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  object-fit: cover;
+  flex-shrink: 0;
 }
 
 .event-card__date {

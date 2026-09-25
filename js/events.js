@@ -11,6 +11,9 @@
  *   dateSort     fecha ISO "AAAA-MM-DD" (se usa solo para ordenar, no se muestra)
  *   venue        nombre del espacio (déjalo como "" si quieres reservar la ubicación
  *                exacta para el DFOS y no mostrarla en la web)
+ *   flyer        ruta al flyer del encuentro (ej. "/assets/img/flyer-xxx.webp"), se
+ *                muestra en miniatura junto a la fecha en las tarjetas. Déjalo como ""
+ *                si todavía no hay flyer.
  *   city         ciudad
  *   price        texto libre de precio, ej. "25-30€" o "Gratis"
  *   founderPrice texto libre de precio solo para fundadoras, ej. "15€" (déjalo como ""
@@ -34,6 +37,7 @@ const FRACCCTAL_EVENTS = [
     dateMonth: "OCT",
     dateSort: "2026-10-24",
     venue: "Espacio en Blanco",
+    flyer: "/assets/img/flyer-la-erotica-del-buentrato.webp",
     city: "Madrid",
     price: "Early bird 20€ · General 25€",
     founderPrice: "",
@@ -53,6 +57,7 @@ const FRACCCTAL_EVENTS = [
     dateMonth: "SEP",
     dateSort: "2026-09-26",
     venue: "",
+    flyer: "/assets/img/flyer-una-vida-de-fantasia.jpg",
     city: "Madrid",
     price: "Early bird 20€ · General 25€",
     founderPrice: "",

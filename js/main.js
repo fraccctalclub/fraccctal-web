@@ -37,14 +37,26 @@ function tagsHTML(event) {
     .join("");
 }
 
-function upcomingCardHTML(event) {
-  const metaParts = [event.venue, event.city, event.price].filter(Boolean);
+function dateBlockHTML(event) {
+  const thumb = event.flyer
+    ? `<img class="event-card__thumb" src="${event.flyer}" alt="" loading="lazy">`
+    : "";
   return `
-    <article class="event-card">
+    <div class="event-card__datewrap">
+      ${thumb}
       <div class="event-card__date">
         ${event.dateLabel}
         <span>${event.dateMonth}</span>
       </div>
+    </div>
+  `;
+}
+
+function upcomingCardHTML(event) {
+  const metaParts = [event.venue, event.city, event.price].filter(Boolean);
+  return `
+    <article class="event-card">
+      ${dateBlockHTML(event)}
       <div class="event-card__body">
         ${tagsHTML(event)}
         <h3>${event.title}</h3>
@@ -63,10 +75,7 @@ function pastCardHTML(event) {
     : `<span class="btn btn--disabled">Encuentro pasado</span>`;
   return `
     <article class="event-card event-card--closed">
-      <div class="event-card__date">
-        ${event.dateLabel}
-        <span>${event.dateMonth}</span>
-      </div>
+      ${dateBlockHTML(event)}
       <div class="event-card__body">
         ${tagsHTML(event)}
         <h3>${event.title}</h3>
@@ -93,10 +102,7 @@ function founderCardHTML(event) {
     : `<span class="btn btn--disabled">Preventa próximamente</span>`;
   return `
     <article class="event-card">
-      <div class="event-card__date">
-        ${event.dateLabel}
-        <span>${event.dateMonth}</span>
-      </div>
+      ${dateBlockHTML(event)}
       <div class="event-card__body">
         ${tagsHTML(event)}
         <h3>${event.title}</h3>
