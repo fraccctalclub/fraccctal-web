@@ -77,7 +77,7 @@ async function getAllSupabase(table, select, SUPABASE_URL, SUPABASE_SERVICE_ROLE
 async function buildPersonas(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, STRIPE_SECRET_KEY) {
   const [founders, members, founderApps, memberApps, tickets, stripeCharges] = await Promise.all([
     getAllSupabase("founders", "email,status,created_at", SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY),
-    getAllSupabase("members", "email,status,created_at", SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY),
+    getAllSupabase("members", "email,status,created_at,counts_as_socia", SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY),
     getAllSupabase("founder_applications", "email,nombre,apellido,telefono,created_at", SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY),
     getAllSupabase("member_applications", "email,nombre,apellido,telefono,created_at", SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY),
     getAllSupabase("event_tickets", "email,event_id,ticket_tier,status,created_at", SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY),
@@ -117,6 +117,7 @@ async function buildPersonas(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, STRIPE_SEC
 
   for (const m of members) {
     if (m.status !== "active" || !m.email) continue;
+    if (m.counts_as_socia === false) continue; // acceso otorgado a mano, no es socia real
     const p = ensurePerson(m.email);
     const app = memberAppByEmail[m.email.toLowerCase()];
     if (app) {

@@ -41,7 +41,7 @@ function ultimaPorEmail(rows) {
 async function getActiveSocias(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY) {
   const [founders, members, founderApps, memberApps] = await Promise.all([
     getAllSupabase("founders", "email,status", SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY),
-    getAllSupabase("members", "email,status", SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY),
+    getAllSupabase("members", "email,status,counts_as_socia", SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY),
     getAllSupabase("founder_applications", "email,nombre,apellido,created_at", SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY),
     getAllSupabase("member_applications", "email,nombre,apellido,created_at", SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY),
   ]);
@@ -57,6 +57,7 @@ async function getActiveSocias(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY) {
   }
   for (const m of members) {
     if (m.status !== "active") continue;
+    if (m.counts_as_socia === false) continue; // acceso otorgado a mano, no es socia real
     const app = memberAppsPorEmail[m.email];
     socias.push({ email: m.email, nombre: app?.nombre || "", apellido: app?.apellido || "", tipo: "Miembro" });
   }
