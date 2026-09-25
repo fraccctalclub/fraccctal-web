@@ -24,11 +24,17 @@ const NOTIFICACION_EMAIL = "fraccctal.contact@gmail.com";
 const CARTA_FUNDADORAS = `
   <p>Somos Irina y Nat. Te escribimos porque acabas de convertirte en una de las veinte fundadoras de Fraccctal, y eso no queríamos resolverlo con un correo automático.</p>
   <p>Hasta hace nada Fraccctal éramos dos personas hablando de lo que echábamos en falta en Madrid: un sitio al que ir sin tener que llegar con respuestas. Sin gurú, sin promesas de transformación, sin networking disfrazado de otra cosa. Lo que hay hoy: los encuentros, la gente, esta lista; existe porque unas cuantas dijisteis que sí cuando todavía no había nada que enseñar. Eso no se nos olvida y no se nos va a olvidar.</p>
-  <p>Ser fundadora significa dos cosas concretas.</p>
-  <p>La primera: hasta el 31 de diciembre no pagas nada, y desde enero de 2027 tu cuota es de 11 € al mes (la mitad de la general) para siempre. Te lo contamos ahora, con cinco meses de antelación, porque no queremos que en enero te llegue ninguna sorpresa.</p>
-  <p>La segunda: sois veinte y no habrá más. En enero se cierra el cupo y la palabra fundadora deja de estar disponible.</p>
+  <p>Ser fundadora significa esto.</p>
+  <p>Lo primero: hasta el 31 de diciembre no pagas nada, y desde enero de 2027 tu cuota es de 11 € al mes (la mitad de la general) para siempre. Te lo contamos ahora, con cinco meses de antelación, porque no queremos que en enero te llegue ninguna sorpresa.</p>
+  <p>Lo segundo: sois veinte y no habrá más. En enero se cierra el cupo y la palabra fundadora deja de estar disponible.</p>
+  <p>Lo tercero: vas a estar ayudándonos a dar forma a este club. Contaremos con tu opinión, tu feedback, tus ideas y lo que quieras traer. En DFOS, nuestro espacio de encuentro online al que te recomendamos unirte, vas a estar dentro del círculo íntimo.</p>
+  <p>Lo cuarto: tienes un 15% de descuento en tu primera sesión con nuestra terapeuta de cabecera, Yaneli García Ríos. Puedes reservar escribiendo a yaneli.psicoterapia@gmail.com.</p>
+  <p>Lo quinto: la próxima vez que nos veamos te vamos a dar tu regalo de bienvenida, un merch solo para ti, en agradecimiento a tu apoyo.</p>
+  <p>Y lo sexto: hasta que cerremos el club en enero, sois las únicas con acceso a la preventa de los talleres, con la posibilidad de comprar las entradas early bird antes que nadie.</p>
   <p>Y te pedimos algo a cambio, porque esto lo estamos construyendo con vosotras y no para vosotras: que nos digas qué funciona y qué no. Después de cada encuentro te va a llegar una encuesta corta. Contéstala siempre: queremos escucharte, sobre todo en lo que creas que podemos mejorar. Y cuando algo te parezca lo bastante bueno, tráete a alguien.</p>
-  <p>Debajo te dejamos los primeros pasos.</p>
+  <p>Debajo te dejamos los pasos cruciales para terminar de completar tu registro como fundadora.</p>
+  <p><strong><a href="${DFOS_LINK}">Crea tu cuenta en el DFOS</a></strong>, nuestro espacio de comunidad online. Ahí también podrás comunicarte con el resto de miembros de la comunidad: hay distintos canales de conversación según el tema.</p>
+  <p><strong><a href="${WHATSAPP_LINK}">Súmate al canal de difusión de WhatsApp</a></strong>, ahí vamos a avisar las novedades y fechas.</p>
   <p>Nos vemos pronto, en persona.</p>
   <p>Irina y Nat<br>Fraccctal · club, comunidad, cambio</p>
 `;
@@ -139,13 +145,23 @@ async function sendWelcomeEmail(email, application, RESEND_API_KEY, tier) {
 
   const nombre = application?.nombre || "";
   const saludo = nombre ? `Hola, ${nombre}:` : "Hola:";
-  const carta = tier === "member" ? CARTA_MIEMBROS : CARTA_FUNDADORAS;
+  const esFundadora = tier !== "member";
+  const carta = esFundadora ? CARTA_FUNDADORAS : CARTA_MIEMBROS;
+
+  // La carta de fundadoras ya trae el DFOS y el WhatsApp adentro, como pasos
+  // para completar el registro. La de miembros todavía no, así que se los
+  // agregamos acá al final (igual que antes).
+  const pasosMiembro = esFundadora
+    ? ""
+    : `
+    <p><strong><a href="${DFOS_LINK}">Crea tu cuenta en el DFOS</a></strong>, nuestro espacio de comunidad online. Ahí también podrás comunicarte con el resto de miembros de la comunidad: hay distintos canales de conversación según el tema.</p>
+    <p><strong><a href="${WHATSAPP_LINK}">Súmate al canal de difusión de WhatsApp</a></strong>, ahí vamos a avisar las novedades y fechas.</p>
+  `;
 
   const html = `
     <p>${saludo}</p>
     ${carta}
-    <p><strong><a href="${WHATSAPP_LINK}">Súmate al canal de difusión de WhatsApp</a></strong>, ahí vamos a avisar las novedades y fechas.</p>
-    <p><strong><a href="${DFOS_LINK}">Crea tu cuenta en el DFOS</a></strong>, nuestro espacio de comunidad online. Ahí también podrás comunicarte con el resto de miembros de la comunidad: hay distintos canales de conversación según el tema.</p>
+    ${pasosMiembro}
   `;
 
   await sendEmail(RESEND_API_KEY, { to: email, subject: "Bienvenida a Fraccctal", html });
