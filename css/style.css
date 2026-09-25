@@ -244,6 +244,17 @@ section { padding: 96px 0; }
 
 .hero .lede { margin: 24px auto 34px; text-align: center; }
 
+.hero__flyer {
+  width: 100%;
+  max-width: 380px;
+  margin: 8px auto 0;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+
+.hero__flyer img { display: block; width: 100%; height: auto; }
+
 .hero__actions {
   display: flex;
   gap: 14px;
