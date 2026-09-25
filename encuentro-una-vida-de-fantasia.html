@@ -65,7 +65,7 @@
         <button type="submit" class="btn btn--primary" id="acceso-submit">Verificar</button>
       </form>
       <p id="acceso-mensaje" class="form-message" style="display:none; margin-top:12px"></p>
-      <p style="margin:16px 0 0; font-size:0.9rem"><a href="/membresia.html">¿Todavía no eres socia? Súmate aquí →</a></p>
+      <p style="margin:16px 0 0; font-size:0.9rem"><a href="/membresia.html">¿Todavía no eres socia? Súmate aquí<span id="acceso-gate-gratis"> (es gratis)</span> →</a></p>
     </div>
 
     <div id="tickets-box" style="background:var(--bg-alt); border:1px solid var(--line); border-radius:18px; padding:28px 30px; margin-bottom:48px; display:none">
@@ -266,6 +266,13 @@
   const EVENT_ID = "una-vida-de-fantasia-2026-09";
   const MEMBERS_ONLY_UNTIL = new Date("2026-09-01T00:00:00+02:00");
   const gated = new Date() < MEMBERS_ONLY_UNTIL;
+
+  // "(es gratis)" del link de membresía solo aplica mientras la membresía
+  // sea gratis (hasta el 3 de enero de 2027, mismo corte que el resto del sitio).
+  const FREE_UNTIL = new Date("2027-01-02T23:00:00Z");
+  if (new Date() >= FREE_UNTIL) {
+    document.getElementById("acceso-gate-gratis")?.remove();
+  }
 
   const accesoGate = document.getElementById("acceso-gate");
   const ticketsBox = document.getElementById("tickets-box");
