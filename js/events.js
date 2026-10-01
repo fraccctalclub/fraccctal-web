@@ -68,7 +68,7 @@ const FRACCCTAL_EVENTS = [
       "Taller de escritura para recuperar la imaginación, la curiosidad y el asombro propios de la infancia. No hace falta saber escribir, solo curiosidad.",
     ticketsUrl: "/encuentros/una-vida-de-fantasia",
     lumaUrl: "",
-    status: "abierto",
+    status: "cerrado",
   },
   {
     id: "una-voz-posible-2026-06",
