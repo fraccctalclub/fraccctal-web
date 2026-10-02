@@ -14,6 +14,7 @@
 //   STRIPE_WEBHOOK_SECRET, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY
 
 const crypto = require("crypto");
+const { sendEmail } = require("./lib/send-email");
 
 const WHATSAPP_LINK = "https://whatsapp.com/channel/0029Vb7tjMwGufIxndnWvc2J";
 const DFOS_LINK = "https://app.dfos.com/j/9crkn9827dc9kzzc22z9ha";
@@ -123,23 +124,6 @@ async function getApplication(email, table, SUPABASE_URL, SUPABASE_SERVICE_ROLE_
   }
 }
 
-async function sendEmail(RESEND_API_KEY, { to, subject, html }) {
-  await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${RESEND_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: "Fraccctal <hola@fraccctal.com>",
-      reply_to: NOTIFICACION_EMAIL,
-      to,
-      subject,
-      html,
-    }),
-  });
-}
-
 async function sendWelcomeEmail(email, application, RESEND_API_KEY, tier) {
   if (!RESEND_API_KEY) return;
 
@@ -164,7 +148,12 @@ async function sendWelcomeEmail(email, application, RESEND_API_KEY, tier) {
     ${pasosMiembro}
   `;
 
-  await sendEmail(RESEND_API_KEY, { to: email, subject: "Bienvenida a Fraccctal", html });
+  await sendEmail(RESEND_API_KEY, {
+    kind: esFundadora ? "bienvenida_fundadora" : "bienvenida_miembro",
+    to: email,
+    subject: "Bienvenida a Fraccctal",
+    html,
+  });
 }
 
 async function sendInternalNotification(email, application, RESEND_API_KEY, tier) {
@@ -187,6 +176,7 @@ async function sendInternalNotification(email, application, RESEND_API_KEY, tier
   `;
 
   await sendEmail(RESEND_API_KEY, {
+    kind: "aviso_interno_alta",
     to: NOTIFICACION_EMAIL,
     subject: `${etiqueta}: ${a.nombre || email}`,
     html,
@@ -224,6 +214,7 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
     // avisamos internamente para completarlo a mano en vez de mandar algo
     // con los datos de otro taller.
     await sendEmail(RESEND_API_KEY, {
+      kind: "aviso_interno_falta_copy",
       to: NOTIFICACION_EMAIL,
       subject: `Falta el copy de email para ${eventId}`,
       html: `<p>Se vendió una entrada de <strong>${eventId}</strong> (${email}) pero no hay contenido cargado en EVENT_EMAIL_CONTENT (stripe-webhook.js). Avisale a la persona a mano.</p>`,
@@ -278,9 +269,15 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
 
     <p style="color:#57554a; font-size:0.9rem; margin-top:24px">Fraccctal es un club nacido en Madrid en 2026. Creamos espacios para personas en tránsito (las que tienen la vida más o menos en orden pero sienten que algo no encaja). Cuatro pilares: placer, movimiento, conocimiento y curiosidad espiritual.</p>
   `;
-  await sendEmail(RESEND_API_KEY, { to: email, subject: `Tu plaza · ${contenido.shortTitle}`, html });
+  await sendEmail(RESEND_API_KEY, {
+    kind: "entrada_encuentro",
+    to: email,
+    subject: `Tu plaza · ${contenido.shortTitle}`,
+    html,
+  });
 
   await sendEmail(RESEND_API_KEY, {
+    kind: "aviso_interno_entrada",
     to: NOTIFICACION_EMAIL,
     subject: `Nueva entrada (${ticketTier}): ${email}`,
     html: `<p>Nueva entrada vendida para ${eventId}.</p><ul><li>Tier: ${ticketTier}</li><li>Email: ${email}</li><li>Sesión: ${session.id}</li></ul>`,

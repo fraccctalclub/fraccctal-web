@@ -8,24 +8,7 @@
 // Variables de entorno necesarias:
 //   SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY
 
-const NOTIFICACION_EMAIL = "fraccctal.contact@gmail.com";
-
-async function sendEmail(RESEND_API_KEY, { to, subject, html }) {
-  await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${RESEND_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: "Fraccctal <hola@fraccctal.com>",
-      reply_to: NOTIFICACION_EMAIL,
-      to,
-      subject,
-      html,
-    }),
-  });
-}
+const { sendEmail } = require("./send-email");
 
 function reminderHtml(nombre) {
   const saludo = nombre ? `Hola, ${nombre}:` : "Hola:";
@@ -74,13 +57,16 @@ async function runFounderReminder(env) {
     const founders = await foundersRes.json();
     if (founders.length > 0) continue; // completó el pago, no hace falta recordatorio
 
-    await sendEmail(RESEND_API_KEY, {
+    const r = await sendEmail(RESEND_API_KEY, {
+      kind: "recordatorio_fundadora",
       to: app.email,
       subject: "Tu lugar como fundadora sigue esperándote",
       html: reminderHtml(app.nombre),
     });
-    enviados++;
-    emailsEnviados.push(app.email);
+    if (r.ok) {
+      enviados++;
+      emailsEnviados.push(app.email);
+    }
   }
 
   return { revisadas: apps.length, recordatorios_enviados: enviados, emails: emailsEnviados };
