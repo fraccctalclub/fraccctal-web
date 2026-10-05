@@ -581,7 +581,8 @@ section { padding: 96px 0; }
   margin: 0 auto;
 }
 
-.form-inline input[type="email"] {
+.form-inline input[type="email"],
+.form-inline input[type="text"] {
   font-family: var(--sans);
   font-size: 0.95rem;
   padding: 13px 18px;
