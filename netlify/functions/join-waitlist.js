@@ -41,6 +41,10 @@ exports.handler = async (event) => {
     return { statusCode: 400, body: JSON.stringify({ error: "email_invalido" }) };
   }
 
+  if (!nombre) {
+    return { statusCode: 400, body: JSON.stringify({ error: "nombre_requerido" }) };
+  }
+
   // 1) Supabase: el orden de llegada. Si ya estaba anotada (índice único),
   // lo tratamos como éxito sin pisar su posición.
   const sbRes = await fetch(`${SUPABASE_URL}/rest/v1/lista_espera`, {
@@ -51,7 +55,7 @@ exports.handler = async (event) => {
       "Content-Type": "application/json",
       Prefer: "resolution=ignore-duplicates,return=minimal",
     },
-    body: JSON.stringify({ event_id: eventId, email, nombre: nombre || null }),
+    body: JSON.stringify({ event_id: eventId, email, nombre }),
   });
   if (!sbRes.ok) {
     console.error("lista_espera: Supabase respondió", sbRes.status);
@@ -61,13 +65,12 @@ exports.handler = async (event) => {
   // 2) Brevo: para poder escribirle. Si falla, ya quedó guardada en Supabase,
   // así que no se lo mostramos como error a la persona.
   try {
-    const attributes = nombre ? { NOMBRE: nombre } : undefined;
     const brevoRes = await fetch("https://api.brevo.com/v3/contacts", {
       method: "POST",
       headers: { "api-key": BREVO_API_KEY, "Content-Type": "application/json" },
       body: JSON.stringify({
         email,
-        ...(attributes && { attributes }),
+        attributes: { NOMBRE: nombre },
         listIds: [WAITLIST_BREVO_LISTS[eventId]],
         updateEnabled: true,
       }),

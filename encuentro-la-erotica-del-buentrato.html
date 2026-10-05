@@ -100,7 +100,7 @@
         <p style="margin:0 0 4px"><strong>Lista de espera</strong></p>
         <p style="margin:0 0 14px; color:var(--ink-soft); font-size:0.9rem">Las plazas se han agotado. Si se libera alguna, te escribimos por orden de llegada. Solo usaremos tu email para eso.</p>
         <form id="waitlist-form" class="form-inline">
-          <input type="text" id="waitlist-nombre" placeholder="Tu nombre (opcional)" autocomplete="given-name">
+          <input type="text" id="waitlist-nombre" placeholder="Tu nombre" required autocomplete="given-name">
           <input type="email" id="waitlist-email" placeholder="tu@email.com" required autocomplete="email">
           <button type="submit" class="btn btn--primary" id="waitlist-submit">Apuntarme</button>
         </form>
@@ -337,6 +337,8 @@
       msg.className = "form-message form-message--error";
       msg.textContent = data.error === "email_invalido"
         ? "Revisa el email, parece que tiene un error."
+        : data.error === "nombre_requerido"
+        ? "Escribe tu nombre para apuntarte."
         : "No pudimos apuntarte. Inténtalo de nuevo.";
     } catch {
       msg.style.display = "block";
