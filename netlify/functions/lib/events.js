@@ -33,7 +33,7 @@ const EVENTS = {
     tiers: {
       early: { price: PRICE_OCT_EARLY, cap: 4, seats: 1 },
       general: { price: PRICE_OCT_GENERAL, cap: 12, seats: 1 },
-      amigxs: { price: PRICE_OCT_AMIGXS, cap: 8, seats: 2 },
+      amigxs: { price: PRICE_OCT_AMIGXS, cap: 2, seats: 2 }, // cerrado: cap = ya vendidas
     },
   },
 };
