@@ -10,7 +10,7 @@
 // Variables de entorno: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, BREVO_API_KEY,
 // RESEND_API_KEY
 
-const { sendEmail } = require("./lib/send-email");
+const { sendEmail, NOTIFICACION_EMAIL } = require("./lib/send-email");
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const FOUNDER_CAP = 20;
@@ -151,6 +151,25 @@ exports.handler = async (event) => {
       });
     } catch (err) {
       console.error("lista_espera: email falló", err.message);
+    }
+  }
+
+  // 4) Aviso interno a Irina, también solo la primera vez.
+  if (nuevaEnLista && RESEND_API_KEY) {
+    try {
+      const countRes = await fetch(
+        `${SUPABASE_URL}/rest/v1/lista_espera?select=id&event_id=eq.${encodeURIComponent(eventId)}`,
+        { headers: { apikey: SUPABASE_SERVICE_ROLE_KEY, Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}` } }
+      );
+      const puesto = countRes.ok ? (await countRes.json()).length : null;
+      await sendEmail(RESEND_API_KEY, {
+        kind: "aviso_interno_lista_espera",
+        to: NOTIFICACION_EMAIL,
+        subject: `Lista de espera · ${ev.titulo}: ${nombre}`,
+        html: `<p>Nueva persona en la lista de espera de <strong>${ev.titulo}</strong>.</p><ul><li>Nombre: ${escapeHtml(nombre)}</li><li>Email: ${escapeHtml(email)}</li>${puesto ? `<li>Puesto en la lista: ${puesto}</li>` : ""}</ul>`,
+      });
+    } catch (err) {
+      console.error("lista_espera: aviso interno falló", err.message);
     }
   }
 
