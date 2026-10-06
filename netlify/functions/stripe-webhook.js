@@ -72,7 +72,7 @@ const EVENT_EMAIL_CONTENT = {
     dateTimeLabel: "Sábado 24 de octubre de 2026, de 17:00 a 20:00 h",
     dayLabel: "24",
     venueLabel: "Espacio en Blanco · Madrid (C. de Mira el Sol, 5, Centro, 28005 Madrid)",
-    capacityWord: "dieciséis",
+    capacityWord: "dieciocho",
     queTraer:
       "Ropa cómoda que permita moverse, calcetines o pies descalzos, una botella de agua y un cuaderno o algo para apuntar. No hace falta ningún tipo de experiencia previa.",
     pageUrl: "https://fraccctal.com/encuentros/la-erotica-del-buentrato",
