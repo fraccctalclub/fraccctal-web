@@ -39,16 +39,32 @@ const CARTA_FUNDADORAS = `
   <p>Lo quinto: la próxima vez que nos veamos te vamos a dar tu regalo de bienvenida, un merch solo para ti, en agradecimiento a tu apoyo.</p>
   <p>Y lo sexto: hasta que cerremos el club en enero, sois las únicas con acceso a la preventa de los talleres, con la posibilidad de comprar las entradas early bird antes que nadie.</p>
   <p>Y te pedimos algo a cambio, porque esto lo estamos construyendo con vosotras y no para vosotras: que nos digas qué funciona y qué no. Después de cada encuentro te va a llegar una encuesta corta. Contéstala siempre: queremos escucharte, sobre todo en lo que creas que podemos mejorar. Y cuando algo te parezca lo bastante bueno, tráete a alguien.</p>
-  <p>Y para que lo sepas desde el principio: puedes darte de baja cuando quieras, tú misma y sin dar explicaciones, desde <a href="https://fraccctal.com/preventa.html">tu espacio de socixs</a> (entras con tu email y pulsas "Darme de baja"). Mientras estés en el periodo gratuito, la baja es inmediata y no se te cobra nada.</p>
+  <p>Puedes darte de baja cuando quieras, tú misma y sin dar explicaciones, desde <a href="https://fraccctal.com/preventa.html">tu espacio de socixs</a> (entras con tu email y pulsas "Darme de baja"). Mientras estés en el periodo gratuito, la baja es inmediata y no se te cobra nada.</p>
   <p>Gracias por confiar en nosotras desde el principio. Si tienes cualquier duda, o simplemente quieres decirnos hola, responde a este correo: nos llega directamente a Irina y a Nat.</p>
   <p>Nos vemos pronto, en persona.</p>
   <p>Con cariño,<br>Irina y Nat<br>Fraccctal · club, comunidad, cambio</p>
 `;
 
-// EDITAR: carta de bienvenida para la membresía general (no fundadora).
-// Reemplazar por el texto definitivo cuando lo tengan.
+// Carta de bienvenida para la membresía general (no fundadora). Misma
+// estructura que la de fundadoras; el saludo lo arma sendWelcomeEmail.
 const CARTA_MIEMBROS = `
-  <p>[PEGAR AQUÍ LA CARTA DE BIENVENIDA PARA MIEMBROS GENERALES]</p>
+  <p>Bienvenida a Fraccctal. Somos Irina y Nat, y estamos felices de que estés aquí: acabas de convertirte en miembro del club, y para nosotras eso significa muchísimo.</p>
+  <p>Para que ya estés dentro de todo, te pedimos dos cosas que te llevan un minuto:</p>
+  <p><strong><a href="${DFOS_LINK}">Crea tu cuenta en el DFOS</a></strong>, nuestro espacio de comunidad online. Ahí también podrás comunicarte con el resto de miembros de la comunidad: hay distintos canales de conversación según el tema.</p>
+  <p><strong><a href="${WHATSAPP_LINK}">Súmate al canal de difusión de WhatsApp</a></strong>, ahí vamos a avisar las novedades y fechas.</p>
+  <p>Y ahora sí, te contamos un poco más.</p>
+  <p>Hasta hace nada Fraccctal éramos dos personas hablando de lo que echábamos en falta en Madrid: un sitio al que ir sin tener que llegar con respuestas. Sin gurú, sin promesas de transformación, sin networking disfrazado de otra cosa. Lo que hay hoy: los encuentros, la gente, esta lista; existe porque unas cuantas dijeron que sí cuando todavía no había nada que enseñar, y ahora tú también has dicho que sí.</p>
+  <p>Ser miembro significa esto.</p>
+  <p>Lo primero: hasta el 3 de enero de 2027 no pagas nada, y desde entonces tu cuota es de 22 € al mes. Te lo contamos ahora, con antelación, porque no queremos que en enero te llegue ninguna sorpresa.</p>
+  <p>Lo segundo: tienes acceso a todos los talleres y encuentros de Fraccctal, y al club de lectura y al walking club. Desde enero los talleres serán exclusivos para socixs: ya no los abriremos fuera de la comunidad.</p>
+  <p>Lo tercero: en DFOS, nuestro espacio de encuentro online, la conversación sigue cada día entre encuentro y encuentro. Es la forma más fácil de conocer a la gente y de proponer lo que te apetezca.</p>
+  <p>Lo cuarto: tienes un 15% de descuento en tu primera sesión con nuestra terapeuta de cabecera, Yaneli García Ríos (puedes reservar escribiendo a yaneli.psicoterapia@gmail.com), y descuentos con el resto de nuestra red de terapeutas y talleristas.</p>
+  <p>Lo quinto: la próxima vez que nos veamos te vamos a dar tu regalo de bienvenida, un merch solo para ti, en agradecimiento a tu apoyo.</p>
+  <p>Y te pedimos algo a cambio, porque esto lo estamos construyendo con vosotras y no para vosotras: que nos digas qué funciona y qué no. Después de cada encuentro te va a llegar una encuesta corta. Contéstala siempre: queremos escucharte, sobre todo en lo que creas que podemos mejorar. Y cuando algo te parezca lo bastante bueno, tráete a alguien.</p>
+  <p>Puedes darte de baja cuando quieras, tú misma y sin dar explicaciones, desde <a href="https://fraccctal.com/preventa.html">tu espacio de socixs</a> (entras con tu email y pulsas "Darme de baja"). Mientras estés en el periodo gratuito, la baja es inmediata y no se te cobra nada.</p>
+  <p>Gracias por confiar en nosotras. Si tienes cualquier duda, o simplemente quieres decirnos hola, responde a este correo: nos llega directamente a Irina y a Nat.</p>
+  <p>Nos vemos pronto, en persona.</p>
+  <p>Con cariño,<br>Irina y Nat<br>Fraccctal · club, comunidad, cambio</p>
 `;
 
 // Contenido específico de cada encuentro para el email de confirmación de
@@ -137,20 +153,9 @@ async function sendWelcomeEmail(email, application, RESEND_API_KEY, tier) {
   const esFundadora = tier !== "member";
   const carta = esFundadora ? CARTA_FUNDADORAS : CARTA_MIEMBROS;
 
-  // La carta de fundadoras ya trae el DFOS y el WhatsApp adentro, como pasos
-  // para completar el registro. La de miembros todavía no, así que se los
-  // agregamos acá al final (igual que antes).
-  const pasosMiembro = esFundadora
-    ? ""
-    : `
-    <p><strong><a href="${DFOS_LINK}">Crea tu cuenta en el DFOS</a></strong>, nuestro espacio de comunidad online. Ahí también podrás comunicarte con el resto de miembros de la comunidad: hay distintos canales de conversación según el tema.</p>
-    <p><strong><a href="${WHATSAPP_LINK}">Súmate al canal de difusión de WhatsApp</a></strong>, ahí vamos a avisar las novedades y fechas.</p>
-  `;
-
   const html = `
     <p>${saludo}</p>
     ${carta}
-    ${pasosMiembro}
   `;
 
   await sendEmail(RESEND_API_KEY, {
