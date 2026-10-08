@@ -46,16 +46,20 @@ async function runFounderReminder(env) {
   if (!appsRes.ok) throw new Error(`Error leyendo founder_applications: ${appsRes.status}`);
   const apps = await appsRes.json();
 
+  // Fundadoras activas, comparadas sin distinguir mayúsculas: si no se puede
+  // consultar, mejor no mandar nada que recordarle el pago a quien ya pagó.
+  const foundersRes = await fetch(`${SUPABASE_URL}/rest/v1/founders?select=email&status=eq.active`, { headers });
+  if (!foundersRes.ok) throw new Error(`Error leyendo founders: ${foundersRes.status}`);
+  const activas = new Set((await foundersRes.json()).map((f) => f.email.trim().toLowerCase()));
+
   let enviados = 0;
   const emailsEnviados = [];
+  const yaTratadas = new Set();
   for (const app of apps) {
-    const foundersRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/founders?select=id&status=eq.active&email=eq.${encodeURIComponent(app.email)}`,
-      { headers }
-    );
-    if (!foundersRes.ok) continue;
-    const founders = await foundersRes.json();
-    if (founders.length > 0) continue; // completó el pago, no hace falta recordatorio
+    const clave = app.email.trim().toLowerCase();
+    if (activas.has(clave)) continue; // completó el pago, no hace falta recordatorio
+    if (yaTratadas.has(clave)) continue; // varias solicitudes del mismo email: un solo recordatorio
+    yaTratadas.add(clave);
 
     const r = await sendEmail(RESEND_API_KEY, {
       kind: "recordatorio_fundadora",
