@@ -6,6 +6,8 @@
 // Variables de entorno necesarias (configurar en Netlify, nunca en el repo):
 //   STRIPE_SECRET_KEY, STRIPE_FOUNDER_PRICE_ID, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
 
+const { avisoInterno, paresSolicitud } = require("./lib/notify-internal");
+
 const FOUNDER_CAP = 20;
 
 // Versión del texto de condiciones.html que se le pide aceptar a cada
@@ -103,6 +105,13 @@ exports.handler = async (event) => {
       acepta_codigo_conducta: true,
       condiciones_version: CONDICIONES_VERSION,
     }),
+  });
+
+  await avisoInterno({
+    kind: "aviso_interno_solicitud_fundadora",
+    subject: `Solicitud de fundadora (aún sin pagar): ${body.nombre || email}`,
+    intro: "Alguien ha empezado el alta como fundadora. Si no completa el pago, mañana recibe el recordatorio automático.",
+    pares: paresSolicitud(body, email),
   });
 
   // 3. Crear la Checkout Session en Stripe (API REST directa, sin el SDK de Stripe).

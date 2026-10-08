@@ -8,6 +8,8 @@
 // Variables de entorno necesarias:
 //   STRIPE_SECRET_KEY, STRIPE_MEMBER_PRICE_ID, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
 
+const { avisoInterno, paresSolicitud } = require("./lib/notify-internal");
+
 // 3 de enero de 2027, 00:00 hora de Madrid (CET = UTC+1 en enero) = 2027-01-02T23:00:00Z.
 // Mismo timestamp que usa create-checkout-session.js para las fundadoras.
 const FREE_UNTIL_TIMESTAMP = Math.floor(Date.parse("2027-01-02T23:00:00Z") / 1000);
@@ -87,6 +89,13 @@ exports.handler = async (event) => {
       acepta_codigo_conducta: true,
       condiciones_version: CONDICIONES_VERSION,
     }),
+  });
+
+  await avisoInterno({
+    kind: "aviso_interno_solicitud_miembro",
+    subject: `Solicitud de miembro (aún sin pagar): ${body.nombre || email}`,
+    intro: "Alguien ha empezado el alta como miembro general.",
+    pares: paresSolicitud(body, email),
   });
 
   // Crear la Checkout Session en Stripe (API REST directa, sin el SDK de Stripe).

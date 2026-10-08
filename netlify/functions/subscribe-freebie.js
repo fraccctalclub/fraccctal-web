@@ -7,6 +7,8 @@
 // Variables de entorno necesarias (configurar en Netlify, nunca en el repo):
 //   BREVO_API_KEY, BREVO_LIST_ID (el id numérico de la lista "vida de fantasía")
 
+const { avisoInterno } = require("./lib/notify-internal");
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PDF_URL = "/assets/freebies/el-poema-de-las-cosas.pdf";
 
@@ -66,6 +68,13 @@ exports.handler = async (event) => {
       body: JSON.stringify({ error: detail || "No pudimos anotarte, inténtalo de nuevo." }),
     };
   }
+
+  await avisoInterno({
+    kind: "aviso_interno_freebie",
+    subject: `Nueva suscripción al regalo del poema: ${nombre}`,
+    intro: "Alguien se ha suscrito para descargar \"El poema de las cosas que (no) se repiten\".",
+    pares: [["Nombre", `${nombre} ${apellido}`], ["Email", email]],
+  });
 
   return { statusCode: 200, body: JSON.stringify({ url: PDF_URL }) };
 };
