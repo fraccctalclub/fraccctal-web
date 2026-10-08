@@ -58,15 +58,30 @@
       <div style="text-align:center; margin-bottom:32px">
         <p class="eyebrow">Bienvenida</p>
         <p style="margin:0"><span id="user-email"></span> · <a href="#" id="logout-link">cerrar sesión</a></p>
-        <p style="margin:8px 0 0"><a href="#" id="portal-link">Gestionar mi membresía</a></p>
+        <p style="margin:8px 0 0"><a href="#" id="portal-link">Gestionar mi membresía</a> · <a href="#" id="baja-link">Darme de baja</a></p>
         <p id="portal-mensaje" class="form-message form-message--error" style="display:none"></p>
       </div>
       <div class="events" id="founder-events"></div>
+
+      <div id="tu-membresia" style="background:var(--bg-alt); border:1px solid var(--line); border-radius:18px; padding:28px 30px; margin-top:48px">
+        <p class="eyebrow" style="margin-bottom:12px">Tu membresía</p>
+        <p style="margin:0 0 16px">Aquí puedes cambiar tu tarjeta, ver tus cobros o darte de baja cuando quieras, sin explicaciones ni llamadas. Se abre una pantalla de Stripe donde lo confirmas.</p>
+        <p style="margin:0 0 20px; color:var(--ink-soft); font-size:0.9rem">Si todavía estás en el periodo gratuito (hasta el 3 de enero), la baja es inmediata y no se te cobra nada. Si ya pagas, sigues como socia hasta el final del periodo abonado.</p>
+        <p style="margin:0; display:flex; gap:12px; flex-wrap:wrap">
+          <a href="#" class="btn btn--ghost" id="portal-boton">Gestionar mi membresía</a>
+          <a href="#" class="btn btn--ghost" id="baja-boton">Darme de baja</a>
+        </p>
+      </div>
     </div>
 
     <p id="loading-mensaje" style="text-align:center">Cargando…</p>
     <p id="not-configured-mensaje" style="text-align:center; display:none">El sistema de membresía todavía no está conectado. Vuelve más tarde.</p>
     <p id="no-membership-mensaje" class="form-message form-message--error" style="text-align:center; display:none">Esa sesión no corresponde a ninguna membresía activa.</p>
+    <div id="baja-ok-mensaje" style="text-align:center; display:none">
+      <p class="eyebrow">Baja registrada</p>
+      <p style="margin:0 0 8px">Hemos registrado tu baja. Gracias por haber estado en Fraccctal.</p>
+      <p style="margin:0; color:var(--ink-soft)">Si fue sin querer o tienes cualquier duda, escríbenos a <a href="https://mail.google.com/mail/?view=cm&fs=1&to=fraccctal.contact@gmail.com" target="_blank" rel="noopener">fraccctal.contact@gmail.com</a>.</p>
+    </div>
 
   </div>
 </section>
@@ -121,6 +136,17 @@
   async function render() {
     loadingMensaje.style.display = "none";
     noMembershipMensaje.style.display = "none";
+
+    // Vuelve del portal de Stripe tras confirmar la baja: se cierra la sesión
+    // y se muestra la confirmación (en vez de "no tienes membresía activa").
+    if (new URLSearchParams(location.search).get("baja") === "ok") {
+      if (isConfigured) await signOut();
+      history.replaceState(null, "", location.pathname);
+      loginGate.style.display = "none";
+      founderContent.style.display = "none";
+      document.getElementById("baja-ok-mensaje").style.display = "block";
+      return;
+    }
 
     if (!isConfigured) {
       notConfiguredMensaje.style.display = "block";
@@ -185,7 +211,10 @@
     render();
   });
 
-  document.getElementById("portal-link").addEventListener("click", async (e) => {
+  // Abre el portal de Stripe (accion "baja" = directo a la pantalla de
+  // cancelar). El servidor identifica a la socia por su sesión, no por un email
+  // enviado desde acá.
+  async function abrirPortal(e, accion) {
     e.preventDefault();
     const link = e.currentTarget;
     const portalMensaje = document.getElementById("portal-mensaje");
@@ -197,23 +226,26 @@
       const session = await getSession();
       const res = await fetch("/.netlify/functions/create-portal-session", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: session.user.email }),
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
+        body: JSON.stringify({ accion }),
       });
       const data = await res.json();
       if (res.ok && data.url) {
         location.href = data.url;
         return;
       }
-      portalMensaje.style.display = "block";
-      portalMensaje.textContent = "No pudimos abrir la gestión de tu membresía. Escríbenos a fraccctal.contact@gmail.com.";
     } catch {
-      portalMensaje.style.display = "block";
-      portalMensaje.textContent = "No pudimos abrir la gestión de tu membresía. Escríbenos a fraccctal.contact@gmail.com.";
+      // cae al mensaje de error de abajo
     }
-
+    portalMensaje.style.display = "block";
+    portalMensaje.textContent = "No pudimos abrir la gestión de tu membresía. Escríbenos a fraccctal.contact@gmail.com.";
     link.textContent = textoOriginal;
-  });
+  }
+
+  document.getElementById("portal-link").addEventListener("click", (e) => abrirPortal(e, undefined));
+  document.getElementById("portal-boton").addEventListener("click", (e) => abrirPortal(e, undefined));
+  document.getElementById("baja-link").addEventListener("click", (e) => abrirPortal(e, "baja"));
+  document.getElementById("baja-boton").addEventListener("click", (e) => abrirPortal(e, "baja"));
 
   render();
 </script>
