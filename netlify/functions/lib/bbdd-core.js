@@ -1,6 +1,7 @@
 // Lógica compartida: junta socias + compras desde Supabase, y sincroniza esa
 // lista contra la base "Socias y compras" de Notion (crea filas nuevas,
-// actualiza las existentes, nunca borra nada).
+// actualiza las existentes, nunca borra nada; solo quita la etiqueta de
+// Fundadora/Miembro a quien ya no tiene alta activa).
 
 const NOTION_DATABASE_ID = "bf454ec2-7ada-47e1-9f6f-ed06874e8046";
 const NOTION_VERSION = "2022-06-28";
@@ -247,6 +248,47 @@ async function syncPersonaToNotion(persona, existingPage, NOTION_TOKEN) {
   return "actualizada";
 }
 
+// Quita de la columna "Compras" de una fila las etiquetas indicadas (ej.
+// "Fundadora", "Miembro") y deja el resto del historial. Devuelve true si
+// cambió algo.
+async function quitarEtiquetasDeFila(page, tags, NOTION_TOKEN) {
+  const actuales = (page.properties?.Compras?.multi_select || []).map((o) => o.name);
+  const nuevas = actuales.filter((t) => !tags.includes(t));
+  if (nuevas.length === actuales.length) return false;
+  await notionFetch(`/pages/${page.id}`, {
+    NOTION_TOKEN,
+    method: "PATCH",
+    body: { properties: { Compras: { multi_select: nuevas.map((name) => ({ name })) } } },
+  });
+  return true;
+}
+
+// Red de seguridad para las bajas: filas de Notion que siguen marcadas como
+// Fundadora/Miembro aunque ya no haya un alta activa en Supabase (baja hecha
+// a mano, evento de Stripe perdido...). Solo quita la etiqueta si Supabase
+// confirma, con una consulta directa, que no hay ninguna alta activa; ante
+// cualquier error de lectura no toca nada.
+async function reconciliarEtiquetasSocia(existingByEmail, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, NOTION_TOKEN) {
+  const activos = {};
+  for (const [tag, tabla] of [["Fundadora", "founders"], ["Miembro", "members"]]) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${tabla}?select=email&status=eq.active`, {
+      headers: { apikey: SUPABASE_SERVICE_ROLE_KEY, Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}` },
+    });
+    if (!res.ok) return 0;
+    activos[tag] = new Set((await res.json()).map((r) => (r.email || "").toLowerCase()));
+  }
+
+  let quitadas = 0;
+  for (const [email, page] of Object.entries(existingByEmail)) {
+    const etiquetas = (page.properties?.Compras?.multi_select || [])
+      .map((o) => o.name)
+      .filter((t) => activos[t] && !activos[t].has(email));
+    if (!etiquetas.length) continue;
+    if (await quitarEtiquetasDeFila(page, etiquetas, NOTION_TOKEN)) quitadas++;
+  }
+  return quitadas;
+}
+
 async function runBbddSync({ SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, NOTION_TOKEN, STRIPE_SECRET_KEY }) {
   const personas = await buildPersonas(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, STRIPE_SECRET_KEY);
   const existingByEmail = await fetchExistingRows(NOTION_TOKEN);
@@ -257,7 +299,14 @@ async function runBbddSync({ SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, NOTION_TOK
     resumen[resultado === "creada" ? "creadas" : resultado === "actualizada" ? "actualizadas" : "sin_cambios"]++;
   }
 
-  return { total: personas.length, ...resumen };
+  const etiquetasQuitadas = await reconciliarEtiquetasSocia(
+    existingByEmail,
+    SUPABASE_URL,
+    SUPABASE_SERVICE_ROLE_KEY,
+    NOTION_TOKEN
+  );
+
+  return { total: personas.length, ...resumen, etiquetas_socia_quitadas: etiquetasQuitadas };
 }
 
-module.exports = { runBbddSync };
+module.exports = { runBbddSync, notionFetch, NOTION_DATABASE_ID, quitarEtiquetasDeFila };

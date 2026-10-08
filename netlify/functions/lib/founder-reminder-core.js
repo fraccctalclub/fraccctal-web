@@ -46,9 +46,11 @@ async function runFounderReminder(env) {
   if (!appsRes.ok) throw new Error(`Error leyendo founder_applications: ${appsRes.status}`);
   const apps = await appsRes.json();
 
-  // Fundadoras activas, comparadas sin distinguir mayúsculas: si no se puede
-  // consultar, mejor no mandar nada que recordarle el pago a quien ya pagó.
-  const foundersRes = await fetch(`${SUPABASE_URL}/rest/v1/founders?select=email&status=eq.active`, { headers });
+  // Quien tiene fila de fundadora en CUALQUIER estado (activa o dada de baja)
+  // ya completó el pago alguna vez: no se le recuerda que lo complete. Se
+  // compara sin distinguir mayúsculas. Si no se puede consultar, mejor no
+  // mandar nada que escribirle a quien ya pagó o se dio de baja.
+  const foundersRes = await fetch(`${SUPABASE_URL}/rest/v1/founders?select=email`, { headers });
   if (!foundersRes.ok) throw new Error(`Error leyendo founders: ${foundersRes.status}`);
   const activas = new Set((await foundersRes.json()).map((f) => f.email.trim().toLowerCase()));
 

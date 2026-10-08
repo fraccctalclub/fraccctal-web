@@ -15,6 +15,8 @@
 
 const crypto = require("crypto");
 const { sendEmail } = require("./lib/send-email");
+const { procesarBaja, esSuscripcionDeSocia } = require("./lib/baja-core");
+const { avisoInterno } = require("./lib/notify-internal");
 
 const WHATSAPP_LINK = "https://whatsapp.com/channel/0029Vb7tjMwGufIxndnWvc2J";
 const DFOS_LINK = "https://app.dfos.com/j/9crkn9827dc9kzzc22z9ha";
@@ -346,6 +348,48 @@ exports.handler = async (event) => {
   }
 
   const stripeEvent = JSON.parse(rawBody);
+
+  // Una suscripción de socia terminó (baja pedida, o cancelada por impago):
+  // cierre automático en Supabase, Brevo y Notion + aviso a Gmail.
+  if (stripeEvent.type === "customer.subscription.deleted") {
+    await procesarBaja(stripeEvent.data.object, process.env);
+    return { statusCode: 200, body: "ok" };
+  }
+
+  // Una socia pidió la baja desde el portal (que cancela "al final del periodo").
+  // Si todavía está en periodo de prueba no ha pagado nada, así que no hay
+  // periodo abonado que respetar: se cancela ya, y eso dispara el evento
+  // "deleted" de arriba. Si ya pagaba, la baja corre hasta fin de periodo y
+  // solo te avisamos.
+  if (stripeEvent.type === "customer.subscription.updated") {
+    const sub = stripeEvent.data.object;
+    const prev = stripeEvent.data.previous_attributes || {};
+    const acabaDePedirla =
+      (sub.cancel_at_period_end === true && "cancel_at_period_end" in prev) ||
+      (sub.cancel_at && "cancel_at" in prev && !prev.cancel_at);
+    if (acabaDePedirla && (await esSuscripcionDeSocia(sub.id, { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY }))) {
+      if (sub.status === "trialing") {
+        const res = await fetch(`https://api.stripe.com/v1/subscriptions/${encodeURIComponent(sub.id)}`, {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`, "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({ "cancellation_details[comment]": "Baja pedida desde el portal durante el periodo de prueba (sin cobros)" }).toString(),
+        });
+        if (!res.ok) return { statusCode: 500, body: "No se pudo cancelar la suscripción en periodo de prueba" };
+      } else {
+        const fin = sub.cancel_at || sub.current_period_end || sub.items?.data?.[0]?.current_period_end;
+        await avisoInterno({
+          kind: "aviso_interno_baja_pedida",
+          subject: "Una socia ha pedido la baja (efectiva al final del periodo)",
+          intro: "Una socia ha cancelado desde el portal; seguirá activa hasta el final del periodo ya abonado y el cierre automático correrá entonces.",
+          pares: [
+            ["Suscripción", sub.id],
+            ["Fin del periodo", fin ? new Date(fin * 1000).toLocaleDateString("es-ES", { timeZone: "Europe/Madrid" }) : ""],
+          ],
+        });
+      }
+    }
+    return { statusCode: 200, body: "ok" };
+  }
 
   if (stripeEvent.type === "checkout.session.completed") {
     const session = stripeEvent.data.object;
