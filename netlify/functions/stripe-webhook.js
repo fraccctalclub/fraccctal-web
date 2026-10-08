@@ -25,7 +25,11 @@ const NOTIFICACION_EMAIL = "fraccctal.contact@gmail.com";
 // Carta de bienvenida de las fundadoras. El saludo con el nombre se arma aparte
 // en sendWelcomeEmail, tomando el nombre guardado en founder_applications.
 const CARTA_FUNDADORAS = `
-  <p>Somos Irina y Nat. Te escribimos porque acabas de convertirte en una de las veinte fundadoras de Fraccctal, y eso no queríamos resolverlo con un correo automático.</p>
+  <p>Bienvenida a Fraccctal. Somos Irina y Nat, y estamos felices de que estés aquí: acabas de convertirte en una de las veinte fundadoras, y para nosotras eso significa muchísimo.</p>
+  <p>Para que ya estés dentro de todo, te pedimos dos cosas que te llevan un minuto:</p>
+  <p><strong><a href="${DFOS_LINK}">Crea tu cuenta en el DFOS</a></strong>, nuestro espacio de comunidad online. Ahí también podrás comunicarte con el resto de miembros de la comunidad: hay distintos canales de conversación según el tema.</p>
+  <p><strong><a href="${WHATSAPP_LINK}">Súmate al canal de difusión de WhatsApp</a></strong>, ahí vamos a avisar las novedades y fechas.</p>
+  <p>Y ahora sí, te contamos un poco más.</p>
   <p>Hasta hace nada Fraccctal éramos dos personas hablando de lo que echábamos en falta en Madrid: un sitio al que ir sin tener que llegar con respuestas. Sin gurú, sin promesas de transformación, sin networking disfrazado de otra cosa. Lo que hay hoy: los encuentros, la gente, esta lista; existe porque unas cuantas dijisteis que sí cuando todavía no había nada que enseñar. Eso no se nos olvida y no se nos va a olvidar.</p>
   <p>Ser fundadora significa esto.</p>
   <p>Lo primero: hasta el 31 de diciembre no pagas nada, y desde enero de 2027 tu cuota es de 11 € al mes (la mitad de la general) para siempre. Te lo contamos ahora, con cinco meses de antelación, porque no queremos que en enero te llegue ninguna sorpresa.</p>
@@ -35,11 +39,10 @@ const CARTA_FUNDADORAS = `
   <p>Lo quinto: la próxima vez que nos veamos te vamos a dar tu regalo de bienvenida, un merch solo para ti, en agradecimiento a tu apoyo.</p>
   <p>Y lo sexto: hasta que cerremos el club en enero, sois las únicas con acceso a la preventa de los talleres, con la posibilidad de comprar las entradas early bird antes que nadie.</p>
   <p>Y te pedimos algo a cambio, porque esto lo estamos construyendo con vosotras y no para vosotras: que nos digas qué funciona y qué no. Después de cada encuentro te va a llegar una encuesta corta. Contéstala siempre: queremos escucharte, sobre todo en lo que creas que podemos mejorar. Y cuando algo te parezca lo bastante bueno, tráete a alguien.</p>
-  <p>Debajo te dejamos los pasos cruciales para terminar de completar tu registro como fundadora.</p>
-  <p><strong><a href="${DFOS_LINK}">Crea tu cuenta en el DFOS</a></strong>, nuestro espacio de comunidad online. Ahí también podrás comunicarte con el resto de miembros de la comunidad: hay distintos canales de conversación según el tema.</p>
-  <p><strong><a href="${WHATSAPP_LINK}">Súmate al canal de difusión de WhatsApp</a></strong>, ahí vamos a avisar las novedades y fechas.</p>
+  <p>Y para que lo sepas desde el principio: puedes darte de baja cuando quieras, tú misma y sin dar explicaciones, desde <a href="https://fraccctal.com/preventa.html">tu espacio de socixs</a> (entras con tu email y pulsas "Darme de baja"). Mientras estés en el periodo gratuito, la baja es inmediata y no se te cobra nada.</p>
+  <p>Gracias por confiar en nosotras desde el principio. Si tienes cualquier duda, o simplemente quieres decirnos hola, responde a este correo: nos llega directamente a Irina y a Nat.</p>
   <p>Nos vemos pronto, en persona.</p>
-  <p>Irina y Nat<br>Fraccctal · club, comunidad, cambio</p>
+  <p>Con cariño,<br>Irina y Nat<br>Fraccctal · club, comunidad, cambio</p>
 `;
 
 // EDITAR: carta de bienvenida para la membresía general (no fundadora).
