@@ -40,3 +40,12 @@
   from = "/encuentros/la-erotica-del-buentrato"
   to = "/encuentro-la-erotica-del-buentrato.html"
   status = 200
+
+# Caché de un día para logos e imágenes. No es más larga porque algunos
+# archivos se reemplazan con el mismo nombre (flyers) y no queremos que quien
+# ya los vio siga viendo la versión vieja. El HTML, CSS y JS no se tocan:
+# Netlify los revalida en cada visita, así los cambios se ven al momento.
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"

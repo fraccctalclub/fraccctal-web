@@ -38,8 +38,9 @@ function tagsHTML(event) {
 }
 
 function dateBlockHTML(event) {
-  const thumb = event.flyer
-    ? `<img class="event-card__thumb" src="${event.flyer}" alt="" loading="lazy">`
+  const thumbSrc = event.flyerThumb || event.flyer;
+  const thumb = thumbSrc
+    ? `<img class="event-card__thumb" src="${thumbSrc}" alt="" loading="lazy">`
     : "";
   return `
     <div class="event-card__datewrap">

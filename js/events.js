@@ -14,6 +14,7 @@
  *   flyer        ruta al flyer del encuentro (ej. "/assets/img/flyer-xxx.webp"), se
  *                muestra en miniatura junto a la fecha en las tarjetas. Déjalo como ""
  *                si todavía no hay flyer.
+ *   flyerThumb   miniatura del flyer (unos 360px de ancho) para las tarjetas; si falta se usa flyer
  *   city         ciudad
  *   price        texto libre de precio, ej. "25-30€" o "Gratis"
  *   founderPrice texto libre de precio solo para fundadoras, ej. "15€" (déjalo como ""
@@ -40,6 +41,7 @@ const FRACCCTAL_EVENTS = [
     dateSort: "2026-10-24",
     venue: "Espacio en Blanco",
     flyer: "/assets/img/flyer-la-erotica-del-buentrato.webp",
+    flyerThumb: "/assets/img/flyer-la-erotica-del-buentrato-thumb.webp",
     city: "Madrid",
     price: "Early bird 20€ · General 25€",
     founderPrice: "",
@@ -59,7 +61,8 @@ const FRACCCTAL_EVENTS = [
     dateMonth: "SEP",
     dateSort: "2026-09-26",
     venue: "",
-    flyer: "/assets/img/flyer-una-vida-de-fantasia.jpg",
+    flyer: "/assets/img/flyer-una-vida-de-fantasia.webp",
+    flyerThumb: "/assets/img/flyer-una-vida-de-fantasia-thumb.webp",
     city: "Madrid",
     price: "Early bird 20€ · General 25€",
     founderPrice: "",
