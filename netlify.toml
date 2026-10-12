@@ -22,6 +22,12 @@
 [functions."remind-founder-applications"]
   schedule = "@daily"
 
+# Aviso a las fundadoras: el 3 de enero empieza la cuota de 11 € y, si se dan
+# de baja, no pueden volver a entrar como fundadoras. 08:00 UTC = 09:00 en
+# Madrid (invierno). La función solo envía en 2026.
+[functions."founder-billing-notice"]
+  schedule = "0 8 30 12 *"
+
 # URLs lindas para las cartas: /cartas/el-mito-de-la-desconexion en vez de
 # /carta.html?c=el-mito-de-la-desconexion (mejor para SEO y para compartir).
 [[redirects]]
