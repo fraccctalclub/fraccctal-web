@@ -26,6 +26,8 @@
  *   description  1-2 frases, tono Fraccctal (sin épica, sin promesas)
  *   ticketsUrl   pega aquí el Payment Link de Stripe cuando lo tengas (solo encuentros abiertos)
  *   lumaUrl      link a la página del evento en Luma, si existe (para encuentros pasados)
+ *   detailUrl    página propia del encuentro en la web (ej. "/encuentros/mi-encuentro").
+ *                Si un encuentro pasado la tiene, la tarjeta enlaza ahí en vez de a Luma.
  *   status       "abierto" | "agotado" | "cerrado" | "proximamente"
  */
 
@@ -68,6 +70,7 @@ const FRACCCTAL_EVENTS = [
       "Taller de escritura para recuperar la imaginación, la curiosidad y el asombro propios de la infancia. No hace falta saber escribir, solo curiosidad.",
     ticketsUrl: "/encuentros/una-vida-de-fantasia",
     lumaUrl: "",
+    detailUrl: "/encuentros/una-vida-de-fantasia",
     status: "cerrado",
   },
   {

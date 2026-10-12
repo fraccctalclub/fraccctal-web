@@ -19,6 +19,7 @@ const EVENTS = {
     slug: "/encuentros/una-vida-de-fantasia",
     roomCap: 16,
     membersOnlyUntil: "2026-09-01T00:00:00+02:00",
+    endsAt: "2026-09-27T00:00:00+02:00", // pasada esta fecha ya no se venden entradas
     tiers: {
       early: { price: "price_1U3d6yCYD2PjyybiCY6yxF0l", cap: 4, seats: 1 },
       general: { price: "price_1U3d6zCYD2Pjyybiz6N4KB4B", cap: 12, seats: 1 },
@@ -30,6 +31,7 @@ const EVENTS = {
     slug: "/encuentros/la-erotica-del-buentrato",
     roomCap: 18,
     membersOnlyUntil: "2026-10-01T00:00:00+02:00",
+    endsAt: "2026-10-25T00:00:00+02:00",
     tiers: {
       early: { price: PRICE_OCT_EARLY, cap: 4, seats: 1 },
       general: { price: PRICE_OCT_GENERAL, cap: 12, seats: 1 },

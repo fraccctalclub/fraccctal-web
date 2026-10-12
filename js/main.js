@@ -70,16 +70,19 @@ function upcomingCardHTML(event) {
 
 function pastCardHTML(event) {
   const credit = event.facilitators ? `Con ${event.facilitators} · ` : "";
-  const action = event.lumaUrl
+  const action = event.detailUrl
+    ? `<a class="btn btn--ghost" href="${event.detailUrl}">Ver encuentro</a>`
+    : event.lumaUrl
     ? `<a class="btn btn--ghost" href="${event.lumaUrl}" target="_blank" rel="noopener">Ver en Luma</a>`
     : `<span class="btn btn--disabled">Encuentro pasado</span>`;
+  const meta = [event.venue, event.city].filter(Boolean).join(" · ");
   return `
     <article class="event-card event-card--closed">
       ${dateBlockHTML(event)}
       <div class="event-card__body">
         ${tagsHTML(event)}
         <h3>${event.title}</h3>
-        <p class="event-card__meta">${credit}${event.venue} · ${event.city}</p>
+        <p class="event-card__meta">${credit}${meta}</p>
         <p>${event.description}</p>
       </div>
       <div class="event-card__action">${action}</div>

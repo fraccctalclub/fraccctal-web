@@ -95,6 +95,11 @@ exports.handler = async (event) => {
     return { statusCode: 400, body: JSON.stringify({ error: "Tier inválido" }) };
   }
 
+  // Encuentro ya celebrado: la página sigue visible, pero no se vende nada.
+  if (eventConfig.endsAt && new Date() >= new Date(eventConfig.endsAt)) {
+    return { statusCode: 410, body: JSON.stringify({ error: "encuentro_finalizado" }) };
+  }
+
   if (!tiersReady(eventConfig)) {
     return {
       statusCode: 500,
