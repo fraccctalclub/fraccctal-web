@@ -109,7 +109,7 @@ const EVENT_EMAIL_CONTENT = {
     capacityWord: "veinte",
     precios: { early: "25€ (early bird)", general: "30€" },
     queTraer:
-      "Nada: el material y los ingredientes están incluidos, y te llevas a casa lo que prepares. Si tienes alguna alergia o intolerancia alimentaria, responde a este correo y lo tenemos en cuenta.",
+      "Nada: el material y los ingredientes están incluidos, y te llevas a casa lo que prepares. Si tienes alguna alergia o intolerancia, escríbenos respondiendo a este correo.",
     pageUrl: "https://fraccctal.com/encuentros/lo-que-el-hambre-sabe",
   },
 };
