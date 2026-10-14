@@ -47,6 +47,12 @@
   to = "/encuentro-la-erotica-del-buentrato.html"
   status = 200
 
+# URL linda para el taller "Lo que el hambre sabe".
+[[redirects]]
+  from = "/encuentros/lo-que-el-hambre-sabe"
+  to = "/encuentro-lo-que-el-hambre-sabe.html"
+  status = 200
+
 # Caché de un día para logos e imágenes. No es más larga porque algunos
 # archivos se reemplazan con el mismo nombre (flyers) y no queremos que quien
 # ya los vio siga viendo la versión vieja. El HTML, CSS y JS no se tocan:

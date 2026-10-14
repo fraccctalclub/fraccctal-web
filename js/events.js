@@ -34,6 +34,26 @@
 
 const FRACCCTAL_EVENTS = [
   {
+    id: "lo-que-el-hambre-sabe-2026-11",
+    title: "Lo que el hambre sabe: entender el antojo, amasar el snack",
+    dateLabel: "28",
+    dateMonth: "NOV",
+    dateSort: "2026-11-28",
+    venue: "María del Río",
+    flyer: "", // pendiente: llega el flyer
+    city: "Madrid",
+    price: "Early bird 25€ · General 30€",
+    founderPrice: "",
+    founderTicketsUrl: "/encuentros/lo-que-el-hambre-sabe",
+    tag: ["conocimiento", "placer"],
+    facilitators: "Kyriaki Erotokritou",
+    description:
+      "Taller de nutrición y cocina para entender el hambre y el antojo, y preparar dos recetas de energy balls. Todo el material y los ingredientes están incluidos.",
+    ticketsUrl: "/encuentros/lo-que-el-hambre-sabe",
+    lumaUrl: "",
+    status: "abierto",
+  },
+  {
     id: "la-erotica-del-buentrato-2026-10",
     title: "La erótica del buentrato",
     dateLabel: "24",

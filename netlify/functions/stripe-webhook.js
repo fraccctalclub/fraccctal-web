@@ -98,6 +98,20 @@ const EVENT_EMAIL_CONTENT = {
       "Ropa cómoda que permita moverse, calcetines o pies descalzos, una botella de agua y un cuaderno o algo para apuntar. No hace falta ningún tipo de experiencia previa.",
     pageUrl: "https://fraccctal.com/encuentros/la-erotica-del-buentrato",
   },
+  "lo-que-el-hambre-sabe-2026-11": {
+    title: "Lo que el hambre sabe: entender el antojo, amasar el snack",
+    shortTitle: "Lo que el hambre sabe",
+    facilitators: "Kyriaki Erotokritou",
+    typeLabel: "Taller de nutrición y cocina",
+    dateTimeLabel: "Sábado 28 de noviembre de 2026, de 17:00 a 19:45 h",
+    dayLabel: "28",
+    venueLabel: "María del Río · Madrid",
+    capacityWord: "veinte",
+    precios: { early: "25€ (early bird)", general: "30€" },
+    queTraer:
+      "Nada: el material y los ingredientes están incluidos, y te llevas a casa lo que prepares. Si tienes alguna alergia o intolerancia alimentaria, responde a este correo y lo tenemos en cuenta.",
+    pageUrl: "https://fraccctal.com/encuentros/lo-que-el-hambre-sabe",
+  },
 };
 
 function verifyStripeSignature(rawBody, signatureHeader, secret) {
@@ -233,7 +247,9 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
   }
 
   const esAmigxs = ticketTier === "amigxs";
-  const precio = ticketTier === "early" ? "20€ (early bird)" : esAmigxs ? "42€ (amigxs, 2 entradas)" : "25€";
+  const precio =
+    contenido.precios?.[ticketTier] ||
+    (ticketTier === "early" ? "20€ (early bird)" : esAmigxs ? "42€ (amigxs, 2 entradas)" : "25€");
   const plazaTexto = esAmigxs ? "tus dos plazas" : "tu plaza";
 
   // Si ya se hizo fundadorx en esta misma compra, no le repetimos el pitch

@@ -38,6 +38,20 @@ const EVENTS = {
       amigxs: { price: PRICE_OCT_AMIGXS, cap: 2, seats: 2 }, // cerrado: cap = ya vendidas
     },
   },
+  "lo-que-el-hambre-sabe-2026-11": {
+    title: "Lo que el hambre sabe: entender el antojo, amasar el snack",
+    slug: "/encuentros/lo-que-el-hambre-sabe",
+    roomCap: 20,
+    // PROVISIONAL: fecha en que la preventa de socias se abre a todo el mundo.
+    // Confirmar con Irina antes de publicar (debe coincidir con MEMBERS_ONLY_UNTIL
+    // de encuentro-lo-que-el-hambre-sabe.html).
+    membersOnlyUntil: "2026-11-02T00:00:00+01:00",
+    endsAt: "2026-11-29T00:00:00+01:00",
+    tiers: {
+      early: { price: "price_1UQRKwCYD2PjyybiaINDfeBn", cap: 4, seats: 1 }, // 25 €
+      general: { price: "price_1UQRKxCYD2Pjyybis4WL15mm", cap: 16, seats: 1 }, // 30 €
+    },
+  },
 };
 
 const DEFAULT_EVENT_ID = "una-vida-de-fantasia-2026-09";
