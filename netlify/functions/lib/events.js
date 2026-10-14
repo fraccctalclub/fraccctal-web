@@ -42,10 +42,9 @@ const EVENTS = {
     title: "Lo que el hambre sabe: entender el antojo, amasar el snack",
     slug: "/encuentros/lo-que-el-hambre-sabe",
     roomCap: 20,
-    // PROVISIONAL: fecha en que la preventa de socias se abre a todo el mundo.
-    // Confirmar con Irina antes de publicar (debe coincidir con MEMBERS_ONLY_UNTIL
-    // de encuentro-lo-que-el-hambre-sabe.html).
-    membersOnlyUntil: "2026-11-02T00:00:00+01:00",
+    // Preventa de socias hasta el 1 de noviembre; desde ahí, venta general.
+    // Debe coincidir con MEMBERS_ONLY_UNTIL de encuentro-lo-que-el-hambre-sabe.html.
+    membersOnlyUntil: "2026-11-01T00:00:00+01:00",
     endsAt: "2026-11-29T00:00:00+01:00",
     tiers: {
       early: { price: "price_1UQRKwCYD2PjyybiaINDfeBn", cap: 4, seats: 1 }, // 25 €

@@ -83,7 +83,7 @@
 
     <div id="acceso-gate" style="background:var(--bg-alt); border:1px solid var(--line); border-radius:18px; padding:28px 30px; margin-bottom:48px; display:none">
       <p class="eyebrow" style="margin-bottom:16px">Preventa exclusiva para socias</p>
-      <p style="margin-top:0">Hasta el 2 de noviembre, las entradas de este taller solo se pueden comprar siendo socix (fundadorx o miembro). Después se abre a todo el mundo.</p>
+      <p style="margin-top:0">Hasta el 1 de noviembre, las entradas de este taller solo se pueden comprar siendo socix (fundadorx o miembro). Después se abre a todo el mundo.</p>
       <form id="acceso-form" class="form-inline" style="margin-top:16px">
         <input type="email" id="acceso-email" placeholder="tu@email.com" required>
         <button type="submit" class="btn btn--primary" id="acceso-submit">Verificar</button>
@@ -281,7 +281,7 @@
   import { checkMembership } from "/js/auth.js";
 
   const EVENT_ID = "lo-que-el-hambre-sabe-2026-11";
-  const MEMBERS_ONLY_UNTIL = new Date("2026-11-02T00:00:00+01:00");
+  const MEMBERS_ONLY_UNTIL = new Date("2026-11-01T00:00:00+01:00");
   const gated = new Date() < MEMBERS_ONLY_UNTIL;
 
   // "(es gratis)" del link de membresía solo aplica mientras la membresía
