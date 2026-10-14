@@ -105,7 +105,7 @@ const EVENT_EMAIL_CONTENT = {
     typeLabel: "Taller de nutrición y cocina",
     dateTimeLabel: "Sábado 28 de noviembre de 2026, de 17:00 a 19:45 h",
     dayLabel: "28",
-    venueLabel: "María del Río · Madrid",
+    venueLabel: "María del Río · Madrid (C. de Doña Urraca, 16, 28011 Madrid, metro Puerta del Ángel)",
     capacityWord: "veinte",
     precios: { early: "25€ (early bird)", general: "30€" },
     queTraer:
