@@ -121,8 +121,8 @@ function bajaEmailHtml({ nombre, canceladaEn, esFundadora = false }) {
   const vuelta = cuenta
     ? `<p>Como te avisamos, podrás volver a darte de alta a partir del <strong>${fechaLarga(finDelBloqueo(canceladaEn))}</strong> (dos meses desde que termina tu membresía), como miembro general. Hasta entonces no podrás apuntarte a encuentros ni talleres, que son solo para la comunidad.${esFundadora ? " La condición de fundadora no se recupera." : ""}</p>`
     : esFundadora
-    ? `<p>Si algún día quieres volver, podrás darte de alta de nuevo como miembro general (22 €/mes) en <a href="https://fraccctal.com/membresia.html">fraccctal.com/membresia.html</a>. La condición de fundadora no se recupera, y con ella tampoco el precio de 11 €.</p>`
-    : `<p>Si algún día quieres volver, puedes darte de alta de nuevo cuando quieras en <a href="https://fraccctal.com/membresia.html">fraccctal.com/membresia.html</a>.</p>`;
+    ? `<p>Si algún día quieres volver, podrás darte de alta de nuevo como miembro general (22 €/mes) en <a href="https://fraccctal.com/membresia.html">fraccctal.com/membresia.html</a>. La condición de fundadora no se recupera, y con ella tampoco el precio de 11 €. Para que lo sepas si vuelves: desde el 30 de diciembre de 2026, quien se da de baja no puede volver a darse de alta hasta que pasan dos meses desde que termina su membresía.</p>`
+    : `<p>Si algún día quieres volver, puedes darte de alta de nuevo cuando quieras en <a href="https://fraccctal.com/membresia.html">fraccctal.com/membresia.html</a>. Para que lo sepas si vuelves: desde el 30 de diciembre de 2026, quien se da de baja no puede volver a darse de alta hasta que pasan dos meses desde que termina su membresía.</p>`;
   const encuesta = ENCUESTA_BAJA_URL.startsWith("http")
     ? `<p>Si tienes dos minutos, nos ayuda muchísimo saber qué pasó, sobre todo lo que podríamos haber hecho distinto. Es una encuesta corta y no te pide ni el nombre ni el email: <a href="${ENCUESTA_BAJA_URL}">responder la encuesta</a>.</p>`
     : "";
