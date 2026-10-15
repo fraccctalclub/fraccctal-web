@@ -109,7 +109,7 @@ async function nombreDe(email, tablaApp, { SUPABASE_URL, SUPABASE_SERVICE_ROLE_K
 }
 
 // Encuesta de salida (Google Forms). Anónima: no pide nombre ni email.
-const ENCUESTA_BAJA_URL = "ENCUESTA_BAJA_URL_PENDIENTE";
+const ENCUESTA_BAJA_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeszUlOanQ11jy1rJudSr530sSsqWqD35Rmh2WESyEvgMXRyA/viewform";
 
 function escHtml(v) {
   return String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -122,7 +122,7 @@ function bajaEmailHtml({ nombre, canceladaEn }) {
     ? `<p>Como te avisamos, podrás volver a darte de alta a partir del <strong>${fechaLarga(finDelBloqueo(canceladaEn))}</strong> (dos meses desde que termina tu membresía), como miembro general. Hasta entonces no podrás apuntarte a encuentros ni talleres, que son solo para la comunidad.</p>`
     : `<p>Si algún día quieres volver, puedes darte de alta de nuevo cuando quieras en <a href="https://fraccctal.com/membresia.html">fraccctal.com/membresia.html</a>.</p>`;
   const encuesta = ENCUESTA_BAJA_URL.startsWith("http")
-    ? `<p>Si tienes dos minutos, nos ayuda muchísimo saber qué pasó, sobre todo lo que podríamos haber hecho distinto. Es una encuesta corta y no te pide ni el nombre ni el email: <a href="${ENCUESTA_BAJA_URL}">${ENCUESTA_BAJA_URL}</a></p>`
+    ? `<p>Si tienes dos minutos, nos ayuda muchísimo saber qué pasó, sobre todo lo que podríamos haber hecho distinto. Es una encuesta corta y no te pide ni el nombre ni el email: <a href="${ENCUESTA_BAJA_URL}">responder la encuesta</a>.</p>`
     : "";
   return `
     <p>${saludo}</p>
