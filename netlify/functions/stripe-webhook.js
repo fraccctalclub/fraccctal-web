@@ -56,7 +56,7 @@ const CARTA_MIEMBROS = `
   <p>Hasta hace nada Fraccctal éramos dos personas hablando de lo que echábamos en falta en Madrid: un sitio al que ir sin tener que llegar con respuestas. Sin gurú, sin promesas de transformación, sin networking disfrazado de otra cosa. Lo que hay hoy: los encuentros, la gente, esta lista; existe porque unas cuantas dijeron que sí cuando todavía no había nada que enseñar, y ahora tú también has dicho que sí.</p>
   <p>Ser miembro significa esto.</p>
   <p>Lo primero: hasta el 3 de enero de 2027 no pagas nada, y desde entonces tu cuota es de 22 € al mes. Te lo contamos ahora, con antelación, porque no queremos que en enero te llegue ninguna sorpresa.</p>
-  <p>Lo segundo: tienes acceso a todos los talleres y encuentros de Fraccctal, y al club de lectura y al walking club. Desde enero los talleres serán exclusivos para socixs: ya no los abriremos fuera de la comunidad.</p>
+  <p>Lo segundo: tienes acceso a los encuentros y talleres de Fraccctal, y al club de lectura y al walking club. Desde enero los encuentros y talleres son solo para la comunidad: ya no los abrimos fuera de ella, y solo pueden acceder las personas miembros. Los talleres facilitados por profesionales se pagan aparte: la cuota te da acceso, y cada taller tiene su propia entrada.</p>
   <p>Lo tercero: en DFOS, nuestro espacio de encuentro online, la conversación sigue cada día entre encuentro y encuentro. Es la forma más fácil de conocer a la gente y de proponer lo que te apetezca.</p>
   <p>Lo cuarto: tienes un 15% de descuento en tu primera sesión con nuestra terapeuta de cabecera, Yaneli García Ríos (puedes reservar escribiendo a yaneli.psicoterapia@gmail.com), y descuentos con el resto de nuestra red de terapeutas y talleristas.</p>
   <p>Lo quinto: la próxima vez que nos veamos te vamos a dar tu regalo de bienvenida, un merch solo para ti, en agradecimiento a tu apoyo.</p>
@@ -243,7 +243,7 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
     ? ""
     : `
     <p><strong>¿Y si te haces socixs?</strong></p>
-    <p>Ser socixs de Fraccctal implica esto: acceso a todos los talleres y encuentros (ya no los abrimos fuera de la comunidad), descuentos con nuestra red de terapeutas y talleristas, un merch de bienvenida, y tu lugar en la comunidad online donde la conversación sigue cada día. Y hoy <strong>ES GRATIS</strong>: no se cobra nada hasta el 3 de enero de 2027.</p>
+    <p>Ser socixs de Fraccctal implica esto: acceso a los encuentros y talleres, que desde enero son solo para la comunidad (los talleres facilitados por profesionales se pagan aparte), descuentos con nuestra red de terapeutas y talleristas, un merch de bienvenida, y tu lugar en la comunidad online donde la conversación sigue cada día. Y hoy <strong>ES GRATIS</strong>: no se cobra nada hasta el 3 de enero de 2027.</p>
     <p><strong><a href="https://fraccctal.com/membresia.html">Conoce la membresía →</a></strong></p>
   `;
 

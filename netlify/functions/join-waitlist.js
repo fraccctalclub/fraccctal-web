@@ -53,7 +53,7 @@ function emailHtml({ nombre, ev, plazasFundadora }) {
     <p>Hola, ${escapeHtml(nombre)}:</p>
     <p>Gracias por apuntarte. Ya estás en la lista de espera de <strong>${ev.titulo}</strong> (${ev.fecha}).</p>
     <p>Las plazas se agotaron. Si se libera alguna, te escribimos a este mismo correo, por orden de llegada. No podemos prometerte que ocurra, pero te avisamos en cuanto pase.</p>
-    <p>Si quieres asegurarte un lugar en los próximos talleres, hay una forma: hacerte socia. Las socias entran antes a la preventa de cada taller, y a partir de enero los talleres serán solo para la comunidad: ya no los abriremos por fuera.</p>
+    <p>Si quieres asegurarte un lugar en los próximos talleres, hay una forma: hacerte socia. Las socias entran antes a la preventa de cada taller, y a partir de enero los talleres serán solo para la comunidad: ya no los abriremos por fuera. La membresía da acceso; la entrada de cada taller facilitado por profesionales se paga aparte.</p>
     ${oferta}
     <p>Puedes verla y apuntarte aquí: <a href="https://fraccctal.com/membresia.html">https://fraccctal.com/membresia.html</a></p>
     <p>Si prefieres no hacerlo, no pasa nada: tu lugar en la lista sigue igual.</p>

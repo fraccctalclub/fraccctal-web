@@ -1,5 +1,5 @@
 // Aviso de diciembre a las socias: el 3 de enero empieza la cuota.
-//  - Fundadoras: 11 €/mes para siempre y, si después se dan de baja, no pueden
+//  - Fundadoras: 11 €/mes (precio que no sube) y, si después se dan de baja, no pueden
 //    volver a entrar como fundadoras.
 //  - Miembros: 22 €/mes.
 // Sale el 30 de diciembre de 2026 (ver [functions."founder-billing-notice"]
@@ -32,7 +32,7 @@ function avisoHtml(nombre) {
   return `
     <p>${saludo}</p>
     <p>Te escribimos, como te prometimos, para avisarte de que el 3 de enero empieza tu cuota de fundadora. Hasta hoy no has pagado nada, y no tienes que hacer nada para seguir: ese día se cobrarán 11 € a la tarjeta con la que te apuntaste, y después 11 € cada mes.</p>
-    <p>Esos 11 € son para siempre, mientras sigas siendo socia. Es la mitad de la cuota general (22 €) y no sube aunque el precio general cambie.</p>
+    <p>Esos 11 € no subirán más. Es la mitad de la cuota general (22 €), y se mantienen aunque el precio general cambie.</p>
     <p>Hay una cosa que preferimos decirte claro desde ahora: ser fundadora es un lugar que no se puede volver a ocupar. El cupo está cerrado, así que si en algún momento te das de baja y más adelante quieres volver, entrarías como miembro general, a 22 € al mes, y no como fundadora. Tus 11 € se mantienen mientras no interrumpas tu membresía.</p>
     <p>Y otra: a partir de enero, los encuentros y talleres de Fraccctal son solo para la comunidad. Solo pueden acceder las personas socias. Si te das de baja, no podrás apuntarte a ningún encuentro ni taller, ni siquiera a uno suelto, hasta que vuelvas a hacerte socia.</p>
     <p>Ten en cuenta también que los talleres facilitados por profesionales se pagan aparte: la cuota te da acceso, y cada taller tiene su propia entrada, con su precio.</p>
