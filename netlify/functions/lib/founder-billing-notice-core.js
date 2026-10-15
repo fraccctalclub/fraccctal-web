@@ -34,7 +34,9 @@ function avisoHtml(nombre) {
     <p>Te escribimos, como te prometimos, para avisarte de que el 3 de enero empieza tu cuota de fundadora. Hasta hoy no has pagado nada, y no tienes que hacer nada para seguir: ese día se cobrarán 11 € a la tarjeta con la que te apuntaste, y después 11 € cada mes.</p>
     <p>Esos 11 € son para siempre, mientras sigas siendo socia. Es la mitad de la cuota general (22 €) y no sube aunque el precio general cambie.</p>
     <p>Hay una cosa que preferimos decirte claro desde ahora: ser fundadora es un lugar que no se puede volver a ocupar. El cupo está cerrado, así que si en algún momento te das de baja y más adelante quieres volver, entrarías como miembro general, a 22 € al mes, y no como fundadora. Tus 11 € se mantienen mientras no interrumpas tu membresía.</p>
-    <p>Si prefieres no continuar, puedes darte de baja tú misma, sin dar explicaciones, desde <a href="${ESPACIO_SOCIXS_URL}">tu espacio de socixs</a> (entras con tu email y pulsas "Darme de baja"). Si lo haces antes del 3 de enero, la baja es inmediata y no se te cobra nada.</p>
+    <p>Y otra: a partir de enero, los encuentros y talleres de Fraccctal son solo para la comunidad. Solo pueden acceder las personas socias. Si te das de baja, no podrás apuntarte a ningún encuentro ni taller, ni siquiera a uno suelto, hasta que vuelvas a hacerte socia.</p>
+    <p>Ten en cuenta también que los talleres facilitados por profesionales se pagan aparte: la cuota te da acceso, y cada taller tiene su propia entrada, con su precio.</p>
+    <p>Si prefieres no continuar, puedes darte de baja tú misma, sin dar explicaciones, desde <a href="${ESPACIO_SOCIXS_URL}">tu espacio de socixs</a> (entras con tu email y pulsas "Darme de baja").</p>
     <p>Gracias por haber estado desde el principio. Si tienes cualquier duda, responde a este correo: nos llega directamente a Irina y a Nat.</p>
     <p>Con cariño,<br>Irina y Nat<br>Fraccctal · club, comunidad, cambio</p>
   `;
@@ -45,8 +47,10 @@ function avisoMiembroHtml(nombre) {
   return `
     <p>${saludo}</p>
     <p>Te escribimos, como te contamos al apuntarte, para avisarte de que el 3 de enero empieza tu cuota de miembro. Hasta hoy no has pagado nada, y no tienes que hacer nada para seguir: ese día se cobrarán 22 € a la tarjeta con la que te apuntaste, y después 22 € cada mes.</p>
-    <p>Con tu membresía tienes acceso a todos los talleres y encuentros de Fraccctal, al club de lectura y al walking club, descuentos con nuestra red de terapeutas y talleristas, y tu lugar en la comunidad online. Desde enero los talleres son solo para socixs.</p>
-    <p>Si prefieres no continuar, puedes darte de baja tú misma, sin dar explicaciones, desde <a href="${ESPACIO_SOCIXS_URL}">tu espacio de socixs</a> (entras con tu email y pulsas "Darme de baja"). Si lo haces antes del 3 de enero, la baja es inmediata y no se te cobra nada. Después de esa fecha también puedes hacerlo ahí, y sigues como socia hasta el final del periodo que ya hayas abonado.</p>
+    <p>Con tu membresía tienes acceso a los encuentros y talleres de Fraccctal, al club de lectura y al walking club, descuentos con nuestra red de terapeutas y talleristas, y tu lugar en la comunidad online.</p>
+    <p>Una cosa que preferimos decirte claro: a partir de enero, los encuentros y talleres de Fraccctal son solo para la comunidad. Solo pueden acceder las personas miembros. Si te das de baja, no podrás apuntarte a ningún encuentro ni taller, ni siquiera a uno suelto, hasta que vuelvas a hacerte miembro.</p>
+    <p>Ten en cuenta también que los talleres facilitados por profesionales se pagan aparte: la cuota te da acceso, y cada taller tiene su propia entrada, con su precio.</p>
+    <p>Si prefieres no continuar, puedes darte de baja tú misma, sin dar explicaciones, desde <a href="${ESPACIO_SOCIXS_URL}">tu espacio de socixs</a> (entras con tu email y pulsas "Darme de baja").</p>
     <p>Gracias por estar. Si tienes cualquier duda, responde a este correo: nos llega directamente a Irina y a Nat.</p>
     <p>Con cariño,<br>Irina y Nat<br>Fraccctal · club, comunidad, cambio</p>
   `;
