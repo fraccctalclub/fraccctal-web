@@ -32,7 +32,7 @@ const CARTA_FUNDADORAS = `
   <p>Y ahora sí, te contamos un poco más.</p>
   <p>Hasta hace nada Fraccctal éramos dos personas hablando de lo que echábamos en falta en Madrid: un sitio al que ir sin tener que llegar con respuestas. Sin gurú, sin promesas de transformación, sin networking disfrazado de otra cosa. Lo que hay hoy: los encuentros, la gente, esta lista; existe porque unas cuantas dijisteis que sí cuando todavía no había nada que enseñar. Eso no se nos olvida y no se nos va a olvidar.</p>
   <p>Ser fundadora significa esto.</p>
-  <p>Lo primero: hasta el 31 de diciembre no pagas nada, y desde enero de 2027 tu cuota es de 11 € al mes (la mitad de la general) para siempre. Te lo contamos ahora, con cinco meses de antelación, porque no queremos que en enero te llegue ninguna sorpresa.</p>
+  <p>Lo primero: hasta el 31 de diciembre no pagas nada, y desde enero de 2027 tu cuota es de 11 € al mes (la mitad de la general) y no subirá más. Te lo contamos ahora, con cinco meses de antelación, porque no queremos que en enero te llegue ninguna sorpresa.</p>
   <p>Lo segundo: sois veinte y no habrá más. En enero se cierra el cupo y la palabra fundadora deja de estar disponible.</p>
   <p>Lo tercero: vas a estar ayudándonos a dar forma a este club. Contaremos con tu opinión, tu feedback, tus ideas y lo que quieras traer. En DFOS, nuestro espacio de encuentro online al que te recomendamos unirte, vas a estar dentro del círculo íntimo.</p>
   <p>Lo cuarto: tienes un 15% de descuento en tu primera sesión con nuestra terapeuta de cabecera, Yaneli García Ríos. Puedes reservar escribiendo a yaneli.psicoterapia@gmail.com.</p>

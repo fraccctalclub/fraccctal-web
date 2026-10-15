@@ -44,7 +44,7 @@ async function quedanPlazasFundadora(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY) {
 function emailHtml({ nombre, ev, plazasFundadora }) {
   const oferta =
     plazasFundadora === true
-      ? `<p>Ahora mismo todavía quedan plazas de fundadora: la membresía es gratis hasta el 31 de diciembre de 2026 y, desde el 3 de enero de 2027, cuesta 11 €/mes, precio de fundadora para siempre. No se cobra nada antes y puedes darte de baja cuando quieras.</p>`
+      ? `<p>Ahora mismo todavía quedan plazas de fundadora: la membresía es gratis hasta el 31 de diciembre de 2026 y, desde el 3 de enero de 2027, cuesta 11 €/mes, precio de fundadora que no subirá más. No se cobra nada antes y puedes darte de baja cuando quieras.</p>`
       : plazasFundadora === false
       ? `<p>El cupo de fundadoras ya se completó, pero puedes entrar a la membresía general: es gratis hasta el 3 de enero de 2027 y después cuesta 22 €/mes. Puedes darte de baja cuando quieras.</p>`
       : `<p>Las condiciones de la membresía, con su precio y fechas, están en la página.</p>`;
