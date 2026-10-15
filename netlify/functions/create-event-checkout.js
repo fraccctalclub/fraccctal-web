@@ -30,12 +30,13 @@
 
 const { getEvent, DEFAULT_EVENT_ID, tiersReady } = require("./lib/events");
 const { avisoInterno, paresSolicitud } = require("./lib/notify-internal");
+const { bloqueoPorBaja, respuestaBloqueo, COMUNIDAD_CERRADA_DESDE } = require("./lib/baja-rules");
 
 const FOUNDER_CAP = 20; // global: no depende del encuentro
 
 // Debe coincidir con LEGAL.CONDICIONES_VERSION en js/legal-config.js y con
 // la misma constante en create-checkout-session.js.
-const CONDICIONES_VERSION = "2026-08-v1";
+const CONDICIONES_VERSION = "2026-10-v2";
 
 // 3 de enero de 2027, 00:00 hora de Madrid (CET = UTC+1 en enero) = 2027-01-02T23:00:00Z.
 // Debe coincidir con create-checkout-session.js.
@@ -109,8 +110,11 @@ exports.handler = async (event) => {
 
   const membersOnlyUntil = new Date(eventConfig.membersOnlyUntil);
 
+  // Preventa de socias del propio encuentro, o comunidad cerrada (desde el 3 de
+  // enero de 2027 los encuentros son solo para socias).
+  const ahora = new Date();
   let email = null;
-  if (new Date() < membersOnlyUntil) {
+  if (ahora < membersOnlyUntil || ahora >= COMUNIDAD_CERRADA_DESDE) {
     email = (body.email || "").trim().toLowerCase();
     if (!email || !EMAIL_RE.test(email)) {
       return { statusCode: 400, body: JSON.stringify({ error: "Email inválido" }) };
@@ -120,6 +124,9 @@ exports.handler = async (event) => {
       existsActive("members", email, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY),
     ]);
     if (!isFounder && !isMember) {
+      // Quien se dio de baja hace poco ve cuándo puede volver, no un "no eres socia" a secas.
+      const bloqueo = await bloqueoPorBaja(email, { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY });
+      if (bloqueo) return respuestaBloqueo(bloqueo);
       return { statusCode: 403, body: JSON.stringify({ error: "solo_socias" }) };
     }
   }
@@ -132,6 +139,8 @@ exports.handler = async (event) => {
     if (!emailFundadora || !EMAIL_RE.test(emailFundadora)) {
       return { statusCode: 400, body: JSON.stringify({ error: "Email inválido" }) };
     }
+    const bloqueoFundadora = await bloqueoPorBaja(emailFundadora, { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY });
+    if (bloqueoFundadora) return respuestaBloqueo(bloqueoFundadora);
     if (REQUIRED_FOUNDER_FIELDS.some((field) => !body[field])) {
       return { statusCode: 400, body: JSON.stringify({ error: "Faltan campos obligatorios" }) };
     }

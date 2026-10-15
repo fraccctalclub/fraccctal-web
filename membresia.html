@@ -467,6 +467,8 @@
 
         if (res.status === 409 && data.error === "cupo_completo") {
           showMessage("El cupo de 20 fundadoras ya se completó. Escríbenos si quieres que te avisemos de la membresía general.", true);
+        } else if (data.error === "baja_reciente") {
+          showMessage(`Te diste de baja hace poco. Podrás volver a darte de alta a partir del ${data.hasta_label}. Si crees que es un error, escríbenos.`, true);
         } else if (!res.ok) {
           showMessage(data.error || "Algo salió mal, inténtalo de nuevo.", true);
         } else {
@@ -527,7 +529,9 @@
         });
         const data = await res.json();
 
-        if (!res.ok) {
+        if (data.error === "baja_reciente") {
+          showMemberMessage(`Te diste de baja hace poco. Podrás volver a darte de alta a partir del ${data.hasta_label}. Si crees que es un error, escríbenos.`, true);
+        } else if (!res.ok) {
           showMemberMessage(data.error || "Algo salió mal, inténtalo de nuevo.", true);
         } else {
           window.location.href = data.url;

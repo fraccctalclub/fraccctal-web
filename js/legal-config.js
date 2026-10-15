@@ -15,7 +15,7 @@ const LEGAL = {
   // Subir este número (o poner una fecha) cada vez que cambie el contenido
   // legal de condiciones.html, así el registro de consentimientos queda
   // ligado a QUÉ versión exacta aceptó cada quien.
-  CONDICIONES_VERSION: "2026-08-v1",
+  CONDICIONES_VERSION: "2026-10-v2",
 };
 
 // Rellena cualquier elemento con [data-legal="CLAVE"] con el valor de LEGAL.CLAVE.

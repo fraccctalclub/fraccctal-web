@@ -86,6 +86,19 @@
   </div>
 </section>
 
+<div id="baja-confirmar" role="dialog" aria-modal="true" aria-labelledby="baja-confirmar-titulo" hidden style="position:fixed; inset:0; z-index:100; background:rgba(23,22,15,0.55); display:none; align-items:center; justify-content:center; padding:16px">
+  <div style="background:var(--bg); border:1px solid var(--line); border-radius:18px; padding:28px 30px; max-width:520px; width:100%">
+    <p class="eyebrow" style="margin-bottom:12px">Darme de baja</p>
+    <h2 id="baja-confirmar-titulo" style="margin:0 0 16px; font-size:1.5rem">¿Seguro que quieres darte de baja?</h2>
+    <p id="baja-confirmar-texto" style="margin:0 0 12px"></p>
+    <p style="margin:0 0 24px; color:var(--ink-soft); font-size:0.9rem">Si eres fundadora, tampoco recuperarás tu plaza de fundadora ni tu precio de 11 €/mes.</p>
+    <p style="margin:0; display:flex; gap:12px; flex-wrap:wrap">
+      <button type="button" class="btn btn--primary" id="baja-confirmar-no">Quedarme</button>
+      <button type="button" class="btn btn--ghost" id="baja-confirmar-si">Sí, darme de baja</button>
+    </p>
+  </div>
+</div>
+
 <footer>
   <div class="wrap">
     <div>
@@ -244,8 +257,29 @@
 
   document.getElementById("portal-link").addEventListener("click", (e) => abrirPortal(e, undefined));
   document.getElementById("portal-boton").addEventListener("click", (e) => abrirPortal(e, undefined));
-  document.getElementById("baja-link").addEventListener("click", (e) => abrirPortal(e, "baja"));
-  document.getElementById("baja-boton").addEventListener("click", (e) => abrirPortal(e, "baja"));
+  // Antes de abrir la pantalla de baja pedimos confirmación. Desde el 30 de
+  // diciembre de 2026 la baja lleva 2 meses sin poder volver a darse de alta
+  // (debe coincidir con BLOQUEO_DESDE en netlify/functions/lib/baja-rules.js).
+  const BAJA_BLOQUEO_DESDE = new Date("2026-12-30T08:00:00Z");
+  const bajaConfirmar = document.getElementById("baja-confirmar");
+  const abrirConfirmacion = (e) => {
+    e.preventDefault();
+    document.getElementById("baja-confirmar-texto").textContent = new Date() >= BAJA_BLOQUEO_DESDE
+      ? "Si te das de baja, no podrás volver a darte de alta ni apuntarte a ningún encuentro o taller hasta que pasen 2 meses desde que termine tu membresía."
+      : "Como estás en el periodo gratuito, la baja es inmediata y no se te cobra nada.";
+    bajaConfirmar.hidden = false;
+    bajaConfirmar.style.display = "flex";
+    document.getElementById("baja-confirmar-no").focus();
+  };
+  const cerrarConfirmacion = () => {
+    bajaConfirmar.hidden = true;
+    bajaConfirmar.style.display = "none";
+  };
+  document.getElementById("baja-link").addEventListener("click", abrirConfirmacion);
+  document.getElementById("baja-boton").addEventListener("click", abrirConfirmacion);
+  document.getElementById("baja-confirmar-no").addEventListener("click", cerrarConfirmacion);
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") cerrarConfirmacion(); });
+  document.getElementById("baja-confirmar-si").addEventListener("click", (e) => abrirPortal(e, "baja"));
 
   render();
 </script>

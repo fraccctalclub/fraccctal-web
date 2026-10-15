@@ -39,7 +39,7 @@ const CARTA_FUNDADORAS = `
   <p>Lo quinto: la próxima vez que nos veamos te vamos a dar tu regalo de bienvenida, un merch solo para ti, en agradecimiento a tu apoyo.</p>
   <p>Y lo sexto: hasta que cerremos el club en enero, sois las únicas con acceso a la preventa de los talleres, con la posibilidad de comprar las entradas early bird antes que nadie.</p>
   <p>Y te pedimos algo a cambio, porque esto lo estamos construyendo con vosotras y no para vosotras: que nos digas qué funciona y qué no. Después de cada encuentro te va a llegar una encuesta corta. Contéstala siempre: queremos escucharte, sobre todo en lo que creas que podemos mejorar. Y cuando algo te parezca lo bastante bueno, tráete a alguien.</p>
-  <p>Puedes darte de baja cuando quieras, tú misma y sin dar explicaciones, desde <a href="https://fraccctal.com/preventa.html">tu espacio de socixs</a> (entras con tu email y pulsas "Darme de baja"). Mientras estés en el periodo gratuito, la baja es inmediata y no se te cobra nada.</p>
+  <p>Puedes darte de baja cuando quieras, tú misma y sin dar explicaciones, desde <a href="https://fraccctal.com/preventa.html">tu espacio de socixs</a> (entras con tu email y pulsas "Darme de baja"). Mientras estés en el periodo gratuito, la baja es inmediata y no se te cobra nada. A partir del 30 de diciembre, si te das de baja no podrás volver a darte de alta hasta pasados dos meses desde que termine tu membresía.</p>
   <p>Gracias por confiar en nosotras desde el principio. Si tienes cualquier duda, o simplemente quieres decirnos hola, responde a este correo: nos llega directamente a Irina y a Nat.</p>
   <p>Nos vemos pronto, en persona.</p>
   <p>Con cariño,<br>Irina y Nat<br>Fraccctal · club, comunidad, cambio</p>
@@ -61,7 +61,7 @@ const CARTA_MIEMBROS = `
   <p>Lo cuarto: tienes un 15% de descuento en tu primera sesión con nuestra terapeuta de cabecera, Yaneli García Ríos (puedes reservar escribiendo a yaneli.psicoterapia@gmail.com), y descuentos con el resto de nuestra red de terapeutas y talleristas.</p>
   <p>Lo quinto: la próxima vez que nos veamos te vamos a dar tu regalo de bienvenida, un merch solo para ti, en agradecimiento a tu apoyo.</p>
   <p>Y te pedimos algo a cambio, porque esto lo estamos construyendo con vosotras y no para vosotras: que nos digas qué funciona y qué no. Después de cada encuentro te va a llegar una encuesta corta. Contéstala siempre: queremos escucharte, sobre todo en lo que creas que podemos mejorar. Y cuando algo te parezca lo bastante bueno, tráete a alguien.</p>
-  <p>Puedes darte de baja cuando quieras, tú misma y sin dar explicaciones, desde <a href="https://fraccctal.com/preventa.html">tu espacio de socixs</a> (entras con tu email y pulsas "Darme de baja"). Mientras estés en el periodo gratuito, la baja es inmediata y no se te cobra nada.</p>
+  <p>Puedes darte de baja cuando quieras, tú misma y sin dar explicaciones, desde <a href="https://fraccctal.com/preventa.html">tu espacio de socixs</a> (entras con tu email y pulsas "Darme de baja"). Mientras estés en el periodo gratuito, la baja es inmediata y no se te cobra nada. A partir del 30 de diciembre, si te das de baja no podrás volver a darte de alta hasta pasados dos meses desde que termine tu membresía.</p>
   <p>Gracias por confiar en nosotras. Si tienes cualquier duda, o simplemente quieres decirnos hola, responde a este correo: nos llega directamente a Irina y a Nat.</p>
   <p>Nos vemos pronto, en persona.</p>
   <p>Con cariño,<br>Irina y Nat<br>Fraccctal · club, comunidad, cambio</p>
