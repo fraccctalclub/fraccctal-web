@@ -1,7 +1,7 @@
-// Versión disparable a mano de founder-billing-notice.js, protegida con
+// Versión disparable a mano de founder-billing-notice.js (fundadoras y miembros), protegida con
 // SYNC_SECRET. Tres modos (parámetro `modo`):
 //   lista   (por defecto) solo muestra a quién se enviaría, sin enviar nada
-//   prueba  manda UN correo de muestra a fraccctal.contact@gmail.com
+//   prueba  manda dos correos de muestra (fundadoras y miembros) a fraccctal.contact@gmail.com
 //   enviar  envía de verdad a las fundadoras pendientes (idempotente)
 //
 // Uso: https://fraccctal.com/.netlify/functions/founder-billing-notice-manual?secret=TU_SYNC_SECRET&modo=prueba
