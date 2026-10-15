@@ -64,6 +64,29 @@ async function bloqueoPorBaja(email, { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY }
   return { hasta, hastaLabel: fechaLarga(hasta) };
 }
 
+// Quien se dio de baja como fundadora (en cualquier fecha) no puede volver a
+// darse de alta como fundadora: la condición no se recupera. Puede entrar como
+// miembro general. Si no se puede consultar, no se bloquea.
+async function fueFundadoraYSeDioDeBaja(email, { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY }) {
+  const clave = (email || "").trim().toLowerCase();
+  if (!clave || !SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) return false;
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/founders?select=email&status=eq.canceled`, {
+      headers: { apikey: SUPABASE_SERVICE_ROLE_KEY, Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}` },
+    });
+    if (!res.ok) throw new Error(`founders: ${res.status}`);
+    return (await res.json()).some((r) => (r.email || "").trim().toLowerCase() === clave);
+  } catch (err) {
+    console.error("fueFundadoraYSeDioDeBaja: no se pudo consultar", err.message);
+    return false;
+  }
+}
+
+const RESPUESTA_FUNDADORA_BAJA = {
+  statusCode: 403,
+  body: JSON.stringify({ error: "fundadora_baja" }),
+};
+
 function respuestaBloqueo(b) {
   return {
     statusCode: 403,
@@ -71,4 +94,4 @@ function respuestaBloqueo(b) {
   };
 }
 
-module.exports = { BLOQUEO_DESDE, BLOQUEO_MESES, COMUNIDAD_CERRADA_DESDE, finDelBloqueo, fechaLarga, bloqueoPorBaja, respuestaBloqueo };
+module.exports = { fueFundadoraYSeDioDeBaja, RESPUESTA_FUNDADORA_BAJA, BLOQUEO_DESDE, BLOQUEO_MESES, COMUNIDAD_CERRADA_DESDE, finDelBloqueo, fechaLarga, bloqueoPorBaja, respuestaBloqueo };

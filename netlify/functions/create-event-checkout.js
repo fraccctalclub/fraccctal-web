@@ -30,7 +30,7 @@
 
 const { getEvent, DEFAULT_EVENT_ID, tiersReady } = require("./lib/events");
 const { avisoInterno, paresSolicitud } = require("./lib/notify-internal");
-const { bloqueoPorBaja, respuestaBloqueo, COMUNIDAD_CERRADA_DESDE } = require("./lib/baja-rules");
+const { bloqueoPorBaja, respuestaBloqueo, fueFundadoraYSeDioDeBaja, RESPUESTA_FUNDADORA_BAJA, COMUNIDAD_CERRADA_DESDE } = require("./lib/baja-rules");
 
 const FOUNDER_CAP = 20; // global: no depende del encuentro
 
@@ -141,6 +141,7 @@ exports.handler = async (event) => {
     }
     const bloqueoFundadora = await bloqueoPorBaja(emailFundadora, { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY });
     if (bloqueoFundadora) return respuestaBloqueo(bloqueoFundadora);
+    if (await fueFundadoraYSeDioDeBaja(emailFundadora, { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY })) return RESPUESTA_FUNDADORA_BAJA;
     if (REQUIRED_FOUNDER_FIELDS.some((field) => !body[field])) {
       return { statusCode: 400, body: JSON.stringify({ error: "Faltan campos obligatorios" }) };
     }

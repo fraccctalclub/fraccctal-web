@@ -7,7 +7,7 @@
 //   STRIPE_SECRET_KEY, STRIPE_FOUNDER_PRICE_ID, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
 
 const { avisoInterno, paresSolicitud } = require("./lib/notify-internal");
-const { bloqueoPorBaja, respuestaBloqueo } = require("./lib/baja-rules");
+const { bloqueoPorBaja, respuestaBloqueo, fueFundadoraYSeDioDeBaja, RESPUESTA_FUNDADORA_BAJA } = require("./lib/baja-rules");
 
 const FOUNDER_CAP = 20;
 
@@ -59,6 +59,8 @@ exports.handler = async (event) => {
   // de alta hasta pasados 2 meses desde que terminó la membresía.
   const bloqueo = await bloqueoPorBaja(email, process.env);
   if (bloqueo) return respuestaBloqueo(bloqueo);
+  // Una fundadora que se dio de baja no puede volver a serlo.
+  if (await fueFundadoraYSeDioDeBaja(email, process.env)) return RESPUESTA_FUNDADORA_BAJA;
   if (!acepta_condiciones || !acepta_privacidad || !acepta_codigo_conducta) {
     return {
       statusCode: 400,
