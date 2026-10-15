@@ -8,10 +8,16 @@
 // verificada acá server-side. Así nadie puede abrir el portal de otra socia
 // solo conociendo su email.
 //
-// body.accion === "baja" abre el portal directamente en la pantalla de
-// cancelar la suscripción (Stripe flow subscription_cancel); sin acción, abre
-// el portal completo. El cierre de la baja (Supabase, Brevo, Notion, aviso)
-// lo hace el webhook cuando Stripe confirma que la suscripción terminó.
+// body.accion === "baja":
+//   - Si la suscripción sigue en periodo gratuito (trialing), se cancela aquí
+//     mismo y al instante, sin pasar por Stripe: así el mensaje es uno solo
+//     ("la baja es inmediata") y no se ve la pantalla de Stripe, que diría que
+//     sigue disponible hasta fin de periodo. Responde { baja: "inmediata" }.
+//   - Si ya paga, abre el portal en la pantalla de cancelar (Stripe flow
+//     subscription_cancel): ahí sí sigue hasta el final del periodo abonado.
+// Sin acción, abre el portal completo. El cierre de la baja (Supabase, Brevo,
+// Notion, correo y aviso) lo hace el webhook cuando Stripe confirma que la
+// suscripción terminó.
 //
 // Variables de entorno necesarias:
 //   STRIPE_SECRET_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
@@ -80,6 +86,30 @@ exports.handler = async (event) => {
   const ids = await findStripeIds(email, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
   if (!ids) {
     return { statusCode: 404, body: JSON.stringify({ error: "no_encontrada" }) };
+  }
+
+  if (accion === "baja" && ids.subscriptionId) {
+    const stripeHeaders = { Authorization: `Bearer ${STRIPE_SECRET_KEY}` };
+    let enPrueba = false;
+    try {
+      const subRes = await fetch(`https://api.stripe.com/v1/subscriptions/${encodeURIComponent(ids.subscriptionId)}`, {
+        headers: stripeHeaders,
+      });
+      enPrueba = subRes.ok && (await subRes.json()).status === "trialing";
+    } catch {
+      // si no se puede consultar, cae al portal de Stripe
+    }
+    if (enPrueba) {
+      const delRes = await fetch(`https://api.stripe.com/v1/subscriptions/${encodeURIComponent(ids.subscriptionId)}`, {
+        method: "DELETE",
+        headers: { ...stripeHeaders, "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ "cancellation_details[comment]": "Baja pedida desde el espacio de socixs durante el periodo de prueba (sin cobros)" }).toString(),
+      });
+      if (!delRes.ok) {
+        return { statusCode: 500, body: JSON.stringify({ error: "No se pudo completar la baja" }) };
+      }
+      return { statusCode: 200, body: JSON.stringify({ baja: "inmediata" }) };
+    }
   }
 
   const origin = event.headers.origin || "https://fraccctal.com";
