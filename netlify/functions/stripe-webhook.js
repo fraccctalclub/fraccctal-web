@@ -215,6 +215,41 @@ async function sendInternalNotification(email, application, RESEND_API_KEY, tier
 // Entrada a un encuentro puntual (taller, etc.) — no crea cuenta ni socia,
 // solo confirma el pago, suma la fila en event_tickets (para el cupo) y
 // manda la confirmación por email.
+// Correo para la segunda persona de un pack amigxs.
+function amigxEmailHtml({ contenido, nombre, quien }) {
+  const saludo = nombre ? `¡Hola, ${escapeHtml(nombre.split(" ")[0])}!` : "¡Hola!";
+  const invita = quien ? `${escapeHtml(quien)} te ha reservado` : "Una persona amiga te ha reservado";
+  const avisos = (contenido.avisosAlergias || []).map((t) => `<p>${t}</p>`).join("");
+  return `
+    <p>${saludo}</p>
+    <p>${invita} una plaza en <strong>${contenido.title}</strong>. Tu entrada ya está pagada dentro de un pack amigxs: no tienes que hacer nada para confirmarla. Somos ${contenido.capacityWord} personas, y tú eres una de ellas.</p>
+
+    <p><strong>Los datos</strong></p>
+    <ul>
+      <li><strong>${contenido.title}.</strong> ${contenido.typeLabel} con ${contenido.facilitators}.</li>
+      <li>${contenido.dateTimeLabel}.</li>
+      <li>${contenido.venueLabel}.</li>
+    </ul>
+
+    <p><strong>Qué traer</strong></p>
+    <p>${contenido.queTraer}</p>
+    ${avisos ? `<p><strong>Alergias e intolerancias</strong></p>${avisos}` : ""}
+
+    <p><strong>Súmate a nuestra comunidad digital</strong></p>
+    <p>Las novedades del encuentro pasan por ahí, no por email, y es un buen sitio para conocer a las demás personas antes del taller. <strong><a href="${DFOS_LINK}">Súmate al DFOS</a></strong> (toma dos minutos), y <strong><a href="${WHATSAPP_LINK}">al canal de difusión de WhatsApp</a></strong>, donde avisamos las novedades.</p>
+
+    <p><strong>Si no puedes venir</strong></p>
+    <p>Avísanos respondiendo a este correo, o díselo a quien te invitó, y vemos cómo resolverlo entre todxs.</p>
+
+    <p>Cualquier duda, responde a este mismo correo y te contestamos nosotras directamente. Somos dos personas, no un buzón automático.</p>
+
+    <p>Nos vemos el ${contenido.dayLabel}.</p>
+    <p>Irina y Nat<br>Fraccctal</p>
+
+    <p style="color:#57554a; font-size:0.9rem; margin-top:24px">Recibes este correo porque quien te ha invitado nos dio tu email al reservar. Lo usaremos solo para lo que tiene que ver con este encuentro; no te hemos apuntado a ninguna lista. Fraccctal es un club nacido en Madrid en 2026.</p>
+  `;
+}
+
 function escapeHtml(v) {
   return String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
@@ -325,11 +360,37 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
     html,
   });
 
+  // Pack amigxs: la segunda persona recibe su propio correo con los datos del
+  // encuentro. Nunca bloquea la venta: si falla, el aviso interno lo cuenta.
+  let estadoAmigx = "";
+  if (esAmigxs && acompananteEmail) {
+    const valido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(acompananteEmail);
+    if (!valido) {
+      estadoAmigx = "no enviado: el email no parece válido";
+    } else if (acompananteEmail.toLowerCase() === email.toLowerCase()) {
+      estadoAmigx = "no enviado: es el mismo email de quien compró";
+    } else {
+      try {
+        const quien = session.customer_details?.name?.trim() || "";
+        const r = await sendEmail(RESEND_API_KEY, {
+          kind: "entrada_amigx",
+          to: acompananteEmail,
+          subject: `Tu plaza · ${contenido.shortTitle}`,
+          html: amigxEmailHtml({ contenido, nombre: acompananteNombre, quien }),
+        });
+        estadoAmigx = r?.ok ? "enviado" : "FALLÓ: Resend rechazó el envío";
+      } catch (err) {
+        console.error("correo a la segunda persona del pack falló", err.message);
+        estadoAmigx = `FALLÓ: ${err.message}`;
+      }
+    }
+  }
+
   await sendEmail(RESEND_API_KEY, {
     kind: "aviso_interno_entrada",
     to: NOTIFICACION_EMAIL,
     subject: `Nueva entrada (${ticketTier}): ${email}${conAlergia ? " · CON ALERGIA/INTOLERANCIA" : ""}`,
-    html: `<p>Nueva entrada vendida para ${eventId}.</p><ul><li>Tier: ${ticketTier}</li><li>Email: ${email}</li>${alergias ? `<li><strong>Alergias o intolerancias: ${escapeHtml(alergias)}</strong></li>` : ""}${acompananteNombre || acompananteEmail ? `<li>Segunda persona del pack: ${escapeHtml(acompananteNombre || "—")} · ${escapeHtml(acompananteEmail || "—")}${acompananteEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(acompananteEmail) ? " <strong>(el email no parece válido: escríbele a quien compró)</strong>" : ""}</li>` : ""}<li>Sesión: ${session.id}</li></ul>`,
+    html: `<p>Nueva entrada vendida para ${eventId}.</p><ul><li>Tier: ${ticketTier}</li><li>Email: ${email}</li>${alergias ? `<li><strong>Alergias o intolerancias: ${escapeHtml(alergias)}</strong></li>` : ""}${acompananteNombre || acompananteEmail ? `<li>Segunda persona del pack: ${escapeHtml(acompananteNombre || "—")} · ${escapeHtml(acompananteEmail || "—")}${estadoAmigx ? ` — correo a esa persona: <strong>${escapeHtml(estadoAmigx)}</strong>` : ""}</li>` : ""}<li>Sesión: ${session.id}</li></ul>`,
   });
 }
 
