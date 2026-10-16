@@ -7,13 +7,14 @@
 //   STRIPE_SECRET_KEY, STRIPE_FOUNDER_PRICE_ID, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
 
 const { avisoInterno, paresSolicitud } = require("./lib/notify-internal");
+const { bloqueoPorBaja, respuestaBloqueo, fueFundadoraYSeDioDeBaja, RESPUESTA_FUNDADORA_BAJA } = require("./lib/baja-rules");
 
 const FOUNDER_CAP = 20;
 
 // Versión del texto de condiciones.html que se le pide aceptar a cada
 // fundadora. Debe coincidir con LEGAL.CONDICIONES_VERSION en
 // js/legal-config.js — subirla ahí cuando cambie el contenido legal.
-const CONDICIONES_VERSION = "2026-08-v1";
+const CONDICIONES_VERSION = "2026-10-v2";
 
 // 3 de enero de 2027, 00:00 hora de Madrid (CET = UTC+1 en enero) = 2027-01-02T23:00:00Z
 const TRIAL_END_TIMESTAMP = Math.floor(Date.parse("2027-01-02T23:00:00Z") / 1000);
@@ -53,6 +54,13 @@ exports.handler = async (event) => {
   if (REQUIRED_TEXT_FIELDS.some((field) => !body[field])) {
     return { statusCode: 400, body: JSON.stringify({ error: "Faltan campos obligatorios" }) };
   }
+
+  // Baja reciente (desde el 30 de diciembre de 2026): no se puede volver a darse
+  // de alta hasta pasados 2 meses desde que terminó la membresía.
+  const bloqueo = await bloqueoPorBaja(email, process.env);
+  if (bloqueo) return respuestaBloqueo(bloqueo);
+  // Una fundadora que se dio de baja no puede volver a serlo.
+  if (await fueFundadoraYSeDioDeBaja(email, process.env)) return RESPUESTA_FUNDADORA_BAJA;
   if (!acepta_condiciones || !acepta_privacidad || !acepta_codigo_conducta) {
     return {
       statusCode: 400,

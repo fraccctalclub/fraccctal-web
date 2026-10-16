@@ -22,8 +22,9 @@
 [functions."remind-founder-applications"]
   schedule = "@daily"
 
-# Aviso a las fundadoras: el 3 de enero empieza la cuota de 11 € y, si se dan
-# de baja, no pueden volver a entrar como fundadoras. 08:00 UTC = 09:00 en
+# Aviso a fundadoras (11 €) y miembros (22 €): el 3 de enero empieza la cuota.
+# A las fundadoras se les avisa además de que, si se dan de baja, no pueden
+# volver a entrar como fundadoras. 08:00 UTC = 09:00 en
 # Madrid (invierno). La función solo envía en 2026.
 [functions."founder-billing-notice"]
   schedule = "0 8 30 12 *"

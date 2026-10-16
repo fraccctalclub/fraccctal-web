@@ -6,7 +6,9 @@
 //      (el contacto no se borra).
 //   3. Notion (base "Socias y compras"): se le quita la etiqueta Fundadora /
 //      Miembro de "Compras". La fila y el resto de su historial se conservan.
-//   4. Aviso a fraccctal.contact@gmail.com con el resultado de cada paso.
+//   4. Correo a la persona confirmando la baja, con la fecha en que puede volver
+//      (si la baja cuenta para el bloqueo de 2 meses) y el enlace a la encuesta.
+//   5. Aviso a fraccctal.contact@gmail.com con el resultado de cada paso.
 //
 // Cada paso va por separado: si uno falla, los demás se hacen igual y el fallo
 // aparece en el aviso. Es idempotente: si la fila ya no está activa, no hace
@@ -16,6 +18,8 @@
 // NOTION_TOKEN, RESEND_API_KEY
 
 const { avisoInterno } = require("./notify-internal");
+const { sendEmail } = require("./send-email");
+const { BLOQUEO_DESDE, finDelBloqueo, fechaLarga } = require("./baja-rules");
 const { BREVO_LIST_ID } = require("./brevo-socias-core");
 const { notionFetch, NOTION_DATABASE_ID, quitarEtiquetasDeFila } = require("./bbdd-core");
 
@@ -30,7 +34,7 @@ function sbHeaders(key, extra = {}) {
 
 // Marca como "canceled" la fila activa que tenga esa suscripción. Devuelve
 // [{ tier, tablaApp, email }] (vacío si no había ninguna activa).
-async function cancelarEnSupabase(subscriptionId, { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY }) {
+async function cancelarEnSupabase(subscriptionId, { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY }, canceladaEn) {
   const encontradas = [];
   for (const t of TABLAS) {
     const res = await fetch(
@@ -38,7 +42,8 @@ async function cancelarEnSupabase(subscriptionId, { SUPABASE_URL, SUPABASE_SERVI
       {
         method: "PATCH",
         headers: sbHeaders(SUPABASE_SERVICE_ROLE_KEY, { Prefer: "return=representation" }),
-        body: JSON.stringify({ status: "canceled" }),
+        // canceled_at = cuándo terminó de verdad la membresía: de ahí cuentan los 2 meses de bloqueo.
+        body: JSON.stringify({ status: "canceled", canceled_at: canceladaEn }),
       }
     );
     if (!res.ok) throw new Error(`Supabase ${t.tabla}: ${res.status}`);
@@ -103,9 +108,40 @@ async function nombreDe(email, tablaApp, { SUPABASE_URL, SUPABASE_SERVICE_ROLE_K
   }
 }
 
+// Encuesta de salida (Google Forms). Anónima: no pide nombre ni email.
+const ENCUESTA_BAJA_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeszUlOanQ11jy1rJudSr530sSsqWqD35Rmh2WESyEvgMXRyA/viewform";
+
+function escHtml(v) {
+  return String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+function bajaEmailHtml({ nombre, canceladaEn, esFundadora = false }) {
+  const saludo = nombre ? `Hola, ${escHtml(nombre)}:` : "Hola:";
+  const cuenta = new Date(canceladaEn) >= BLOQUEO_DESDE;
+  const vuelta = cuenta
+    ? `<p>Como te avisamos, podrás volver a darte de alta a partir del <strong>${fechaLarga(finDelBloqueo(canceladaEn))}</strong> (dos meses desde que termina tu membresía), como miembro general. Hasta entonces no podrás apuntarte a encuentros ni talleres, que son solo para la comunidad.${esFundadora ? " La condición de fundadora no se recupera." : ""}</p>`
+    : esFundadora
+    ? `<p>Si algún día quieres volver, podrás darte de alta de nuevo como miembro general (22 €/mes) en <a href="https://fraccctal.com/membresia.html">fraccctal.com/membresia.html</a>. La condición de fundadora no se recupera, y con ella tampoco el precio de 11 €. Para que lo sepas si vuelves: desde el 30 de diciembre de 2026, quien se da de baja no puede volver a darse de alta hasta que pasan dos meses desde que termina su membresía.</p>`
+    : `<p>Si algún día quieres volver, puedes darte de alta de nuevo cuando quieras en <a href="https://fraccctal.com/membresia.html">fraccctal.com/membresia.html</a>. Para que lo sepas si vuelves: desde el 30 de diciembre de 2026, quien se da de baja no puede volver a darse de alta hasta que pasan dos meses desde que termina su membresía.</p>`;
+  const encuesta = ENCUESTA_BAJA_URL.startsWith("http")
+    ? `<p>Si tienes dos minutos, nos ayuda muchísimo saber qué pasó, sobre todo lo que podríamos haber hecho distinto. Es una encuesta corta y no te pide ni el nombre ni el email: <a href="${ENCUESTA_BAJA_URL}">responder la encuesta</a>.</p>`
+    : "";
+  return `
+    <p>${saludo}</p>
+    <p>Hemos registrado tu baja de Fraccctal. Gracias por haber estado.</p>
+    ${vuelta}
+    ${encuesta}
+    <p>Si fue sin querer o tienes cualquier duda, responde a este correo: nos llega directamente a Irina y a Nat.</p>
+    <p>Con cariño,<br>Irina y Nat<br>Fraccctal · club, comunidad, cambio</p>
+  `;
+}
+
 async function procesarBaja(subscription, env) {
   const { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, BREVO_API_KEY, NOTION_TOKEN } = env;
-  const filas = await cancelarEnSupabase(subscription.id, { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY });
+  // Fin real de la suscripción (Stripe lo informa en ended_at); si faltara, ahora.
+  const finUnix = subscription.ended_at || subscription.canceled_at;
+  const canceladaEn = (finUnix ? new Date(finUnix * 1000) : new Date()).toISOString();
+  const filas = await cancelarEnSupabase(subscription.id, { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY }, canceladaEn);
   if (filas.length === 0) return { procesada: false };
 
   const resultados = [];
@@ -131,6 +167,22 @@ async function procesarBaja(subscription, env) {
     }
 
     const nombre = await nombreDe(fila.email, fila.tablaApp, { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY });
+
+    try {
+      if (!env.RESEND_API_KEY) throw new Error("falta RESEND_API_KEY");
+      const primerNombre = nombre.split(" ")[0] || "";
+      const r = await sendEmail(env.RESEND_API_KEY, {
+        kind: "baja_confirmacion",
+        to: fila.email,
+        subject: "Hemos registrado tu baja",
+        html: bajaEmailHtml({ nombre: primerNombre, canceladaEn, esFundadora: fila.tier === "Fundadora" }),
+      });
+      pasos.push(["Correo de confirmación de baja", r?.ok ? "ok" : "FALLÓ: Resend rechazó el envío"]);
+    } catch (err) {
+      console.error("baja: correo falló", err.message);
+      pasos.push(["Correo de confirmación de baja", `FALLÓ: ${err.message}`]);
+    }
+
     const motivo = subscription.cancellation_details?.reason || "";
     const hayFallos = pasos.some(([, r]) => r.startsWith("FALLÓ"));
     await avisoInterno({
@@ -142,6 +194,7 @@ async function procesarBaja(subscription, env) {
         ["Email", fila.email],
         ["Tipo", fila.tier],
         ["Motivo en Stripe", motivo],
+        ["Cuenta para el bloqueo de 2 meses", new Date(canceladaEn) >= BLOQUEO_DESDE ? `sí, puede volver a partir del ${fechaLarga(finDelBloqueo(canceladaEn))}` : "no (baja anterior al 30 de diciembre de 2026)"],
         ...pasos.map(([paso, r]) => [paso, r]),
       ],
     });
@@ -150,4 +203,4 @@ async function procesarBaja(subscription, env) {
   return { procesada: true, resultados };
 }
 
-module.exports = { procesarBaja, esSuscripcionDeSocia };
+module.exports = { procesarBaja, esSuscripcionDeSocia, bajaEmailHtml };

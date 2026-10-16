@@ -9,6 +9,7 @@
 //   STRIPE_SECRET_KEY, STRIPE_MEMBER_PRICE_ID, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
 
 const { avisoInterno, paresSolicitud } = require("./lib/notify-internal");
+const { bloqueoPorBaja, respuestaBloqueo } = require("./lib/baja-rules");
 
 // 3 de enero de 2027, 00:00 hora de Madrid (CET = UTC+1 en enero) = 2027-01-02T23:00:00Z.
 // Mismo timestamp que usa create-checkout-session.js para las fundadoras.
@@ -18,7 +19,7 @@ const TRIAL_DAYS = 20;
 // Versión del texto de condiciones.html que se le pide aceptar a cada
 // miembro. Debe coincidir con LEGAL.CONDICIONES_VERSION en
 // js/legal-config.js — subirla ahí cuando cambie el contenido legal.
-const CONDICIONES_VERSION = "2026-08-v1";
+const CONDICIONES_VERSION = "2026-10-v2";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const REQUIRED_TEXT_FIELDS = [
@@ -55,6 +56,11 @@ exports.handler = async (event) => {
   if (REQUIRED_TEXT_FIELDS.some((field) => !body[field])) {
     return { statusCode: 400, body: JSON.stringify({ error: "Faltan campos obligatorios" }) };
   }
+
+  // Baja reciente (desde el 30 de diciembre de 2026): no se puede volver a darse
+  // de alta hasta pasados 2 meses desde que terminó la membresía.
+  const bloqueo = await bloqueoPorBaja(email, process.env);
+  if (bloqueo) return respuestaBloqueo(bloqueo);
   if (!acepta_condiciones || !acepta_privacidad || !acepta_codigo_conducta) {
     return {
       statusCode: 400,
