@@ -109,8 +109,11 @@ const EVENT_EMAIL_CONTENT = {
     capacityWord: "veinte",
     queTraer:
       "Un táper para llevarte tus energy balls. Nosotras ponemos los ingredientes y los utensilios, y no hace falta saber cocinar.",
-    avisoFrutosSecos:
-      "Las dos recetas llevan frutos secos (anacardos y avellanas), por lo que este taller no es apto para personas con alergia a los frutos secos. La harina de avena puede contener trazas de gluten. Si tienes otra alergia o intolerancia, respóndenos a este correo y te contactamos antes del taller.",
+    avisosAlergias: [
+      "Las dos recetas llevan frutos secos (anacardos y avellanas), por lo que este taller no es apto para personas con alergia a los frutos secos.",
+      "La harina de avena puede contener trazas de gluten.",
+      "Si tienes otra alergia o intolerancia, respóndenos a este correo y te contactamos antes del taller.",
+    ],
     precios: { early: "25€ (early bird)", general: "30€", amigxs: "55€ (amigxs, 2 entradas)" },
     pageUrl: "https://fraccctal.com/encuentros/lo-que-el-hambre-sabe",
   },
@@ -290,14 +293,14 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
 
     <p><strong>Qué traer</strong></p>
     <p>${contenido.queTraer}</p>
-    ${contenido.avisoFrutosSecos ? `<p><strong>Alergias e intolerancias</strong></p><p>${contenido.avisoFrutosSecos}</p>${esAmigxs ? "<p>Con el pack amigxs has indicado una sola respuesta en el pago: si tu acompañante tiene alguna alergia o intolerancia, avísanos también.</p>" : ""}` : ""}
+    ${contenido.avisosAlergias ? `<p><strong>Alergias e intolerancias</strong></p>${contenido.avisosAlergias.map((t) => `<p>${t}</p>`).join("")}${esAmigxs ? "<p>Con el pack amigxs has indicado una sola respuesta en el pago: si tu acompañante tiene alguna alergia o intolerancia, avísanos también.</p>" : ""}` : ""}
 
     <p><strong>Súmate a nuestra comunidad digital</strong></p>
     <p>Todo lo que tiene que ver con tu entrada pasa por ahí, no por email: actualizaciones del encuentro, y la posibilidad de conocer al resto de asistentes antes del taller si te apetece. Llegar con algunas caras ya vistas cambia bastante la experiencia. Es también el lugar donde seguimos encontrándonos y compartiendo reflexiones después de cada taller, y donde vas a tener acceso anticipado a los próximos encuentros, antes de que se abran al público.</p>
     <p><strong><a href="${DFOS_LINK}">Súmate al DFOS</a></strong>, el espacio digital de encuentro de la comunidad donde estamos todxs conectadxs (toma dos minutos), y <strong><a href="${WHATSAPP_LINK}">al canal de difusión de WhatsApp</a></strong>, donde avisamos las novedades.</p>
     ${bloqueMembresia}
     <p><strong>Si necesitas cancelar</strong></p>
-    <p>Las entradas no tienen devolución. Si no puedes venir, escríbenos a fraccctal.contact@gmail.com y vemos cómo resolverlo entre todas.</p>
+    <p>Las entradas no tienen devolución. Si no puedes venir, escríbenos a fraccctal.contact@gmail.com y vemos cómo resolverlo entre todxs.</p>
 
     <p>Somos ${contenido.capacityWord} y las plazas se llenan por el boca a boca. Si se te ocurre alguien a quien esto le vendría bien, reenvíale este correo o pásale el enlace: ${contenido.pageUrl}</p>
 
