@@ -286,6 +286,20 @@ exports.handler = async (event) => {
     params.set("custom_fields[0][text][minimum_length]", "1");
     params.set("custom_fields[0][text][maximum_length]", "250");
   }
+  // Pack amigxs: nombre y email de la segunda persona, para tenerla en la base
+  // de datos. (Stripe admite 3 campos personalizados: alergias + estos dos.)
+  if (eventConfig.pideAcompanante && tier === "amigxs") {
+    params.set("custom_fields[1][key]", "amigx_nombre");
+    params.set("custom_fields[1][label][type]", "custom");
+    params.set("custom_fields[1][label][custom]", "Nombre y apellido de tu amigx");
+    params.set("custom_fields[1][type]", "text");
+    params.set("custom_fields[1][optional]", "false");
+    params.set("custom_fields[2][key]", "amigx_email");
+    params.set("custom_fields[2][label][type]", "custom");
+    params.set("custom_fields[2][label][custom]", "Email de tu amigx");
+    params.set("custom_fields[2][type]", "text");
+    params.set("custom_fields[2][optional]", "false");
+  }
   if (eventConfig.avisoCheckout) {
     params.set("custom_text[submit][message]", eventConfig.avisoCheckout);
   }

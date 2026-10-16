@@ -225,7 +225,11 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
   if (!email || !eventId || !ticketTier) return;
 
   // Respuesta al campo de alergias del checkout (solo los encuentros que lo piden).
-  const alergias = (session.custom_fields || []).find((f) => f.key === "alergias")?.text?.value?.trim() || null;
+  const campo = (clave) => (session.custom_fields || []).find((f) => f.key === clave)?.text?.value?.trim() || null;
+  const alergias = campo("alergias");
+  // Pack amigxs: datos de la segunda persona.
+  const acompananteNombre = campo("amigx_nombre");
+  const acompananteEmail = campo("amigx_email");
 
   await fetch(`${SUPABASE_URL}/rest/v1/event_tickets`, {
     method: "POST",
@@ -242,6 +246,8 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
       stripe_session_id: session.id,
       status: "paid",
       alergias,
+      acompanante_nombre: acompananteNombre,
+      acompanante_email: acompananteEmail,
     }),
   });
 
@@ -289,11 +295,12 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
       <li>${contenido.dateTimeLabel}.</li>
       <li>${contenido.venueLabel}.</li>
       <li>${esAmigxs ? "Tus entradas" : "Tu entrada"}: ${precio}</li>
+      ${esAmigxs && acompananteNombre ? `<li>Tu amigx: ${escapeHtml(acompananteNombre)}${acompananteEmail ? ` (${escapeHtml(acompananteEmail)})` : ""}</li>` : ""}
     </ul>
 
     <p><strong>Qué traer</strong></p>
     <p>${contenido.queTraer}</p>
-    ${contenido.avisosAlergias ? `<p><strong>Alergias e intolerancias</strong></p>${contenido.avisosAlergias.map((t) => `<p>${t}</p>`).join("")}${esAmigxs ? "<p>Con el pack amigxs has indicado una sola respuesta en el pago: si tu acompañante tiene alguna alergia o intolerancia, avísanos también.</p>" : ""}` : ""}
+    ${contenido.avisosAlergias ? `<p><strong>Alergias e intolerancias</strong></p>${contenido.avisosAlergias.map((t) => `<p>${t}</p>`).join("")}${esAmigxs ? "<p>Con el pack amigxs has indicado una sola respuesta en el pago: si tu amigx tiene alguna alergia o intolerancia, avísanos también.</p>" : ""}` : ""}
 
     <p><strong>Súmate a nuestra comunidad digital</strong></p>
     <p>Todo lo que tiene que ver con tu entrada pasa por ahí, no por email: actualizaciones del encuentro, y la posibilidad de conocer al resto de asistentes antes del taller si te apetece. Llegar con algunas caras ya vistas cambia bastante la experiencia. Es también el lugar donde seguimos encontrándonos y compartiendo reflexiones después de cada taller, y donde vas a tener acceso anticipado a los próximos encuentros, antes de que se abran al público.</p>
@@ -322,7 +329,7 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
     kind: "aviso_interno_entrada",
     to: NOTIFICACION_EMAIL,
     subject: `Nueva entrada (${ticketTier}): ${email}${conAlergia ? " · CON ALERGIA/INTOLERANCIA" : ""}`,
-    html: `<p>Nueva entrada vendida para ${eventId}.</p><ul><li>Tier: ${ticketTier}</li><li>Email: ${email}</li>${alergias ? `<li><strong>Alergias o intolerancias: ${escapeHtml(alergias)}</strong></li>` : ""}<li>Sesión: ${session.id}</li></ul>`,
+    html: `<p>Nueva entrada vendida para ${eventId}.</p><ul><li>Tier: ${ticketTier}</li><li>Email: ${email}</li>${alergias ? `<li><strong>Alergias o intolerancias: ${escapeHtml(alergias)}</strong></li>` : ""}${acompananteNombre || acompananteEmail ? `<li>Segunda persona del pack: ${escapeHtml(acompananteNombre || "—")} · ${escapeHtml(acompananteEmail || "—")}${acompananteEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(acompananteEmail) ? " <strong>(el email no parece válido: escríbele a quien compró)</strong>" : ""}</li>` : ""}<li>Sesión: ${session.id}</li></ul>`,
   });
 }
 
