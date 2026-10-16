@@ -47,7 +47,7 @@ const EVENTS = {
     membersOnlyUntil: "2026-11-01T00:00:00+01:00",
     endsAt: "2026-11-29T00:00:00+01:00",
     tiers: {
-      early: { price: "price_1UQRKwCYD2PjyybiaINDfeBn", cap: 6, seats: 1 }, // 25 €
+      early: { price: "price_1UQRKwCYD2PjyybiaINDfeBn", cap: 4, seats: 1 }, // 25 €
       general: { price: "price_1UQRKxCYD2Pjyybis4WL15mm", cap: 20, seats: 1 }, // 30 € (el tope real lo pone roomCap)
       amigxs: { price: "price_1UR99tCYD2PjyybiPaj2cbSX", cap: 10, seats: 2 }, // 55 €, una compra = 2 plazas
     },
