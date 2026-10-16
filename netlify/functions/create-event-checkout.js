@@ -274,6 +274,22 @@ exports.handler = async (event) => {
     }
   }
 
+  // Encuentros con comida: pregunta obligatoria por alergias e intolerancias y,
+  // junto al botón de pago, el aviso del catálogo (ej. frutos secos). La
+  // etiqueta de Stripe admite 50 caracteres como máximo.
+  if (eventConfig.pideAlergias) {
+    params.set("custom_fields[0][key]", "alergias");
+    params.set("custom_fields[0][label][type]", "custom");
+    params.set("custom_fields[0][label][custom]", "¿Alergia o intolerancia? Si no, escribe 'ninguna'");
+    params.set("custom_fields[0][type]", "text");
+    params.set("custom_fields[0][optional]", "false");
+    params.set("custom_fields[0][text][minimum_length]", "1");
+    params.set("custom_fields[0][text][maximum_length]", "250");
+  }
+  if (eventConfig.avisoCheckout) {
+    params.set("custom_text[submit][message]", eventConfig.avisoCheckout);
+  }
+
   const sessionRes = await fetch("https://api.stripe.com/v1/checkout/sessions", {
     method: "POST",
     headers: {

@@ -42,13 +42,13 @@ const FRACCCTAL_EVENTS = [
     venue: "María del Río",
     flyer: "", // pendiente: llega el flyer
     city: "Madrid",
-    price: "Early bird 25€ · General 30€",
+    price: "Early bird 25€ · General 30€ · Amigxs 55€ (2 entradas)",
     founderPrice: "",
     founderTicketsUrl: "/encuentros/lo-que-el-hambre-sabe",
     tag: ["conocimiento", "placer"],
     facilitators: "Kyriaki Erotokritou",
     description:
-      "Taller de nutrición y cocina para entender el hambre y el antojo, y preparar dos recetas de energy balls. Todo el material y los ingredientes están incluidos.",
+      "Un taller para entender qué nos pide el cuerpo cuando nos entran ganas de picar algo, y para preparárnoslo con nuestras propias manos.",
     ticketsUrl: "/encuentros/lo-que-el-hambre-sabe",
     lumaUrl: "",
     status: "abierto",

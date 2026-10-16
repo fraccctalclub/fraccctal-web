@@ -107,9 +107,11 @@ const EVENT_EMAIL_CONTENT = {
     dayLabel: "28",
     venueLabel: "María del Río · Madrid (C. de Doña Urraca, 16, 28011 Madrid, metro Puerta del Ángel)",
     capacityWord: "veinte",
-    precios: { early: "25€ (early bird)", general: "30€" },
     queTraer:
-      "Nada: el material y los ingredientes están incluidos, y te llevas a casa lo que prepares. Si tienes alguna alergia o intolerancia, escríbenos respondiendo a este correo.",
+      "Un táper para llevarte tus energy balls. Nosotras ponemos los ingredientes y los utensilios, y no hace falta saber cocinar.",
+    avisoFrutosSecos:
+      "Las dos recetas llevan frutos secos (anacardos y avellanas), por lo que este taller no es apto para personas con alergia a los frutos secos. Si tienes otra alergia o intolerancia, respóndenos a este correo y te contactamos antes del taller.",
+    precios: { early: "25€ (early bird)", general: "30€", amigxs: "55€ (amigxs, 2 entradas)" },
     pageUrl: "https://fraccctal.com/encuentros/lo-que-el-hambre-sabe",
   },
 };
@@ -210,10 +212,17 @@ async function sendInternalNotification(email, application, RESEND_API_KEY, tier
 // Entrada a un encuentro puntual (taller, etc.) — no crea cuenta ni socia,
 // solo confirma el pago, suma la fila en event_tickets (para el cupo) y
 // manda la confirmación por email.
+function escapeHtml(v) {
+  return String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
 async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY }) {
   const eventId = session.metadata?.event_id || "";
   const ticketTier = session.metadata?.ticket_tier || "";
   if (!email || !eventId || !ticketTier) return;
+
+  // Respuesta al campo de alergias del checkout (solo los encuentros que lo piden).
+  const alergias = (session.custom_fields || []).find((f) => f.key === "alergias")?.text?.value?.trim() || null;
 
   await fetch(`${SUPABASE_URL}/rest/v1/event_tickets`, {
     method: "POST",
@@ -229,6 +238,7 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
       email,
       stripe_session_id: session.id,
       status: "paid",
+      alergias,
     }),
   });
 
@@ -247,6 +257,8 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
   }
 
   const esAmigxs = ticketTier === "amigxs";
+  // Cualquier respuesta distinta de "ninguna / no / nada" se marca en el asunto del aviso.
+  const conAlergia = Boolean(alergias) && !/^\s*(ninguna|ninguno|no|nada|ningun[ao]s?|-)\s*\.?\s*$/i.test(alergias);
   const precio =
     contenido.precios?.[ticketTier] ||
     (ticketTier === "early" ? "20€ (early bird)" : esAmigxs ? "42€ (amigxs, 2 entradas)" : "25€");
@@ -265,7 +277,7 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
 
   const html = `
     <p>¡Hola!</p>
-    <p>Ya está: ${plazaTexto} para <strong>${contenido.title}</strong> ${esAmigxs ? "están reservadas" : "está reservada"}. Somos ${contenido.capacityWord}, y ${esAmigxs ? "sois dos de ellas" : "tú eres una de ellas"}.</p>
+    <p>Ya está: ${plazaTexto} para <strong>${contenido.title}</strong> ${esAmigxs ? "están reservadas" : "está reservada"}. Somos ${contenido.capacityWord} personas, y ${esAmigxs ? "sois dos de ellas" : "tú eres una de ellas"}.</p>
     <p>Gracias por venir. Fraccctal es un club muy joven (nació en Madrid este año) y cada entrada que se vende es lo que nos permite seguir programando. No lo decimos por cortesía: lo decimos porque es literal.</p>
 
     <p><strong>Los datos</strong></p>
@@ -278,6 +290,7 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
 
     <p><strong>Qué traer</strong></p>
     <p>${contenido.queTraer}</p>
+    ${contenido.avisoFrutosSecos ? `<p><strong>Alergias e intolerancias</strong></p><p>${contenido.avisoFrutosSecos}</p>${esAmigxs ? "<p>Con el pack amigxs has indicado una sola respuesta en el pago: si tu acompañante tiene alguna alergia o intolerancia, avísanos también.</p>" : ""}` : ""}
 
     <p><strong>Súmate a nuestra comunidad digital</strong></p>
     <p>Todo lo que tiene que ver con tu entrada pasa por ahí, no por email: actualizaciones del encuentro, y la posibilidad de conocer al resto de asistentes antes del taller si te apetece. Llegar con algunas caras ya vistas cambia bastante la experiencia. Es también el lugar donde seguimos encontrándonos y compartiendo reflexiones después de cada taller, y donde vas a tener acceso anticipado a los próximos encuentros, antes de que se abran al público.</p>
@@ -305,8 +318,8 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
   await sendEmail(RESEND_API_KEY, {
     kind: "aviso_interno_entrada",
     to: NOTIFICACION_EMAIL,
-    subject: `Nueva entrada (${ticketTier}): ${email}`,
-    html: `<p>Nueva entrada vendida para ${eventId}.</p><ul><li>Tier: ${ticketTier}</li><li>Email: ${email}</li><li>Sesión: ${session.id}</li></ul>`,
+    subject: `Nueva entrada (${ticketTier}): ${email}${conAlergia ? " · CON ALERGIA/INTOLERANCIA" : ""}`,
+    html: `<p>Nueva entrada vendida para ${eventId}.</p><ul><li>Tier: ${ticketTier}</li><li>Email: ${email}</li>${alergias ? `<li><strong>Alergias o intolerancias: ${escapeHtml(alergias)}</strong></li>` : ""}<li>Sesión: ${session.id}</li></ul>`,
   });
 }
 
