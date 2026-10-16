@@ -53,7 +53,7 @@ const EVENTS = {
     },
     // Este encuentro pregunta por alergias en el checkout y avisa de los frutos secos.
     pideAlergias: true,
-    avisoCheckout: "Las dos recetas llevan frutos secos (anacardos y avellanas), por lo que este taller no es apto para personas con alergia a los frutos secos.",
+    avisoCheckout: "Las dos recetas llevan frutos secos (anacardos y avellanas), por lo que este taller no es apto para personas con alergia a los frutos secos. La harina de avena puede contener trazas de gluten.",
   },
 };
 

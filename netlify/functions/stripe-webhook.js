@@ -110,7 +110,7 @@ const EVENT_EMAIL_CONTENT = {
     queTraer:
       "Un táper para llevarte tus energy balls. Nosotras ponemos los ingredientes y los utensilios, y no hace falta saber cocinar.",
     avisoFrutosSecos:
-      "Las dos recetas llevan frutos secos (anacardos y avellanas), por lo que este taller no es apto para personas con alergia a los frutos secos. Si tienes otra alergia o intolerancia, respóndenos a este correo y te contactamos antes del taller.",
+      "Las dos recetas llevan frutos secos (anacardos y avellanas), por lo que este taller no es apto para personas con alergia a los frutos secos. La harina de avena puede contener trazas de gluten. Si tienes otra alergia o intolerancia, respóndenos a este correo y te contactamos antes del taller.",
     precios: { early: "25€ (early bird)", general: "30€", amigxs: "55€ (amigxs, 2 entradas)" },
     pageUrl: "https://fraccctal.com/encuentros/lo-que-el-hambre-sabe",
   },
