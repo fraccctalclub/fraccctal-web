@@ -12,7 +12,7 @@ function brevoHeaders(BREVO_API_KEY) {
 
 async function getPaidAttendees(eventId, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY) {
   const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/event_tickets?select=email&event_id=eq.${encodeURIComponent(eventId)}&status=eq.paid`,
+    `${SUPABASE_URL}/rest/v1/event_tickets?select=email,acompanante_email&event_id=eq.${encodeURIComponent(eventId)}&status=eq.paid`,
     {
       headers: {
         apikey: SUPABASE_SERVICE_ROLE_KEY,
@@ -22,7 +22,14 @@ async function getPaidAttendees(eventId, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
   );
   if (!res.ok) throw new Error(`Error leyendo event_tickets: ${res.status}`);
   const rows = await res.json();
-  const emails = new Set(rows.map((r) => r.email.toLowerCase()));
+  // Incluye a la segunda persona de cada pack amigxs: también asistió.
+  const emails = new Set();
+  for (const r of rows) {
+    emails.add(r.email.toLowerCase());
+    if (r.acompanante_email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(r.acompanante_email.trim())) {
+      emails.add(r.acompanante_email.trim().toLowerCase());
+    }
+  }
   return [...emails];
 }
 

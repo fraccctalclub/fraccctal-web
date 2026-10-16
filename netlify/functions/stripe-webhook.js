@@ -215,6 +215,32 @@ async function sendInternalNotification(email, application, RESEND_API_KEY, tier
 // Entrada a un encuentro puntual (taller, etc.) — no crea cuenta ni socia,
 // solo confirma el pago, suma la fila en event_tickets (para el cupo) y
 // manda la confirmación por email.
+// Lista de Brevo "Primerxs amigxs de Fraccctal".
+const BREVO_LISTA_AMIGXS = 4;
+
+// Guarda a la segunda persona de un pack amigxs en Brevo, en la lista de amigxs
+// del club. Nunca rompe la venta: devuelve un texto para el aviso interno.
+async function guardarAmigxEnBrevo(email, nombreCompleto) {
+  const { BREVO_API_KEY } = process.env;
+  if (!BREVO_API_KEY) return "no guardado en Brevo: falta BREVO_API_KEY";
+  const [nombre, ...resto] = (nombreCompleto || "").split(" ");
+  try {
+    const res = await fetch("https://api.brevo.com/v3/contacts", {
+      method: "POST",
+      headers: { "api-key": BREVO_API_KEY, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email,
+        attributes: { NOMBRE: nombre || "", APELLIDOS: resto.join(" ") },
+        listIds: [BREVO_LISTA_AMIGXS],
+        updateEnabled: true,
+      }),
+    });
+    return res.ok || res.status === 204 ? "guardado en Brevo (Primerxs amigxs)" : `FALLÓ guardar en Brevo: ${res.status}`;
+  } catch (err) {
+    return `FALLÓ guardar en Brevo: ${err.message}`;
+  }
+}
+
 // Correo para la segunda persona de un pack amigxs.
 function amigxEmailHtml({ contenido, nombre, quien }) {
   const saludo = nombre ? `¡Hola, ${escapeHtml(nombre.split(" ")[0])}!` : "¡Hola!";
@@ -246,7 +272,7 @@ function amigxEmailHtml({ contenido, nombre, quien }) {
     <p>Nos vemos el ${contenido.dayLabel}.</p>
     <p>Irina y Nat<br>Fraccctal</p>
 
-    <p style="color:#57554a; font-size:0.9rem; margin-top:24px">Recibes este correo porque quien te ha invitado nos dio tu email al reservar. Lo usaremos solo para lo que tiene que ver con este encuentro; no te hemos apuntado a ninguna lista. Fraccctal es un club nacido en Madrid en 2026.</p>
+    <p style="color:#57554a; font-size:0.9rem; margin-top:24px">Recibes este correo porque quien te ha invitado nos dio tu email al reservar. Lo usaremos para lo que tiene que ver con este encuentro y para contarte de vez en cuando cuándo hay encuentros nuevos: te hemos sumado a la lista de amigxs de Fraccctal. Puedes salir cuando quieras, con el enlace de baja de cualquiera de esos correos o respondiendo a este. Fraccctal es un club nacido en Madrid en 2026.</p>
   `;
 }
 
@@ -378,10 +404,11 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
           subject: `Tu plaza · ${contenido.shortTitle}`,
           html: amigxEmailHtml({ contenido, nombre: acompananteNombre, quien }),
         });
-        estadoAmigx = r?.ok ? "enviado" : "FALLÓ: Resend rechazó el envío";
+        estadoAmigx = r?.ok ? "correo enviado" : "correo FALLÓ: Resend rechazó el envío";
+        estadoAmigx += " · " + (await guardarAmigxEnBrevo(acompananteEmail, acompananteNombre));
       } catch (err) {
         console.error("correo a la segunda persona del pack falló", err.message);
-        estadoAmigx = `FALLÓ: ${err.message}`;
+        estadoAmigx = `correo FALLÓ: ${err.message}`;
       }
     }
   }
