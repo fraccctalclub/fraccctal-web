@@ -170,10 +170,12 @@ async function sendInternalNotification(email, application, RESEND_API_KEY, tier
   if (!RESEND_API_KEY) return;
 
   const a = application || {};
-  const etiqueta = tier === "member" ? "Nueva miembro general" : "Nueva fundadora";
+  const etiqueta = tier === "member" ? "Nueva miembro" : "Nueva fundadora";
+  const categoria = tier === "member" ? "Miembro (22 €/mes desde el 3 de enero de 2027)" : "Fundadora (11 €/mes desde el 3 de enero de 2027)";
   const html = `
     <p>${etiqueta}: <strong>${a.nombre || ""} ${a.apellido || ""}</strong></p>
     <ul>
+      <li>Categoría: <strong>${categoria}</strong></li>
       <li>Email: ${email}</li>
       <li>Teléfono: ${a.telefono || "-"}</li>
       <li>Edad: ${a.edad ?? "-"}</li>
@@ -238,7 +240,7 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
 
   // Si ya se hizo fundadorx en esta misma compra, no le repetimos el pitch
   // de la membresía acá — ya le llega su propia carta de bienvenida.
-  const esCombo = session.metadata?.tier === "event_founder";
+  const esCombo = session.metadata?.tier === "event_founder" || session.metadata?.tier === "event_member";
   const bloqueMembresia = esCombo
     ? ""
     : `
@@ -416,6 +418,13 @@ exports.handler = async (event) => {
       // fundadora, cada una con su propio email de confirmación.
       await handleEventTicket(session, email, deps);
       await handleMembershipAccount(session, email, "founder", deps);
+      return { statusCode: 200, body: "ok" };
+    }
+
+    if (session.metadata?.tier === "event_member") {
+      // Compró entrada Y se sumó como miembrx en la misma Checkout Session.
+      await handleEventTicket(session, email, deps);
+      await handleMembershipAccount(session, email, "member", deps);
       return { statusCode: 200, body: "ok" };
     }
 

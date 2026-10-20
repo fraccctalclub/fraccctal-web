@@ -73,7 +73,7 @@ exports.handler = async (event) => {
     return { statusCode: 405, body: JSON.stringify({ error: "Método no permitido" }) };
   }
 
-  const { STRIPE_SECRET_KEY, STRIPE_FOUNDER_PRICE_ID, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY } =
+  const { STRIPE_SECRET_KEY, STRIPE_FOUNDER_PRICE_ID, STRIPE_MEMBER_PRICE_ID, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY } =
     process.env;
 
   let body;
@@ -162,7 +162,7 @@ exports.handler = async (event) => {
       hacerseFundadora = false; // ya es socia, no hace falta crear nada nuevo
     } else {
       const countRes = await fetch(
-        `${SUPABASE_URL}/rest/v1/founders?select=id&status=eq.active&counts_toward_cap=is.true`,
+        `${SUPABASE_URL}/rest/v1/founders?select=id&counts_toward_cap=is.true`,
         {
           headers: {
             apikey: SUPABASE_SERVICE_ROLE_KEY,
@@ -178,6 +178,38 @@ exports.handler = async (event) => {
         return { statusCode: 409, body: JSON.stringify({ error: "cupo_fundadoras_completo" }) };
       }
       email = emailFundadora;
+    }
+  }
+
+  // ¿Quiere sumarse como miembrx de paso? (el cupo de fundadorxs está completo,
+  // así que esta es la opción que se ofrece). Gratis hasta el 3 de enero de 2027,
+  // igual que el alta de miembrx normal. Solo antes de esa fecha: después los
+  // encuentros ya son solo para socixs.
+  let hacerseMiembro = Boolean(body.hacerse_miembro) && !hacerseFundadora && Date.now() < TRIAL_END_TIMESTAMP * 1000;
+  if (hacerseMiembro) {
+    const emailMiembro = (body.email || "").trim().toLowerCase();
+    if (!emailMiembro || !EMAIL_RE.test(emailMiembro)) {
+      return { statusCode: 400, body: JSON.stringify({ error: "Email inválido" }) };
+    }
+    const bloqueoMiembro = await bloqueoPorBaja(emailMiembro, { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY });
+    if (bloqueoMiembro) return respuestaBloqueo(bloqueoMiembro);
+    if (REQUIRED_FOUNDER_FIELDS.some((field) => !body[field])) {
+      return { statusCode: 400, body: JSON.stringify({ error: "Faltan campos obligatorios" }) };
+    }
+    if (!body.acepta_condiciones || !body.acepta_privacidad || !body.acepta_codigo_conducta) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Hay que aceptar las condiciones, la privacidad y el código de conducta" }),
+      };
+    }
+    const [yaFundadora, yaMiembro] = await Promise.all([
+      existsActive("founders", emailMiembro, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY),
+      existsActive("members", emailMiembro, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY),
+    ]);
+    if (yaFundadora || yaMiembro) {
+      hacerseMiembro = false; // ya es socia, compra normal
+    } else {
+      email = emailMiembro;
     }
   }
 
@@ -242,6 +274,42 @@ exports.handler = async (event) => {
     });
   }
 
+  // Si se suma como miembrx, guardar su aplicación antes de ir a pagar
+  // (igual que create-membership-session.js).
+  if (hacerseMiembro) {
+    await fetch(`${SUPABASE_URL}/rest/v1/member_applications`, {
+      method: "POST",
+      headers: {
+        apikey: SUPABASE_SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        nombre: body.nombre,
+        apellido: body.apellido,
+        telefono: body.telefono,
+        edad: body.edad ? Number(body.edad) : null,
+        ciudad: body.ciudad,
+        barrio: body.barrio || null,
+        que_te_trae: body.que_te_trae,
+        expectativa: body.expectativa,
+        compartir: body.compartir || null,
+        como_te_entero: body.como_te_entero,
+        acepta_condiciones: true,
+        acepta_privacidad: true,
+        acepta_codigo_conducta: true,
+        condiciones_version: CONDICIONES_VERSION,
+      }),
+    });
+    await avisoInterno({
+      kind: "aviso_interno_solicitud_miembro",
+      subject: `Solicitud de miembro con entrada (aún sin pagar): ${body.nombre || email}`,
+      intro: `Alguien ha empezado a comprar una entrada (${eventId}, ${tier}) y a hacerse miembro de paso.`,
+      pares: paresSolicitud(body, email),
+    });
+  }
+
   const origin = event.headers.origin || "https://fraccctal.com";
   const params = new URLSearchParams({
     "line_items[0][price]": config.price,
@@ -258,6 +326,13 @@ exports.handler = async (event) => {
     params.set("line_items[1][quantity]", "1");
     params.set("subscription_data[trial_end]", String(TRIAL_END_TIMESTAMP));
     params.set("metadata[tier]", "event_founder");
+    params.set("customer_email", email);
+  } else if (hacerseMiembro) {
+    params.set("mode", "subscription");
+    params.set("line_items[1][price]", STRIPE_MEMBER_PRICE_ID);
+    params.set("line_items[1][quantity]", "1");
+    params.set("subscription_data[trial_end]", String(TRIAL_END_TIMESTAMP));
+    params.set("metadata[tier]", "event_member");
     params.set("customer_email", email);
   } else {
     params.set("mode", "payment");

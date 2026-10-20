@@ -188,7 +188,7 @@ async function procesarBaja(subscription, env) {
     await avisoInterno({
       kind: "aviso_interno_baja",
       subject: `${hayFallos ? "Baja con fallos" : "Baja"} de ${fila.tier.toLowerCase()}: ${nombre || fila.email}`,
-      intro: `Se ha dado de baja una ${fila.tier.toLowerCase()} y el cierre automático ha corrido.${fila.tier === "Fundadora" ? " Su plaza de fundadora queda liberada." : ""}`,
+      intro: `Se ha dado de baja una ${fila.tier.toLowerCase()} y el cierre automático ha corrido.${fila.tier === "Fundadora" ? " Su plaza de fundadora NO se libera: el cupo de fundadorxs no se reabre." : ""}`,
       pares: [
         ["Nombre", nombre],
         ["Email", fila.email],

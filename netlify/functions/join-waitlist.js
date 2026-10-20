@@ -31,7 +31,7 @@ function escapeHtml(s) {
 async function quedanPlazasFundadora(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY) {
   try {
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/founders?select=id&status=eq.active&counts_toward_cap=is.true`,
+      `${SUPABASE_URL}/rest/v1/founders?select=id&counts_toward_cap=is.true`,
       { headers: { apikey: SUPABASE_SERVICE_ROLE_KEY, Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}` } }
     );
     if (!res.ok) return null;

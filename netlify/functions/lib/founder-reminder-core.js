@@ -69,7 +69,7 @@ async function runFounderReminder(env) {
   const activas = new Set((await foundersRes.json()).map((f) => f.email.trim().toLowerCase()));
 
   // ¿Quedan plazas de fundadora? Si no, el recordatorio invita a la membresía general.
-  const cupoRes = await fetch(`${SUPABASE_URL}/rest/v1/founders?select=id&status=eq.active&counts_toward_cap=is.true`, { headers });
+  const cupoRes = await fetch(`${SUPABASE_URL}/rest/v1/founders?select=id&counts_toward_cap=is.true`, { headers });
   if (!cupoRes.ok) throw new Error(`Error leyendo el cupo de fundadoras: ${cupoRes.status}`);
   const cupoCompleto = (await cupoRes.json()).length >= 20;
 
