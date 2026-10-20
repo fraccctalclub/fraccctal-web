@@ -72,7 +72,7 @@ exports.handler = async (event) => {
 
   // 1. Chequear el cupo: contar fundadoras ya activas en Supabase.
   const countRes = await fetch(
-    `${SUPABASE_URL}/rest/v1/founders?select=id&status=eq.active&counts_toward_cap=is.true`,
+    `${SUPABASE_URL}/rest/v1/founders?select=id&counts_toward_cap=is.true`,
     {
       headers: {
         apikey: SUPABASE_SERVICE_ROLE_KEY,

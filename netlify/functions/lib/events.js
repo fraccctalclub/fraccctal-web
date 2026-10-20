@@ -33,7 +33,7 @@ const EVENTS = {
     membersOnlyUntil: "2026-10-01T00:00:00+02:00",
     endsAt: "2026-10-25T00:00:00+02:00",
     tiers: {
-      early: { price: PRICE_OCT_EARLY, cap: 4, seats: 1 },
+      early: { price: PRICE_OCT_EARLY, cap: 3, seats: 1 }, // cap 3 (era 4): se dio de baja una early bird y su plaza se reabre solo como general
       general: { price: PRICE_OCT_GENERAL, cap: 12, seats: 1 },
       amigxs: { price: PRICE_OCT_AMIGXS, cap: 2, seats: 2 }, // cerrado: cap = ya vendidas
     },

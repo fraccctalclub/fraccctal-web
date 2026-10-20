@@ -63,7 +63,7 @@ const FRACCCTAL_EVENTS = [
     flyer: "/assets/img/flyer-la-erotica-del-buentrato.webp",
     flyerThumb: "/assets/img/flyer-la-erotica-del-buentrato-thumb.webp",
     city: "Madrid",
-    price: "Early bird 20€ · General 25€",
+    price: "General 25€",
     founderPrice: "",
     founderTicketsUrl: "/encuentros/la-erotica-del-buentrato",
     tag: ["placer", "conocimiento"],
