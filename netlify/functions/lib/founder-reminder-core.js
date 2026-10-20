@@ -24,6 +24,20 @@ function reminderHtml(nombre) {
   `;
 }
 
+// Variante para cuando el cupo de fundadoras ya se completó: la persona empezó
+// el alta de fundadora pero ya no queda plaza; se le invita a la membresía general.
+function reminderMiembroHtml(nombre) {
+  const saludo = nombre ? `Hola, ${nombre}:` : "Hola:";
+  return `
+    <p>${saludo}</p>
+    <p>Vimos que empezaste el alta como fundadora de Fraccctal, pero el pago no llegó a completarse. Te escribimos para contarte que el cupo de fundadorxs ya se completó, así que esa opción se ha cerrado.</p>
+    <p>Lo que sí está abierto es la membresía general: no se cobra nada hasta el 3 de enero de 2027 y después son 22 €/mes. Incluye acceso a los encuentros, a la comunidad, al club de lectura y al walking club. A partir de enero, los encuentros son solo para la comunidad.</p>
+    <p>Si quieres entrar, puedes hacerlo aquí: <a href="https://fraccctal.com/membresia.html">https://fraccctal.com/membresia.html</a></p>
+    <p>Cualquier duda, responde a este mismo correo.</p>
+    <p>Irina y Nat<br>Fraccctal</p>
+  `;
+}
+
 async function runFounderReminder(env) {
   const { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY } = env;
   if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY || !RESEND_API_KEY) {
@@ -54,6 +68,11 @@ async function runFounderReminder(env) {
   if (!foundersRes.ok) throw new Error(`Error leyendo founders: ${foundersRes.status}`);
   const activas = new Set((await foundersRes.json()).map((f) => f.email.trim().toLowerCase()));
 
+  // ¿Quedan plazas de fundadora? Si no, el recordatorio invita a la membresía general.
+  const cupoRes = await fetch(`${SUPABASE_URL}/rest/v1/founders?select=id&status=eq.active&counts_toward_cap=is.true`, { headers });
+  if (!cupoRes.ok) throw new Error(`Error leyendo el cupo de fundadoras: ${cupoRes.status}`);
+  const cupoCompleto = (await cupoRes.json()).length >= 20;
+
   let enviados = 0;
   const emailsEnviados = [];
   const yaTratadas = new Set();
@@ -66,8 +85,8 @@ async function runFounderReminder(env) {
     const r = await sendEmail(RESEND_API_KEY, {
       kind: "recordatorio_fundadora",
       to: app.email,
-      subject: "Tu lugar como fundadora sigue esperándote",
-      html: reminderHtml(app.nombre),
+      subject: cupoCompleto ? "Ya puedes entrar a Fraccctal como miembrx" : "Tu lugar como fundadora sigue esperándote",
+      html: cupoCompleto ? reminderMiembroHtml(app.nombre) : reminderHtml(app.nombre),
     });
     if (r.ok) {
       enviados++;

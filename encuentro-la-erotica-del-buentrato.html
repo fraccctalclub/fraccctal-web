@@ -526,6 +526,14 @@
   }
 
   btnGeneral.addEventListener("click", () => comprar("general", btnGeneral));
+
+  // Con el cupo de fundadorxs completo, no se ofrece hacerse fundadorx al comprar.
+  fetch("/.netlify/functions/founder-status")
+    .then((r) => r.json())
+    .then((d) => {
+      if (d.capReached) document.getElementById("fundadora-section").style.display = "none";
+    })
+    .catch(() => {});
   btnAmigxs.addEventListener("click", () => comprar("amigxs", btnAmigxs));
 </script>
 </body>

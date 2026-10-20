@@ -48,9 +48,9 @@
 
 <header class="hero" style="padding-bottom:56px">
   <div class="wrap">
-    <p class="hero__lockup">Membresía fundadorx</p>
-    <h1>Solo 20 plazas</h1>
-    <p class="lede" style="margin-left:auto;margin-right:auto">La membresía es la forma de pertenecer a Fraccctal: acceso a los encuentros, a la comunidad y al club de lectura y el walking club. Te animamos a sumarte ahora que las plazas son muy limitadas: en enero ya no habrá más fundadorxs. Por eso el cupo fundadorx no se amplía.</p>
+    <p class="hero__lockup" id="hero-lockup">Membresía fundadorx</p>
+    <h1 id="hero-titulo">Solo 20 plazas</h1>
+    <p class="lede" id="hero-lede" style="margin-left:auto;margin-right:auto">La membresía es la forma de pertenecer a Fraccctal: acceso a los encuentros, a la comunidad y al club de lectura y el walking club. Te animamos a sumarte ahora que las plazas son muy limitadas: en enero ya no habrá más fundadorxs. Por eso el cupo fundadorx no se amplía.</p>
   </div>
 </header>
 
@@ -90,9 +90,13 @@
       </div>
       <div class="tier tier--locked" id="tier-member-card">
         <p class="tier__lock-badge" id="tier-member-lock-badge">🔒 Disponible cuando se completen las 20 plazas fundadoras</p>
-        <p class="eyebrow">Desde enero 2027</p>
+        <p class="eyebrow" id="tier-member-eyebrow">Desde enero 2027</p>
         <h3>Miembrx</h3>
-        <p class="tier__price">22€ <small>/ mes</small></p>
+        <p class="tier__price" id="tier-member-price">22€ <small>/ mes</small></p>
+        <div id="tier-member-notes" style="display:none">
+          <p class="tier__price-note"><strong>Ahora es gratis:</strong> no se cobra nada hasta el 3 de enero de 2027.</p>
+          <p class="tier__price-note">Desde el 3 de enero de 2027: 22 €/mes. Baja cuando quieras.</p>
+        </div>
         <ul>
           <li>Acceso a los encuentros y talleres de Fraccctal, solo para la comunidad: desde enero ya no los abrimos fuera de ella</li>
           <li>Descuentos con nuestra red de terapeutas y talleristas</li>
@@ -113,7 +117,7 @@
       <h2>Sin sorpresas</h2>
     </div>
     <div>
-      <p>Te lo decimos desde el día uno: la membresía es gratis hasta el 31 de diciembre de 2026. Desde el 3 de enero de 2027, si entraste como fundadorx pagas 11€/mes: precio fundador que no subirá más, aunque el precio general suba con el tiempo. Una vez cubierto el cupo de 20, quien se una después entra directo a la membresía general, a 22€/mes.</p>
+      <p>Te lo decimos desde el día uno: la membresía es gratis hasta el 31 de diciembre de 2026. Desde el 3 de enero de 2027, si entraste como fundadorx pagas 11€/mes: precio fundador que no subirá más, aunque el precio general suba con el tiempo. Una vez cubierto el cupo de 20, quien se una después entra a la membresía general: también gratis hasta el 3 de enero de 2027 y, desde entonces, 22€/mes.</p>
     </div>
   </div>
 </section>
@@ -362,6 +366,18 @@
     function closeFounderSignup() {
       document.getElementById("tier-founder-promo").style.display = "none";
       document.getElementById("tier-founder-cerrado").style.display = "block";
+      // Cupo completo: la página pasa a hablar de la membresía general, que ya está abierta.
+      document.getElementById("tier-founder-cerrado").textContent = "El cupo de fundadorxs ya se completó. Gracias a quienes llegaron primero. Ahora puedes hacerte miembrx.";
+      document.getElementById("hero-lockup").textContent = "Membresía";
+      document.getElementById("hero-titulo").textContent = "Ya puedes hacerte miembrx";
+      document.getElementById("hero-lede").textContent = "La membresía es la forma de pertenecer a Fraccctal: acceso a los encuentros, a la comunidad y al club de lectura y el walking club. El cupo de fundadorxs ya se completó y la membresía general está abierta: gratis hasta el 3 de enero de 2027 y después 22 €/mes.";
+      document.getElementById("tier-founder-eyebrow").textContent = "Cupo completo";
+      document.getElementById("tier-member-eyebrow").textContent = "Abierta ahora";
+      // Igual que en fundadorx: el precio tachado y un 0, aclarando que se cobra desde enero.
+      const precioMiembro = document.getElementById("tier-member-price");
+      precioMiembro.className = "tier__price tier__price--compound";
+      precioMiembro.innerHTML = '<span class="tier__price-old">22 €/mes</span><span class="tier__price-new">0 €</span>';
+      document.getElementById("tier-member-notes").style.display = "block";
       document.getElementById("founder-explainer-section").style.display = "none";
       const founderCard = document.getElementById("tier-founder-card");
       founderCard.style.cursor = "default";
@@ -466,7 +482,7 @@
         const data = await res.json();
 
         if (res.status === 409 && data.error === "cupo_completo") {
-          showMessage("El cupo de 20 fundadoras ya se completó. Escríbenos si quieres que te avisemos de la membresía general.", true);
+          showMessage("El cupo de fundadorxs ya se completó. Recarga la página: ya puedes hacerte miembrx.", true);
         } else if (data.error === "fundadora_baja") {
           showMessage("Ya fuiste fundadora y te diste de baja: esa condición no se recupera. Cuando se abra la membresía general podrás entrar como miembrx. Si crees que es un error, escríbenos.", true);
         } else if (data.error === "baja_reciente") {
