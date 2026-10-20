@@ -38,17 +38,6 @@ const EVENTS = {
       amigxs: { price: PRICE_OCT_AMIGXS, cap: 2, seats: 2 }, // cerrado: cap = ya vendidas
     },
   },
-  // PRUEBA INTERNA (borrar): comprueba de punta a punta el alta de miembrx al
-  // comprar una entrada. Precio de 1 €, 2 plazas, sin página. Quitar después.
-  "prueba-interna-miembro": {
-    title: "PRUEBA interna",
-    slug: "/membresia.html",
-    roomCap: 2,
-    membersOnlyUntil: "2020-01-01T00:00:00+01:00",
-    tiers: {
-      general: { price: "price_1USdMjCYD2PjyybivM36kRbB", cap: 2, seats: 1 },
-    },
-  },
 };
 
 const DEFAULT_EVENT_ID = "una-vida-de-fantasia-2026-09";
