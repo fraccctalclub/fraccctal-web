@@ -96,7 +96,11 @@
     <div id="tickets-box" style="background:var(--bg-alt); border:1px solid var(--line); border-radius:18px; padding:28px 30px; margin-bottom:48px; display:none">
       <p class="eyebrow" style="margin-bottom:16px">Entradas</p>
       <p style="margin:0 0 20px; padding:14px 16px; border:1px solid var(--ink); border-radius:12px; background:var(--bg)"><strong>Las dos recetas llevan frutos secos (anacardos y avellanas), por lo que este taller no es apto para personas con alergia a los frutos secos.</strong></p>
-      <p style="margin:-8px 0 20px">La harina de avena puede contener trazas de gluten.</p>
+      <p style="margin:-8px 0 20px">Ninguna de las recetas lleva gluten, aunque la harina de avena puede contener trazas.</p>
+      <div class="checkbox-field" style="margin:0 0 24px">
+        <input type="checkbox" id="lactosa-checkbox">
+        <label for="lactosa-checkbox">Soy intolerante a la lactosa (o lo es mi amigx, si compro el pack). Prepararemos una alternativa.</label>
+      </div>
       <div style="display:grid; gap:14px">
         <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap">
           <div>
@@ -465,7 +469,7 @@
   }
 
   async function comprar(tier, btn) {
-    const payload = { event: EVENT_ID, tier, email: verifiedEmail };
+    const payload = { event: EVENT_ID, tier, email: verifiedEmail, sin_lactosa: document.getElementById("lactosa-checkbox").checked };
 
     if (fundadoraCheckbox.checked) {
       const { campos, error } = datosFundadora();

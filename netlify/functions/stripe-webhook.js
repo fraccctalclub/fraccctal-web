@@ -111,7 +111,7 @@ const EVENT_EMAIL_CONTENT = {
       "Un táper para llevarte tus energy balls. Nosotras ponemos los ingredientes y los utensilios, y no hace falta saber cocinar.",
     avisosAlergias: [
       "Las dos recetas llevan frutos secos (anacardos y avellanas), por lo que este taller no es apto para personas con alergia a los frutos secos.",
-      "La harina de avena puede contener trazas de gluten.",
+      "Ninguna receta lleva gluten, aunque la harina de avena puede contener trazas.",
       "Si tienes otra alergia o intolerancia, respóndenos a este correo y te contactamos antes del taller.",
     ],
     precios: { early: "25€ (early bird)", general: "30€", amigxs: "55€ (amigxs, 2 entradas)" },
@@ -290,6 +290,7 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
   // Respuesta al campo de alergias del checkout (solo los encuentros que lo piden).
   const campo = (clave) => (session.custom_fields || []).find((f) => f.key === clave)?.text?.value?.trim() || null;
   const alergias = campo("alergias");
+  const sinLactosa = session.metadata?.sin_lactosa === "true";
   // Pack amigxs: datos de la segunda persona.
   const acompananteNombre = campo("amigx_nombre");
   const acompananteEmail = campo("amigx_email");
@@ -309,6 +310,7 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
       stripe_session_id: session.id,
       status: "paid",
       alergias,
+      sin_lactosa: sinLactosa,
       acompanante_nombre: acompananteNombre,
       acompanante_email: acompananteEmail,
     }),
@@ -363,7 +365,7 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
 
     <p><strong>Qué traer</strong></p>
     <p>${contenido.queTraer}</p>
-    ${contenido.avisosAlergias ? `<p><strong>Alergias e intolerancias</strong></p>${contenido.avisosAlergias.map((t) => `<p>${t}</p>`).join("")}${esAmigxs ? "<p>Con el pack amigxs has indicado una sola respuesta en el pago: si tu amigx tiene alguna alergia o intolerancia, avísanos también.</p>" : ""}` : ""}
+    ${contenido.avisosAlergias ? `<p><strong>Alergias e intolerancias</strong></p>${contenido.avisosAlergias.map((t) => `<p>${t}</p>`).join("")}${sinLactosa ? `<p>Has marcado que ${esAmigxs ? "alguien del pack es" : "eres"} intolerante a la lactosa: prepararemos una alternativa.</p>` : ""}${esAmigxs ? "<p>Con el pack amigxs has indicado una sola respuesta en el pago: si tu amigx tiene alguna alergia o intolerancia, avísanos también.</p>" : ""}` : ""}
 
     <p><strong>Súmate a nuestra comunidad digital</strong></p>
     <p>Todo lo que tiene que ver con tu entrada pasa por ahí, no por email: actualizaciones del encuentro, y la posibilidad de conocer al resto de asistentes antes del taller si te apetece. Llegar con algunas caras ya vistas cambia bastante la experiencia. Es también el lugar donde seguimos encontrándonos y compartiendo reflexiones después de cada taller, y donde vas a tener acceso anticipado a los próximos encuentros, antes de que se abran al público.</p>
@@ -418,8 +420,8 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
   await sendEmail(RESEND_API_KEY, {
     kind: "aviso_interno_entrada",
     to: NOTIFICACION_EMAIL,
-    subject: `Nueva entrada (${ticketTier}): ${email}${conAlergia ? " · CON ALERGIA/INTOLERANCIA" : ""}`,
-    html: `<p>Nueva entrada vendida para ${eventId}.</p><ul><li>Tier: ${ticketTier}</li><li>Email: ${email}</li>${alergias ? `<li><strong>Alergias o intolerancias: ${escapeHtml(alergias)}</strong></li>` : ""}${acompananteNombre || acompananteEmail ? `<li>Segunda persona del pack: ${escapeHtml(acompananteNombre || "—")} · ${escapeHtml(acompananteEmail || "—")}${estadoAmigx ? ` — correo a esa persona: <strong>${escapeHtml(estadoAmigx)}</strong>` : ""}</li>` : ""}<li>Sesión: ${session.id}</li></ul>`,
+    subject: `Nueva entrada (${ticketTier}): ${email}${conAlergia ? " · CON ALERGIA/INTOLERANCIA" : ""}${sinLactosa ? " · SIN LACTOSA" : ""}`,
+    html: `<p>Nueva entrada vendida para ${eventId}.</p><ul><li>Tier: ${ticketTier}</li><li>Email: ${email}</li>${alergias ? `<li><strong>Alergias o intolerancias: ${escapeHtml(alergias)}</strong></li>` : ""}${sinLactosa ? `<li><strong>Intolerancia a la lactosa: SÍ, preparar alternativa${esAmigxs ? " (en el pack, no sabemos si es quien compró o su amigx)" : ""}</strong></li>` : ""}${acompananteNombre || acompananteEmail ? `<li>Segunda persona del pack: ${escapeHtml(acompananteNombre || "—")} · ${escapeHtml(acompananteEmail || "—")}${estadoAmigx ? ` — correo a esa persona: <strong>${escapeHtml(estadoAmigx)}</strong>` : ""}</li>` : ""}<li>Sesión: ${session.id}</li></ul>`,
   });
 }
 

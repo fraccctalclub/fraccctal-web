@@ -352,6 +352,11 @@ exports.handler = async (event) => {
   // Encuentros con comida: pregunta obligatoria por alergias e intolerancias y,
   // junto al botón de pago, el aviso del catálogo (ej. frutos secos). La
   // etiqueta de Stripe admite 50 caracteres como máximo.
+  // Casilla de intolerancia a la lactosa (alguien de la compra): se guarda en la
+  // metadata de la sesión y el webhook la pasa a la entrada.
+  if (eventConfig.pideAlergias && body.sin_lactosa === true) {
+    params.set("metadata[sin_lactosa]", "true");
+  }
   if (eventConfig.pideAlergias) {
     params.set("custom_fields[0][key]", "alergias");
     params.set("custom_fields[0][label][type]", "custom");
