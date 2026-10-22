@@ -86,8 +86,15 @@ async function renderCartaDetail(containerId) {
   document.title = `${carta.title} · Fraccctal`;
   const descMeta = document.querySelector('meta[name="description"]');
   if (descMeta) descMeta.setAttribute("content", carta.excerpt || carta.title);
-  const canonical = document.querySelector('link[rel="canonical"]');
-  if (canonical) canonical.setAttribute("href", `https://fraccctal.com/cartas/${carta.slug}`);
+  // carta.html no trae canonical fijo (antes apuntaba al listado y Google trataba
+  // cada carta como "página alternativa"): se crea aquí, con la URL de la carta.
+  let canonical = document.querySelector('link[rel="canonical"]');
+  if (!canonical) {
+    canonical = document.createElement("link");
+    canonical.rel = "canonical";
+    document.head.appendChild(canonical);
+  }
+  canonical.setAttribute("href", `https://fraccctal.com/cartas/${carta.slug}`);
   document.querySelectorAll('meta[property="og:title"], meta[name="twitter:title"]').forEach((m) =>
     m.setAttribute("content", `${carta.title} · Fraccctal`)
   );
