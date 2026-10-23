@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>La erótica del buentrato · Taller con Yaneli García Ríos · Fraccctal</title>
-<meta name="description" content="Taller teórico-práctico sobre vínculos, límites y buentrato con Yaneli García Ríos. Sábado 24 de octubre, Madrid. General 25€ · Amigxs 42€ (2 entradas).">
+<meta name="description" content="Taller teórico-práctico sobre vínculos, límites y buentrato con Yaneli García Ríos. Sábado 24 de octubre, Madrid. General 25€.">
 <link rel="canonical" href="https://fraccctal.com/encuentros/la-erotica-del-buentrato">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://fraccctal.com/encuentros/la-erotica-del-buentrato">
@@ -109,13 +109,6 @@
             <p id="general-quedan" style="margin:2px 0 0; color:var(--ink-soft); font-size:0.9rem">Consultando disponibilidad…</p>
           </div>
           <button class="btn btn--primary" id="btn-general" disabled>Comprar</button>
-        </div>
-        <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; padding-top:14px; border-top:1px solid var(--line)">
-          <div>
-            <strong>Amigxs — 42€ (2 entradas)</strong>
-            <p id="amigxs-quedan" style="margin:2px 0 0; color:var(--ink-soft); font-size:0.9rem">Consultando disponibilidad…</p>
-          </div>
-          <button class="btn btn--primary" id="btn-amigxs" disabled>Comprar</button>
         </div>
       </div>
       <div id="waitlist-box" style="display:none; margin-top:24px; padding-top:20px; border-top:1px solid var(--line)">
@@ -323,9 +316,7 @@
   let verifiedEmail = null;
 
   const btnGeneral = document.getElementById("btn-general");
-  const btnAmigxs = document.getElementById("btn-amigxs");
   const generalQuedan = document.getElementById("general-quedan");
-  const amigxsQuedan = document.getElementById("amigxs-quedan");
   const mensaje = document.getElementById("tickets-mensaje");
   const waitlistBox = document.getElementById("waitlist-box");
 
@@ -427,16 +418,11 @@
       btnGeneral.disabled = data.general.quedan <= 0;
       btnGeneral.textContent = data.general.quedan > 0 ? "Comprar" : "Agotado";
 
-      amigxsQuedan.textContent = data.amigxs.quedan > 0 ? `Quedan ${data.amigxs.quedan} de ${data.amigxs.cap}` : "Agotado";
-      btnAmigxs.disabled = data.amigxs.quedan <= 0;
-      btnAmigxs.textContent = data.amigxs.quedan > 0 ? "Comprar" : "Agotado";
-
-      const todoAgotado = data.general.quedan <= 0 && data.amigxs.quedan <= 0;
+      const todoAgotado = data.general.quedan <= 0;
       waitlistBox.style.display = todoAgotado ? "block" : "none";
       document.getElementById("fundadora-section").style.display = todoAgotado ? "none" : "block";
     } catch {
       generalQuedan.textContent = "No pudimos consultar la disponibilidad.";
-      amigxsQuedan.textContent = "No pudimos consultar la disponibilidad.";
     }
   }
 
@@ -529,7 +515,6 @@
 
   btnGeneral.addEventListener("click", () => comprar("general", btnGeneral));
 
-  btnAmigxs.addEventListener("click", () => comprar("amigxs", btnAmigxs));
 </script>
 </body>
 </html>

@@ -48,10 +48,23 @@
   to = "/encuentro-la-erotica-del-buentrato.html"
   status = 200
 
+<<<<<<< HEAD
 # URL linda para el taller "Lo que el hambre sabe".
 [[redirects]]
   from = "/encuentros/lo-que-el-hambre-sabe"
   to = "/encuentro-lo-que-el-hambre-sabe.html"
+=======
+# Apple y los buscadores piden el icono en la raíz; las páginas ya apuntan a
+# assets/logo/favicon-180.png, esto evita el 404.
+[[redirects]]
+  from = "/apple-touch-icon.png"
+  to = "/assets/logo/favicon-180.png"
+  status = 200
+
+[[redirects]]
+  from = "/apple-touch-icon-precomposed.png"
+  to = "/assets/logo/favicon-180.png"
+>>>>>>> main
   status = 200
 
 # Caché de un día para logos e imágenes. No es más larga porque algunos

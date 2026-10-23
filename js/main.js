@@ -164,25 +164,41 @@ function injectEventSchema() {
   );
   if (!upcoming.length) return;
 
-  const schema = upcoming.map((e) => ({
-    "@context": "https://schema.org",
-    "@type": "Event",
-    name: e.title,
-    startDate: e.dateSort,
-    eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
-    eventStatus: "https://schema.org/EventScheduled",
-    location: {
-      "@type": "Place",
-      name: e.venue || e.city,
-      address: e.city,
-    },
-    description: e.description,
-    organizer: {
-      "@type": "Organization",
-      name: "Fraccctal",
-      url: "https://fraccctal.com/",
-    },
-  }));
+  const abs = (u) => (u && u.startsWith("/") ? `https://fraccctal.com${u}` : u);
+  const schema = upcoming.map((e) => {
+    const item = {
+      "@context": "https://schema.org",
+      "@type": "Event",
+      name: e.title,
+      startDate: e.startsAt || e.dateSort,
+      eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+      eventStatus: "https://schema.org/EventScheduled",
+      location: {
+        "@type": "Place",
+        name: e.venue || e.city,
+        address: e.city,
+      },
+      description: e.description,
+      organizer: {
+        "@type": "Organization",
+        name: "Fraccctal",
+        url: "https://fraccctal.com/",
+      },
+    };
+    if (e.endsAt) item.endDate = e.endsAt;
+    if (e.flyer) item.image = abs(e.flyer);
+    if (e.facilitators) item.performer = { "@type": "Person", name: e.facilitators };
+    if (e.offers && e.offers.length) {
+      item.offers = e.offers.map((o) => ({
+        "@type": "Offer",
+        name: o.name,
+        price: String(o.price),
+        priceCurrency: "EUR",
+        url: abs(e.ticketsUrl) || "https://fraccctal.com/encuentros.html",
+      }));
+    }
+    return item;
+  });
 
   const script = document.createElement("script");
   script.type = "application/ld+json";
