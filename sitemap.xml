@@ -3,7 +3,7 @@
   <url>
     <loc>https://fraccctal.com/</loc>
     <priority>1.0</priority>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-23</lastmod>
   </url>
   <url>
     <loc>https://fraccctal.com/encuentros.html</loc>
@@ -13,12 +13,12 @@
   <url>
     <loc>https://fraccctal.com/membresia.html</loc>
     <priority>0.8</priority>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-23</lastmod>
   </url>
   <url>
     <loc>https://fraccctal.com/quienes-somos.html</loc>
     <priority>0.7</priority>
-    <lastmod>2026-09-24</lastmod>
+    <lastmod>2026-10-12</lastmod>
   </url>
   <url>
     <loc>https://fraccctal.com/cartas.html</loc>
@@ -26,14 +26,24 @@
     <lastmod>2026-09-24</lastmod>
   </url>
   <url>
+    <loc>https://fraccctal.com/encuentros/lo-que-el-hambre-sabe</loc>
+    <priority>0.9</priority>
+    <lastmod>2026-10-23</lastmod>
+  </url>
+  <url>
     <loc>https://fraccctal.com/encuentros/la-erotica-del-buentrato</loc>
     <priority>0.9</priority>
-    <lastmod>2026-10-12</lastmod>
+    <lastmod>2026-10-22</lastmod>
   </url>
   <url>
     <loc>https://fraccctal.com/encuentros/una-vida-de-fantasia</loc>
     <priority>0.5</priority>
     <lastmod>2026-10-12</lastmod>
+  </url>
+  <url>
+    <loc>https://fraccctal.com/cartas/el-cringe-como-policia-afectiva</loc>
+    <priority>0.5</priority>
+    <lastmod>2026-10-15</lastmod>
   </url>
   <url>
     <loc>https://fraccctal.com/cartas/la-ternura-tambien-puede-ser-radical</loc>
