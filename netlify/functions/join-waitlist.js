@@ -21,11 +21,8 @@ const WAITLIST_EVENTS = {
     titulo: "La erótica del buentrato",
     fecha: "sábado 24 de octubre",
   },
-  // Sin lista de Brevo todavía (brevoList: null): las personas quedan guardadas en
-  // Supabase (lista_espera) y te llega el aviso. Para usar Brevo, crear la lista
-  // y poner aquí su id.
   "lo-que-el-hambre-sabe-2026-11": {
-    brevoList: null,
+    brevoList: 12, // "Lista de espera · Lo que el hambre sabe"
     titulo: "Lo que el hambre sabe",
     fecha: "sábado 28 de noviembre",
   },
