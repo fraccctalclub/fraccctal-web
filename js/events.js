@@ -29,6 +29,9 @@
  *   lumaUrl      link a la página del evento en Luma, si existe (para encuentros pasados)
  *   detailUrl    página propia del encuentro en la web (ej. "/encuentros/mi-encuentro").
  *                Si un encuentro pasado la tiene, la tarjeta enlaza ahí en vez de a Luma.
+ *   startsAt     inicio con hora y zona, ISO (ej. "2026-10-24T17:00:00+02:00"); para Google
+ *   endsAt       fin con hora y zona, ISO; para Google
+ *   offers       lista de entradas a la venta, ej. [{ name: "General", price: 25 }]; para Google
  *   status       "abierto" | "agotado" | "cerrado" | "proximamente"
  */
 
@@ -52,6 +55,9 @@ const FRACCCTAL_EVENTS = [
       "Taller teórico-práctico sobre lo que nos enseñaron a erotizar en los vínculos y qué pasa si movemos el deseo de sitio. Con movimiento y dinámicas en grupo.",
     ticketsUrl: "/encuentros/la-erotica-del-buentrato",
     lumaUrl: "",
+    startsAt: "2026-10-24T17:00:00+02:00",
+    endsAt: "2026-10-24T20:00:00+02:00",
+    offers: [{ name: "General", price: 25 }],
     status: "abierto",
   },
   {

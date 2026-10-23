@@ -48,6 +48,18 @@
   to = "/encuentro-la-erotica-del-buentrato.html"
   status = 200
 
+# Apple y los buscadores piden el icono en la raíz; las páginas ya apuntan a
+# assets/logo/favicon-180.png, esto evita el 404.
+[[redirects]]
+  from = "/apple-touch-icon.png"
+  to = "/assets/logo/favicon-180.png"
+  status = 200
+
+[[redirects]]
+  from = "/apple-touch-icon-precomposed.png"
+  to = "/assets/logo/favicon-180.png"
+  status = 200
+
 # Caché de un día para logos e imágenes. No es más larga porque algunos
 # archivos se reemplazan con el mismo nombre (flyers) y no queremos que quien
 # ya los vio siga viendo la versión vieja. El HTML, CSS y JS no se tocan:
