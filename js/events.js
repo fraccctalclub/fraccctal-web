@@ -38,7 +38,7 @@
 const FRACCCTAL_EVENTS = [
   {
     id: "lo-que-el-hambre-sabe-2026-11",
-    title: "Lo que el hambre sabe: entender el antojo, amasar el snack",
+    title: "Lo que el hambre sabe: Entender el antojo, amasar el snack",
     dateLabel: "28",
     dateMonth: "NOV",
     dateSort: "2026-11-28",

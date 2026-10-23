@@ -39,7 +39,7 @@ const EVENTS = {
     },
   },
   "lo-que-el-hambre-sabe-2026-11": {
-    title: "Lo que el hambre sabe: entender el antojo, amasar el snack",
+    title: "Lo que el hambre sabe: Entender el antojo, amasar el snack",
     slug: "/encuentros/lo-que-el-hambre-sabe",
     roomCap: 20,
     // Preventa de socias hasta el 1 de noviembre; desde ahí, venta general.
