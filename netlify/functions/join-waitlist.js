@@ -21,6 +21,14 @@ const WAITLIST_EVENTS = {
     titulo: "La erótica del buentrato",
     fecha: "sábado 24 de octubre",
   },
+  // Sin lista de Brevo todavía (brevoList: null): las personas quedan guardadas en
+  // Supabase (lista_espera) y te llega el aviso. Para usar Brevo, crear la lista
+  // y poner aquí su id.
+  "lo-que-el-hambre-sabe-2026-11": {
+    brevoList: null,
+    titulo: "Lo que el hambre sabe",
+    fecha: "sábado 28 de noviembre",
+  },
 };
 
 function escapeHtml(s) {
@@ -121,6 +129,7 @@ exports.handler = async (event) => {
   // 2) Brevo: para poder escribirle. Si falla, ya quedó guardada en Supabase,
   // así que no se lo mostramos como error a la persona.
   try {
+    if (!ev.brevoList) throw new Error("este encuentro no tiene lista de Brevo (solo Supabase)");
     const brevoRes = await fetch("https://api.brevo.com/v3/contacts", {
       method: "POST",
       headers: { "api-key": BREVO_API_KEY, "Content-Type": "application/json" },

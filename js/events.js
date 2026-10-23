@@ -43,7 +43,8 @@ const FRACCCTAL_EVENTS = [
     dateMonth: "NOV",
     dateSort: "2026-11-28",
     venue: "María del Río",
-    flyer: "", // pendiente: llega el flyer
+    flyer: "/assets/img/flyer-lo-que-el-hambre-sabe.webp",
+    flyerThumb: "/assets/img/flyer-lo-que-el-hambre-sabe-thumb.webp",
     city: "Madrid",
     price: "Early bird 25€ · General 30€ · Amigxs 55€ (2 entradas)",
     founderPrice: "",
