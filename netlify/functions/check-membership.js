@@ -40,6 +40,7 @@ exports.handler = async (event) => {
   } catch {
     return { statusCode: 400, body: JSON.stringify({ error: "Body inválido" }) };
   }
+  email = typeof email === "string" ? email.trim().toLowerCase() : email;
   if (!email || !EMAIL_RE.test(email)) {
     return { statusCode: 400, body: JSON.stringify({ error: "Email inválido" }) };
   }

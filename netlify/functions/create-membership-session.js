@@ -47,8 +47,11 @@ exports.handler = async (event) => {
     return { statusCode: 400, body: JSON.stringify({ error: "Body inválido" }) };
   }
 
-  const { email, edad, barrio, compartir, acepta_condiciones, acepta_privacidad, acepta_codigo_conducta } =
+  const { email: emailEscrito, edad, barrio, compartir, acepta_condiciones, acepta_privacidad, acepta_codigo_conducta } =
     body;
+  // Siempre en minúsculas y sin espacios: el correo no distingue mayúsculas, y
+  // las comprobaciones de socia comparan el texto exacto.
+  const email = (emailEscrito || "").trim().toLowerCase();
 
   if (!email || !EMAIL_RE.test(email)) {
     return { statusCode: 400, body: JSON.stringify({ error: "Email inválido" }) };

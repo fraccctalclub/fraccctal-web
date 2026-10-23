@@ -532,7 +532,8 @@ exports.handler = async (event) => {
 
   if (stripeEvent.type === "checkout.session.completed") {
     const session = stripeEvent.data.object;
-    const email = session.customer_email || (session.customer_details && session.customer_details.email);
+    // En minúsculas: así las filas de socia y las comprobaciones coinciden siempre.
+    const email = (session.customer_email || (session.customer_details && session.customer_details.email) || "").trim().toLowerCase() || undefined;
     const deps = { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY };
 
     if (session.metadata?.tier === "event") {
