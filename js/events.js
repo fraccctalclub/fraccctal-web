@@ -55,6 +55,7 @@ const FRACCCTAL_EVENTS = [
       "Un taller para entender qué nos pide el cuerpo cuando nos entran ganas de picar algo, y para preparárnoslo con nuestras propias manos.",
     ticketsUrl: "/encuentros/lo-que-el-hambre-sabe",
     lumaUrl: "",
+    detailUrl: "/encuentros/lo-que-el-hambre-sabe",
     startsAt: "2026-11-28T17:00:00+01:00",
     endsAt: "2026-11-28T19:45:00+01:00",
     offers: [
@@ -83,6 +84,7 @@ const FRACCCTAL_EVENTS = [
       "Taller teórico-práctico sobre lo que nos enseñaron a erotizar en los vínculos y qué pasa si movemos el deseo de sitio. Con movimiento y dinámicas en grupo.",
     ticketsUrl: "/encuentros/la-erotica-del-buentrato",
     lumaUrl: "",
+    detailUrl: "/encuentros/la-erotica-del-buentrato",
     startsAt: "2026-10-24T17:00:00+02:00",
     endsAt: "2026-10-24T20:00:00+02:00",
     offers: [{ name: "General", price: 25 }],
@@ -147,4 +149,10 @@ const FRACCCTAL_EVENTS = [
 ];
 
 // No tocar de aquí para abajo: esto ordena y expone el array.
+
+// Un encuentro con hora de fin (endsAt) ya pasada se marca "cerrado" solo: sale
+// de "próximos" y de los datos para buscadores, y pasa a "pasados" en el listado.
+FRACCCTAL_EVENTS.forEach((e) => {
+  if (e.endsAt && Date.parse(e.endsAt) <= Date.now()) e.status = "cerrado";
+});
 FRACCCTAL_EVENTS.sort((a, b) => (a.dateSort < b.dateSort ? 1 : -1));

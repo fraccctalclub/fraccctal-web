@@ -73,7 +73,7 @@
 
 <header class="hero" style="padding-bottom:40px">
   <div class="wrap">
-    <p class="hero__lockup">Taller · Sábado 28 de noviembre</p>
+    <p class="hero__lockup" id="hero-lockup">Taller · Sábado 28 de noviembre</p>
     <h1>Lo que el hambre sabe: Entender el antojo, amasar el snack</h1>
     <p class="lede" style="margin-left:auto;margin-right:auto">Taller práctico de nutrición y cocina con Kyriaki Erotokritou</p>
     <div class="hero__flyer">
@@ -84,6 +84,12 @@
 
 <section class="section--tight">
   <div class="wrap" style="max-width:65ch">
+
+    <div id="pasado-box" style="background:var(--bg-alt); border:1px solid var(--line); border-radius:18px; padding:28px 30px; margin-bottom:48px; display:none">
+      <p class="eyebrow" style="margin-bottom:16px">Encuentro pasado</p>
+      <p style="margin-top:0">Este taller se celebró el 28 de noviembre y ya no se pueden comprar entradas. Dejamos aquí la descripción por si quieres ver cómo fue.</p>
+      <p style="margin:16px 0 0"><a class="btn btn--ghost" href="/encuentros.html">Ver los próximos encuentros</a></p>
+    </div>
 
     <div id="acceso-gate" style="background:var(--bg-alt); border:1px solid var(--line); border-radius:18px; padding:28px 30px; margin-bottom:48px; display:none">
       <p class="eyebrow" style="margin-bottom:16px">Preventa exclusiva para socixs</p>
@@ -297,6 +303,8 @@
   const EVENT_ID = "lo-que-el-hambre-sabe-2026-11";
   const MEMBERS_ONLY_UNTIL = new Date("2026-11-01T00:00:00+01:00");
   const gated = new Date() < MEMBERS_ONLY_UNTIL;
+  // Terminado el taller la página se queda como ficha: sin entradas ni gate.
+  const ENDED = new Date() >= new Date("2026-11-29T00:00:00+01:00");
 
   // "(es gratis)" del link de membresía solo aplica mientras la membresía
   // sea gratis (hasta el 3 de enero de 2027, mismo corte que el resto del sitio).
@@ -363,7 +371,11 @@
   const params = new URLSearchParams(location.search);
   const vieneDeCompra = params.get("compra") === "ok" || params.get("compra") === "cancelado";
 
-  if (vieneDeCompra) {
+  if (ENDED) {
+    document.getElementById("pasado-box").style.display = "block";
+    const lock = document.getElementById("hero-lockup");
+    lock.textContent = lock.textContent + " · Ya realizado";
+  } else if (vieneDeCompra) {
     // Ya pasó por Stripe (haya salido bien o mal): mostramos el resultado
     // directo, sin volver a pedirle el gate de socia.
     ticketsBox.style.display = "block";
