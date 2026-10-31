@@ -49,8 +49,11 @@ const EVENTS = {
     tiers: {
       early: { price: "price_1UQRKwCYD2PjyybiaINDfeBn", cap: 4, seats: 1 }, // 25 €
       general: { price: "price_1UQRKxCYD2Pjyybis4WL15mm", cap: 20, seats: 1 }, // 30 € (el tope real lo pone roomCap)
-      amigxs: { price: "price_1UR99tCYD2PjyybiPaj2cbSX", cap: 10, seats: 2 }, // 55 €, una compra = 2 plazas
+      amigxs: { price: "price_1UR99tCYD2PjyybiPaj2cbSX", cap: 10, seats: 2, sinCodigos: true }, // 55 €, una compra = 2 plazas
     },
+    // El checkout muestra el campo "código promocional" (ej. WHOISFRACCCTAL) en
+    // las entradas sueltas; los tiers con sinCodigos (pack amigxs) no lo muestran.
+    permiteCodigos: true,
     // Este encuentro pregunta por alergias en el checkout y avisa de los frutos secos.
     pideAlergias: true,
     // Pack amigxs: el checkout pide nombre y email de la segunda persona.

@@ -347,6 +347,11 @@ exports.handler = async (event) => {
     if (email) {
       params.set("customer_email", email);
     }
+    // Solo en compra suelta: con alta de socia en el mismo carrito el descuento
+    // se aplicaría también a la cuota.
+    if (eventConfig.permiteCodigos && !config.sinCodigos) {
+      params.set("allow_promotion_codes", "true");
+    }
   }
 
   // Encuentros con comida: pregunta obligatoria por alergias e intolerancias y,
