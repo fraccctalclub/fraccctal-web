@@ -103,7 +103,7 @@ exports.handler = async (event) => {
   await avisoInterno({
     kind: "aviso_interno_solicitud_miembro",
     subject: `Solicitud de miembro (aún sin pagar): ${body.nombre || email}`,
-    intro: "Alguien ha empezado el alta como miembro general.",
+    intro: "Alguien ha empezado el alta como miembro general. Si no completa el pago, mañana recibe el recordatorio automático.",
     pares: paresSolicitud(body, email),
   });
 

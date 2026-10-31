@@ -38,6 +38,19 @@ function reminderMiembroHtml(nombre) {
   `;
 }
 
+// Recordatorio para quien empezó el alta de MIEMBRX y no completó el pago.
+function reminderMembresiaGeneralHtml(nombre) {
+  const saludo = nombre ? `Hola, ${nombre}:` : "Hola:";
+  return `
+    <p>${saludo}</p>
+    <p>Vimos que empezaste a hacerte miembrx de Fraccctal, pero el pago no llegó a completarse. A veces pasa: se cierra la pestaña, o el banco pide una confirmación que no llega a abrirse.</p>
+    <p>No se cobra nada hasta el 3 de enero de 2027; desde entonces son 22 €/mes y puedes darte de baja cuando quieras. Incluye acceso a los encuentros, a la comunidad, al club de lectura y al walking club. A partir de enero, los encuentros son solo para la comunidad, y los talleres facilitados por profesionales se pagan aparte.</p>
+    <p>Si quieres retomarlo, puedes hacerlo aquí: <a href="https://fraccctal.com/membresia.html">https://fraccctal.com/membresia.html</a></p>
+    <p>Si el banco te pide aprobar el pago, hazlo en su app, y si te da problemas, prueba desde Chrome o Safari, no desde el navegador de Instagram. Y si algo no funciona, responde a este correo y te ayudamos.</p>
+    <p>Irina y Nat<br>Fraccctal</p>
+  `;
+}
+
 async function runFounderReminder(env) {
   const { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY } = env;
   if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY || !RESEND_API_KEY) {
@@ -94,7 +107,45 @@ async function runFounderReminder(env) {
     }
   }
 
-  return { revisadas: apps.length, recordatorios_enviados: enviados, emails: emailsEnviados };
+  // Mismo recordatorio para quien empezó el alta de miembrx (member_applications).
+  // Se salta a quien ya es socia (fundadora o miembro, en cualquier estado) o ya
+  // recibió el recordatorio de fundadora arriba.
+  const membersRes = await fetch(`${SUPABASE_URL}/rest/v1/members?select=email`, { headers });
+  if (!membersRes.ok) throw new Error(`Error leyendo members: ${membersRes.status}`);
+  const sociasMiembro = new Set((await membersRes.json()).map((m) => m.email.trim().toLowerCase()));
+  const appsMiembroRes = await fetch(
+    `${SUPABASE_URL}/rest/v1/member_applications?select=email,nombre,created_at&created_at=gte.${desde}&created_at=lt.${hasta}&order=created_at.asc`,
+    { headers }
+  );
+  if (!appsMiembroRes.ok) throw new Error(`Error leyendo member_applications: ${appsMiembroRes.status}`);
+  const appsMiembro = await appsMiembroRes.json();
+
+  let enviadosMiembro = 0;
+  const emailsMiembro = [];
+  for (const app of appsMiembro) {
+    const clave = app.email.trim().toLowerCase();
+    if (sociasMiembro.has(clave) || activas.has(clave) || yaTratadas.has(clave)) continue;
+    yaTratadas.add(clave);
+    const r = await sendEmail(RESEND_API_KEY, {
+      kind: "recordatorio_miembro",
+      to: app.email,
+      subject: "Tu alta en Fraccctal se quedó a medias",
+      html: reminderMembresiaGeneralHtml(app.nombre),
+    });
+    if (r.ok) {
+      enviadosMiembro++;
+      emailsMiembro.push(app.email);
+    }
+  }
+
+  return {
+    revisadas: apps.length,
+    recordatorios_enviados: enviados,
+    emails: emailsEnviados,
+    miembros_revisadas: appsMiembro.length,
+    miembros_recordatorios_enviados: enviadosMiembro,
+    miembros_emails: emailsMiembro,
+  };
 }
 
-module.exports = { runFounderReminder };
+module.exports = { runFounderReminder, reminderMembresiaGeneralHtml };
