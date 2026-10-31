@@ -48,7 +48,7 @@
   "performer": { "@type": "Person", "name": "Yaneli García Ríos" },
   "organizer": { "@type": "Organization", "name": "Fraccctal", "url": "https://fraccctal.com/" },
   "offers": [
-    { "@type": "Offer", "name": "General", "price": "25", "priceCurrency": "EUR", "url": "https://fraccctal.com/encuentros/la-erotica-del-buentrato" }
+    { "@type": "Offer", "name": "General", "price": "25", "priceCurrency": "EUR", "url": "https://fraccctal.com/encuentros/la-erotica-del-buentrato", "availability": "https://schema.org/InStock", "validFrom": "2026-10-01T00:00:00+02:00" }
   ]
 }
 </script>
@@ -420,6 +420,29 @@
     submitBtn.disabled = false;
     submitBtn.textContent = "Verificar";
   });
+
+
+  // Datos estructurados: la disponibilidad de cada entrada sigue a las plazas reales.
+  const DESDE_VENTA_GENERAL = new Date("2026-10-01T00:00:00+02:00");
+  const TIER_DE_OFERTA = {"General": "general"};
+  function actualizarOfertasSchema(data) {
+    const el = [...document.querySelectorAll('script[type="application/ld+json"]')].find((s) => s.textContent.includes('"Event"'));
+    if (!el) return;
+    try {
+      const ev = JSON.parse(el.textContent);
+      (ev.offers || []).forEach((o) => {
+        const q = data[TIER_DE_OFERTA[o.name]]?.quedan;
+        o.availability = q === 0 ? "https://schema.org/SoldOut" : new Date() < DESDE_VENTA_GENERAL ? "https://schema.org/PreOrder" : "https://schema.org/InStock";
+      });
+      el.textContent = JSON.stringify(ev, null, 2);
+    } catch {}
+  }
+
+  // Se consulta al cargar la página, aunque haya preventa, para que lo que ve Google sea real.
+  fetch(`/.netlify/functions/event-status?event=${EVENT_ID}`)
+    .then((r) => (r.ok ? r.json() : null))
+    .then((d) => d && actualizarOfertasSchema(d))
+    .catch(() => {});
 
   async function cargarDisponibilidad() {
     try {

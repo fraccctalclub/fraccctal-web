@@ -31,7 +31,9 @@
  *                Si un encuentro pasado la tiene, la tarjeta enlaza ahí en vez de a Luma.
  *   startsAt     inicio con hora y zona, ISO (ej. "2026-10-24T17:00:00+02:00"); para Google
  *   endsAt       fin con hora y zona, ISO; para Google
- *   offers       lista de entradas a la venta, ej. [{ name: "General", price: 25 }]; para Google
+ *   offers       lista de entradas a la venta, ej. [{ tier: "general", name: "General", price: 25 }];
+ *                "tier" es la clave del tier en lib/events.js (para saber cuántas quedan); para Google
+ *   publicSaleFrom  desde cuándo puede comprar cualquiera (fin de la preventa de socixs), ISO; para Google
  *   status       "abierto" | "agotado" | "cerrado" | "proximamente"
  */
 
@@ -58,10 +60,11 @@ const FRACCCTAL_EVENTS = [
     detailUrl: "/encuentros/lo-que-el-hambre-sabe",
     startsAt: "2026-11-28T17:00:00+01:00",
     endsAt: "2026-11-28T19:45:00+01:00",
+    publicSaleFrom: "2026-11-01T00:00:00+01:00",
     offers: [
-      { name: "Early bird", price: 25 },
-      { name: "General", price: 30 },
-      { name: "Pack amigxs (2 entradas)", price: 55 },
+      { tier: "early", name: "Early bird", price: 25 },
+      { tier: "general", name: "General", price: 30 },
+      { tier: "amigxs", name: "Pack amigxs (2 entradas)", price: 55 },
     ],
     status: "abierto",
   },
@@ -87,7 +90,8 @@ const FRACCCTAL_EVENTS = [
     detailUrl: "/encuentros/la-erotica-del-buentrato",
     startsAt: "2026-10-24T17:00:00+02:00",
     endsAt: "2026-10-24T20:00:00+02:00",
-    offers: [{ name: "General", price: 25 }],
+    publicSaleFrom: "2026-10-01T00:00:00+02:00",
+    offers: [{ tier: "general", name: "General", price: 25 }],
     status: "abierto",
   },
   {

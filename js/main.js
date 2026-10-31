@@ -157,7 +157,15 @@ function renderEventsList(upcomingId, pastId) {
   }
 }
 
-function injectEventSchema() {
+// Disponibilidad de una entrada para Google: PreOrder mientras solo pueden comprar
+// socixs, InStock cuando queda y SoldOut cuando se agota.
+function availabilityDe(e, quedan) {
+  if (quedan === 0) return "https://schema.org/SoldOut";
+  if (e.publicSaleFrom && Date.now() < Date.parse(e.publicSaleFrom)) return "https://schema.org/PreOrder";
+  return "https://schema.org/InStock";
+}
+
+async function injectEventSchema() {
   if (typeof FRACCCTAL_EVENTS === "undefined") return;
   const upcoming = FRACCCTAL_EVENTS.filter(
     (e) => e.status !== "cerrado" && e.dateSort && e.title
@@ -165,7 +173,17 @@ function injectEventSchema() {
   if (!upcoming.length) return;
 
   const abs = (u) => (u && u.startsWith("/") ? `https://fraccctal.com${u}` : u);
-  const schema = upcoming.map((e) => {
+  // Plazas que quedan de cada tier, en directo. Si no se pueden consultar, la
+  // disponibilidad se deduce solo de las fechas.
+  const estados = await Promise.all(
+    upcoming.map((e) =>
+      fetch(`/.netlify/functions/event-status?event=${encodeURIComponent(e.id)}`)
+        .then((r) => (r.ok ? r.json() : null))
+        .catch(() => null)
+    )
+  );
+  const schema = upcoming.map((e, i) => {
+    const estado = estados[i];
     const item = {
       "@context": "https://schema.org",
       "@type": "Event",
@@ -189,13 +207,19 @@ function injectEventSchema() {
     if (e.flyer) item.image = abs(e.flyer);
     if (e.facilitators) item.performer = { "@type": "Person", name: e.facilitators };
     if (e.offers && e.offers.length) {
-      item.offers = e.offers.map((o) => ({
-        "@type": "Offer",
-        name: o.name,
-        price: String(o.price),
-        priceCurrency: "EUR",
-        url: abs(e.ticketsUrl) || "https://fraccctal.com/encuentros.html",
-      }));
+      item.offers = e.offers.map((o) => {
+        const quedan = estado && o.tier && estado[o.tier] ? estado[o.tier].quedan : null;
+        const offer = {
+          "@type": "Offer",
+          name: o.name,
+          price: String(o.price),
+          priceCurrency: "EUR",
+          url: abs(e.ticketsUrl) || "https://fraccctal.com/encuentros.html",
+          availability: availabilityDe(e, quedan),
+        };
+        if (e.publicSaleFrom) offer.validFrom = e.publicSaleFrom;
+        return offer;
+      });
     }
     return item;
   });
