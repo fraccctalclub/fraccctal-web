@@ -114,14 +114,14 @@
         <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap">
           <div>
             <strong>Early bird — 25€</strong>
-            <p id="early-quedan" style="margin:2px 0 0; color:var(--ink-soft); font-size:0.9rem">Consultando disponibilidad…</p>
+            <p id="early-quedan" style="margin:2px 0 0; color:var(--ink-soft); font-size:0.9rem" hidden></p>
           </div>
           <button class="btn btn--primary" id="btn-early" disabled>Comprar</button>
         </div>
         <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; padding-top:14px; border-top:1px solid var(--line)">
           <div>
             <strong>General — 30€</strong>
-            <p id="general-quedan" style="margin:2px 0 0; color:var(--ink-soft); font-size:0.9rem">Consultando disponibilidad…</p>
+            <p id="general-quedan" style="margin:2px 0 0; color:var(--ink-soft); font-size:0.9rem" hidden></p>
           </div>
           <button class="btn btn--primary" id="btn-general" disabled>Comprar</button>
         </div>
@@ -129,7 +129,7 @@
           <div>
             <strong>Amigxs — 55€ (2 entradas)</strong>
             <p style="margin:2px 0 0; color:var(--ink-soft); font-size:0.9rem">Al pagar te pediremos el nombre y el email de tu amigx.</p>
-            <p id="amigxs-quedan" style="margin:2px 0 0; color:var(--ink-soft); font-size:0.9rem">Consultando disponibilidad…</p>
+            <p id="amigxs-quedan" style="margin:2px 0 0; color:var(--ink-soft); font-size:0.9rem" hidden></p>
           </div>
           <button class="btn btn--primary" id="btn-amigxs" disabled>Comprar</button>
         </div>
@@ -444,20 +444,30 @@
     .then((d) => d && actualizarOfertasSchema(d))
     .catch(() => {});
 
+  // El contador solo se enseña cuando quedan pocas plazas: "quedan 16 de 20" resta
+  // más de lo que suma. Con cupo holgado se oculta; al agotarse sale "Agotado".
+  const UMBRAL_QUEDAN = 6;
+  function mostrarQuedan(el, quedan) {
+    if (quedan <= 0) el.textContent = "Agotado";
+    else if (quedan <= UMBRAL_QUEDAN) el.textContent = quedan === 1 ? "Queda 1 plaza" : `Quedan ${quedan}`;
+    else el.textContent = "";
+    el.hidden = !el.textContent;
+  }
+
   async function cargarDisponibilidad() {
     try {
       const res = await fetch(`/.netlify/functions/event-status?event=${EVENT_ID}`);
       const data = await res.json();
 
-      earlyQuedan.textContent = data.early.quedan > 0 ? `Quedan ${data.early.quedan} de ${data.early.cap}` : "Agotado";
+      mostrarQuedan(earlyQuedan, data.early.quedan);
       btnEarly.disabled = data.early.quedan <= 0;
       btnEarly.textContent = data.early.quedan > 0 ? "Comprar" : "Agotado";
 
-      generalQuedan.textContent = data.general.quedan > 0 ? `Quedan ${data.general.quedan} de ${data.general.cap}` : "Agotado";
+      mostrarQuedan(generalQuedan, data.general.quedan);
       btnGeneral.disabled = data.general.quedan <= 0;
       btnGeneral.textContent = data.general.quedan > 0 ? "Comprar" : "Agotado";
 
-      amigxsQuedan.textContent = data.amigxs.quedan > 0 ? `Quedan ${data.amigxs.quedan} de ${data.amigxs.cap}` : "Agotado";
+      mostrarQuedan(amigxsQuedan, data.amigxs.quedan);
       btnAmigxs.disabled = data.amigxs.quedan <= 0;
       btnAmigxs.textContent = data.amigxs.quedan > 0 ? "Comprar" : "Agotado";
 
@@ -465,9 +475,10 @@
       waitlistBox.style.display = todoAgotado ? "block" : "none";
       document.getElementById("fundadora-section").style.display = todoAgotado ? "none" : "block";
     } catch {
-      earlyQuedan.textContent = "No pudimos consultar la disponibilidad.";
-      generalQuedan.textContent = "No pudimos consultar la disponibilidad.";
-      amigxsQuedan.textContent = "No pudimos consultar la disponibilidad.";
+      [earlyQuedan, generalQuedan, amigxsQuedan].forEach((el) => {
+        el.textContent = "No pudimos consultar la disponibilidad.";
+        el.hidden = false;
+      });
     }
   }
 
