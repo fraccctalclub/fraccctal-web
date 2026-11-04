@@ -173,16 +173,7 @@ async function injectEventSchema() {
   if (!upcoming.length) return;
 
   const abs = (u) => (u && u.startsWith("/") ? `https://fraccctal.com${u}` : u);
-  // Plazas que quedan de cada tier, en directo. Si no se pueden consultar, la
-  // disponibilidad se deduce solo de las fechas.
-  const estados = await Promise.all(
-    upcoming.map((e) =>
-      fetch(`/.netlify/functions/event-status?event=${encodeURIComponent(e.id)}`)
-        .then((r) => (r.ok ? r.json() : null))
-        .catch(() => null)
-    )
-  );
-  const schema = upcoming.map((e, i) => {
+  const construir = (estados) => upcoming.map((e, i) => {
     const estado = estados[i];
     const item = {
       "@context": "https://schema.org",
@@ -223,11 +214,27 @@ async function injectEventSchema() {
     }
     return item;
   });
+  const serializar = (estados) => {
+    const schema = construir(estados);
+    return JSON.stringify(schema.length === 1 ? schema[0] : schema);
+  };
 
+  // Primero, sin esperar a la red (Google puede fotografiar la página antes de
+  // que termine un fetch): la disponibilidad se deduce solo de las fechas.
   const script = document.createElement("script");
   script.type = "application/ld+json";
-  script.textContent = JSON.stringify(schema.length === 1 ? schema[0] : schema);
+  script.textContent = serializar([]);
   document.head.appendChild(script);
+
+  // Después, con las plazas que quedan de cada tier en directo.
+  const estados = await Promise.all(
+    upcoming.map((e) =>
+      fetch(`/.netlify/functions/event-status?event=${encodeURIComponent(e.id)}`)
+        .then((r) => (r.ok ? r.json() : null))
+        .catch(() => null)
+    )
+  );
+  if (estados.some(Boolean)) script.textContent = serializar(estados);
 }
 
 document.addEventListener("DOMContentLoaded", initNav);
