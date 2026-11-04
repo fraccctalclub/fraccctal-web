@@ -552,5 +552,12 @@
   btnGeneral.addEventListener("click", () => comprar("general", btnGeneral));
 
 </script>
+<script>
+  // Meta: quién miró este encuentro (solo si aceptó las cookies). Sirve para volver a
+  // enseñarle el anuncio a quien lo miró y no compró.
+  document.addEventListener("DOMContentLoaded", function () {
+    if (typeof fraccctalTrack === "function") fraccctalTrack("ViewContent", { content_ids: ["la-erotica-del-buentrato-2026-10"], content_type: "product", content_name: "La erótica del buentrato", value: 25, currency: "EUR" });
+  });
+</script>
 </body>
 </html>

@@ -489,5 +489,12 @@
   btnGeneral.addEventListener("click", () => comprar("general", btnGeneral));
   btnAmigxs.addEventListener("click", () => comprar("amigxs", btnAmigxs));
 </script>
+<script>
+  // Meta: quién miró este encuentro (solo si aceptó las cookies). Sirve para volver a
+  // enseñarle el anuncio a quien lo miró y no compró.
+  document.addEventListener("DOMContentLoaded", function () {
+    if (typeof fraccctalTrack === "function") fraccctalTrack("ViewContent", { content_ids: ["una-vida-de-fantasia-2026-09"], content_type: "product", content_name: "Una vida de fantasía", value: 25, currency: "EUR" });
+  });
+</script>
 </body>
 </html>

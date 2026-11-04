@@ -469,7 +469,7 @@
 
   // El contador solo se enseña cuando quedan pocas plazas: "quedan 16 de 20" resta
   // más de lo que suma. Con cupo holgado se oculta; al agotarse sale "Agotado".
-  const UMBRAL_QUEDAN = 6;
+  const UMBRAL_QUEDAN = 5;
   function mostrarQuedan(el, quedan) {
     if (quedan <= 0) el.textContent = "Agotado";
     else if (quedan <= UMBRAL_QUEDAN) el.textContent = quedan === 1 ? "Queda 1 plaza" : `Quedan ${quedan}`;
@@ -599,6 +599,13 @@
   btnEarly.addEventListener("click", () => comprar("early", btnEarly));
   btnGeneral.addEventListener("click", () => comprar("general", btnGeneral));
   btnAmigxs.addEventListener("click", () => comprar("amigxs", btnAmigxs));
+</script>
+<script>
+  // Meta: quién miró este encuentro (solo si aceptó las cookies). Sirve para volver a
+  // enseñarle el anuncio a quien lo miró y no compró.
+  document.addEventListener("DOMContentLoaded", function () {
+    if (typeof fraccctalTrack === "function") fraccctalTrack("ViewContent", { content_ids: ["lo-que-el-hambre-sabe-2026-11"], content_type: "product", content_name: "Lo que el hambre sabe", value: 30, currency: "EUR" });
+  });
 </script>
 </body>
 </html>
