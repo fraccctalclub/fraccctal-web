@@ -145,6 +145,14 @@
   umamiScript.src = "https://cloud.umami.is/script.js";
   umamiScript.setAttribute("data-website-id", "e087ac58-dba3-4486-9c45-344e54c3a58d");
   document.head.appendChild(umamiScript);
+  // El aviso de cookies y el píxel de Meta se cargan también después de limpiar el
+  // hash, para que Meta nunca vea el token de sesión en la URL.
+  const consentListo = new Promise((resolve) => {
+    const consentScript = document.createElement("script");
+    consentScript.src = "/js/consent.js";
+    consentScript.onload = consentScript.onerror = resolve;
+    document.head.appendChild(consentScript);
+  });
 
   async function render() {
     loadingMensaje.style.display = "none";
@@ -185,6 +193,13 @@
       founderContent.style.display = "block";
       document.getElementById("user-email").textContent = session.user.email;
       renderFounderEvents("founder-events");
+
+      // Primera entrada tras pagar el alta de socia: se mide el registro.
+      consentListo.then(() => {
+        if (typeof fraccctalAltaPendiente !== "function") return;
+        const tipo = fraccctalAltaPendiente();
+        if (tipo) fraccctalTrack("CompleteRegistration", { content_name: tipo === "fundadora" ? "Membresía fundadorx" : "Membresía", status: true });
+      });
     } else {
       loginGate.style.display = "block";
       founderContent.style.display = "none";

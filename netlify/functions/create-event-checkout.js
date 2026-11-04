@@ -316,7 +316,8 @@ exports.handler = async (event) => {
     "line_items[0][quantity]": "1",
     "metadata[event_id]": eventId,
     "metadata[ticket_tier]": tier,
-    success_url: `${origin}${eventConfig.slug}?compra=ok`,
+    // tier y sid (sesión de Stripe) los lee la ficha para medir la compra sin duplicarla.
+    success_url: `${origin}${eventConfig.slug}?compra=ok&tier=${tier}&sid={CHECKOUT_SESSION_ID}${hacerseFundadora || hacerseMiembro ? "&alta=1" : ""}`,
     cancel_url: `${origin}${eventConfig.slug}?compra=cancelado`,
   });
 

@@ -49,6 +49,7 @@
 }
 </script>
 <script defer src="https://cloud.umami.is/script.js" data-website-id="e087ac58-dba3-4486-9c45-344e54c3a58d"></script>
+<script defer src="/js/consent.js"></script>
 
 </head>
 <body>
@@ -301,6 +302,8 @@
   import { checkMembership } from "/js/auth.js";
 
   const EVENT_ID = "lo-que-el-hambre-sabe-2026-11";
+  // Precio de lista de cada entrada, para el valor que se manda a Meta.
+  const PRECIO_TIER = { early: 25, general: 30, amigxs: 55 };
   const MEMBERS_ONLY_UNTIL = new Date("2026-11-01T00:00:00+01:00");
   const gated = new Date() < MEMBERS_ONLY_UNTIL;
   // Terminado el taller la página se queda como ficha: sin entradas ni gate.
@@ -382,6 +385,26 @@
     accesoGate.style.display = "none";
     mensaje.style.display = "block";
     if (params.get("compra") === "ok") {
+      // Medición de la compra (solo si aceptó las cookies). La clave por sesión evita
+      // contarla dos veces si recarga la página.
+      const sid = params.get("sid");
+      const tierComprado = params.get("tier");
+      const claveMedida = "fraccctal_medida_" + sid;
+      let yaMedida = false;
+      try { yaMedida = !!sessionStorage.getItem(claveMedida); } catch {}
+      if (sid && PRECIO_TIER[tierComprado] && !yaMedida && typeof fraccctalTrack === "function") {
+        fraccctalTrack(
+          "Purchase",
+          { value: PRECIO_TIER[tierComprado], currency: "EUR", content_ids: [EVENT_ID], content_type: "product", content_name: "Lo que el hambre sabe" },
+          sid
+        );
+        try { sessionStorage.setItem(claveMedida, "1"); } catch {}
+        if (params.get("alta") === "1") {
+          // Compró la entrada y se hizo miembrx en el mismo pago.
+          if (typeof fraccctalAltaPendiente === "function") fraccctalAltaPendiente();
+          fraccctalTrack("CompleteRegistration", { content_name: "Membresía", status: true });
+        }
+      }
       mensaje.className = "form-message";
       mensaje.textContent = "¡Listo! Tu entrada quedó confirmada — revisá tu email.";
     } else {
@@ -544,7 +567,11 @@
       });
       const data = await res.json();
       if (res.ok && data.url) {
-        location.href = data.url;
+        fraccctalIrAlPago(
+          data.url,
+          { value: PRECIO_TIER[tier], currency: "EUR", content_ids: [EVENT_ID], content_type: "product", content_name: "Lo que el hambre sabe" },
+          fundadoraCheckbox.checked ? "miembro" : null
+        );
         return;
       }
       mensaje.style.display = "block";
