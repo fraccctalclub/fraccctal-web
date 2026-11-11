@@ -36,6 +36,13 @@
   to = "/carta.html?c=:slug"
   status = 200
 
+# Enlace roto que circula por fuera de la web (la URL quedó pegada a la palabra
+# "Fraccctal"); Google lo rastreaba y daba 404.
+[[redirects]]
+  from = "/encuentros/una-vida-de-fantasiaFraccctal"
+  to = "/encuentros/una-vida-de-fantasia"
+  status = 301
+
 # URL linda para el taller "Una vida de fantasía".
 [[redirects]]
   from = "/encuentros/una-vida-de-fantasia"
