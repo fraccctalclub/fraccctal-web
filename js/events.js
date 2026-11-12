@@ -186,4 +186,11 @@ const FRACCCTAL_EVENTS = [
 FRACCCTAL_EVENTS.forEach((e) => {
   if (e.endsAt && Date.parse(e.endsAt) <= Date.now()) e.status = "cerrado";
 });
-FRACCCTAL_EVENTS.sort((a, b) => (a.dateSort < b.dateSort ? 1 : -1));
+// Los próximos van primero y por orden de fecha (el más cercano arriba, que es
+// también el destacado de la home); los pasados, del más reciente al más antiguo.
+FRACCCTAL_EVENTS.sort((a, b) => {
+  const pa = a.status === "cerrado", pb = b.status === "cerrado";
+  if (pa !== pb) return pa ? 1 : -1;
+  if (a.dateSort === b.dateSort) return 0;
+  return (a.dateSort < b.dateSort ? -1 : 1) * (pa ? -1 : 1);
+});
