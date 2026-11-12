@@ -102,6 +102,10 @@
 
     <div id="tickets-box" style="background:var(--bg-alt); border:1px solid var(--line); border-radius:18px; padding:28px 30px; margin-bottom:48px; display:none">
       <p class="eyebrow" style="margin-bottom:16px">Entradas</p>
+      <div class="checkbox-field" style="margin:0 0 24px">
+        <input type="checkbox" id="apoyo-checkbox">
+        <label for="apoyo-checkbox">Tengo alguna dificultad auditiva o necesito algún apoyo para participar. Al pagar te preguntamos qué necesitas y te escribimos antes del taller.</label>
+      </div>
       <div style="display:grid; gap:14px">
         <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap">
           <div>
@@ -525,7 +529,7 @@
   }
 
   async function comprar(tier, btn) {
-    const payload = { event: EVENT_ID, tier, email: verifiedEmail };
+    const payload = { event: EVENT_ID, tier, email: verifiedEmail, necesita_apoyo: document.getElementById("apoyo-checkbox").checked };
 
     if (fundadoraCheckbox.checked) {
       const { campos, error } = datosFundadora();

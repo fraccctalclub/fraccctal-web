@@ -72,6 +72,9 @@ const EVENTS = {
       early: { price: "price_1UazuKCYD2PjyybiwJdYm4Up", cap: 4, seats: 1 }, // 16 €
       general: { price: "price_1UazuLCYD2PjyybicyBsWjWv", cap: 25, seats: 1 }, // 19 € (el tope real lo pone roomCap)
     },
+    // La ficha tiene una casilla de "dificultad auditiva o apoyo para participar":
+    // si se marca, el checkout pregunta qué necesita la persona.
+    pideAccesibilidad: true,
   },
 };
 

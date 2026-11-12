@@ -386,6 +386,20 @@ exports.handler = async (event) => {
     params.set("custom_fields[2][type]", "text");
     params.set("custom_fields[2][optional]", "false");
   }
+  // Casilla de dificultad auditiva / apoyo para participar: se marca en la
+  // metadata y se pregunta qué necesita (el índice del campo depende de cuántos
+  // campos personalizados lleve ya la sesión).
+  if (eventConfig.pideAccesibilidad && body.necesita_apoyo === true) {
+    params.set("metadata[necesita_apoyo]", "true");
+    const i = [...params.keys()].filter((k) => /^custom_fields\[\d+\]\[key\]$/.test(k)).length;
+    params.set(`custom_fields[${i}][key]`, "apoyo");
+    params.set(`custom_fields[${i}][label][type]`, "custom");
+    params.set(`custom_fields[${i}][label][custom]`, "¿Qué necesitas para participar con comodidad?");
+    params.set(`custom_fields[${i}][type]`, "text");
+    params.set(`custom_fields[${i}][optional]`, "false");
+    params.set(`custom_fields[${i}][text][minimum_length]`, "1");
+    params.set(`custom_fields[${i}][text][maximum_length]`, "250");
+  }
   if (eventConfig.avisoCheckout) {
     params.set("custom_text[submit][message]", eventConfig.avisoCheckout);
   }
