@@ -120,15 +120,15 @@ const EVENT_EMAIL_CONTENT = {
   "ver-de-oido-2026-12": {
     title: "Ver de oído: reconocerse a través de la escucha",
     shortTitle: "Ver de oído",
-    facilitators: "Lara Alcázar, de Onda Atelier Sonoro",
-    typeLabel: "Taller de escucha, en colaboración con Onda Atelier Sonoro,",
+    facilitators: "Lara Alcázar, de ONDA Atelier Sonoro",
+    typeLabel: "Taller de escucha y exploración musical, en colaboración con ONDA Atelier Sonoro,",
     dateTimeLabel: "Jueves 17 de diciembre de 2026, de 19:00 a 21:30 h",
     dayLabel: "17",
     // Lugar por confirmar: actualizar aquí en cuanto se cierre el espacio.
     venueLabel: "Madrid. Estamos cerrando el espacio: te escribimos con la dirección en cuanto esté confirmado",
     capacityWord: "veinticinco",
     queTraer:
-      "Tus auriculares. No hace falta saber de música ni tocar ningún instrumento.",
+      "Tus auriculares. No necesitas conocimientos musicales previos: solo curiosidad, ganas de escuchar y disposición para experimentar.",
     precios: { early: "16€ (early bird)", general: "19€" },
     pageUrl: "https://fraccctal.com/encuentros/ver-de-oido",
   },

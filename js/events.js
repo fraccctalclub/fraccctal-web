@@ -80,7 +80,7 @@ const FRACCCTAL_EVENTS = [
     founderPrice: "",
     founderTicketsUrl: "/encuentros/ver-de-oido",
     tag: ["placer", "conocimiento"],
-    facilitators: "Lara Alcázar (Onda Atelier Sonoro)",
+    facilitators: "Lara Alcázar (ONDA Atelier Sonoro)",
     description:
       "Un taller para afinar la escucha, descubrir cómo lo que oímos guía lo que pensamos y sentimos, y recuperar tu propio criterio frente al algoritmo.",
     ticketsUrl: "/encuentros/ver-de-oido",
