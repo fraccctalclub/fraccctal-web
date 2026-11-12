@@ -128,7 +128,7 @@ const EVENT_EMAIL_CONTENT = {
     venueLabel: "Madrid. Estamos cerrando el espacio: te escribimos con la dirección en cuanto esté confirmado",
     capacityWord: "veinticinco",
     queTraer:
-      "Tu móvil con batería y tus auriculares, por si los necesitas. No hace falta saber de música ni tocar ningún instrumento.",
+      "Tus auriculares. No hace falta saber de música ni tocar ningún instrumento.",
     precios: { early: "16€ (early bird)", general: "19€" },
     pageUrl: "https://fraccctal.com/encuentros/ver-de-oido",
   },
