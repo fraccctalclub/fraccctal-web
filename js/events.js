@@ -35,6 +35,8 @@
  *                "tier" es la clave del tier en lib/events.js (para saber cuántas quedan); para Google
  *   publicSaleFrom  desde cuándo puede comprar cualquiera (fin de la preventa de socixs), ISO; para Google
  *   status       "abierto" | "agotado" | "cerrado" | "proximamente"
+ *   oculto       true = tiene ficha (para revisarla con el enlace) pero no sale en
+ *                listados, destacado de la home ni datos para buscadores. Opcional.
  */
 
 const FRACCCTAL_EVENTS = [
@@ -65,6 +67,36 @@ const FRACCCTAL_EVENTS = [
       { tier: "early", name: "Early bird", price: 25 },
       { tier: "general", name: "General", price: 30 },
       { tier: "amigxs", name: "Pack amigxs (2 entradas)", price: 55 },
+    ],
+    status: "abierto",
+  },
+  {
+    id: "ver-de-oido-2026-12",
+    // En revisión: la ficha existe (enlace para ONDA) pero no sale en listados.
+    // QUITAR esta línea al lanzar el taller.
+    oculto: true,
+    title: "Ver de oído: reconocerse a través de la escucha",
+    dateLabel: "17",
+    dateMonth: "DIC",
+    dateSort: "2026-12-17",
+    venue: "", // por confirmar
+    city: "Madrid",
+    price: "Early bird 16€ · General 19€",
+    founderPrice: "",
+    founderTicketsUrl: "/encuentros/ver-de-oido",
+    tag: ["placer", "conocimiento"],
+    facilitators: "Lara Alcázar (ONDA Atelier Sonoro)",
+    description:
+      "Un taller para afinar la escucha, descubrir cómo lo que oímos guía lo que pensamos y sentimos, y recuperar tu propio criterio frente al algoritmo.",
+    ticketsUrl: "/encuentros/ver-de-oido",
+    lumaUrl: "",
+    detailUrl: "/encuentros/ver-de-oido",
+    startsAt: "2026-12-17T19:00:00+01:00",
+    endsAt: "2026-12-17T21:30:00+01:00",
+    publicSaleFrom: "2026-11-17T00:00:00+01:00",
+    offers: [
+      { tier: "early", name: "Early bird", price: 16 },
+      { tier: "general", name: "General", price: 19 },
     ],
     status: "abierto",
   },
@@ -159,4 +191,23 @@ const FRACCCTAL_EVENTS = [
 FRACCCTAL_EVENTS.forEach((e) => {
   if (e.endsAt && Date.parse(e.endsAt) <= Date.now()) e.status = "cerrado";
 });
-FRACCCTAL_EVENTS.sort((a, b) => (a.dateSort < b.dateSort ? 1 : -1));
+// Los próximos van primero y por orden de fecha (el más cercano arriba, que es
+// también el destacado de la home); los pasados, del más reciente al más antiguo.
+FRACCCTAL_EVENTS.sort((a, b) => {
+  const pa = a.status === "cerrado", pb = b.status === "cerrado";
+  if (pa !== pb) return pa ? 1 : -1;
+  if (a.dateSort === b.dateSort) return 0;
+  return (a.dateSort < b.dateSort ? -1 : 1) * (pa ? -1 : 1);
+});
+
+// Los encuentros con `oculto: true` se apartan de FRACCCTAL_EVENTS (que es lo que
+// leen los listados); su ficha los encuentra igualmente con fraccctalEvento(id).
+const FRACCCTAL_EVENTS_OCULTOS = [];
+for (let i = FRACCCTAL_EVENTS.length - 1; i >= 0; i--) {
+  if (FRACCCTAL_EVENTS[i].oculto) FRACCCTAL_EVENTS_OCULTOS.push(FRACCCTAL_EVENTS.splice(i, 1)[0]);
+}
+
+// Datos de un encuentro por su id (las fichas leen de aquí sus precios).
+function fraccctalEvento(id) {
+  return FRACCCTAL_EVENTS.concat(FRACCCTAL_EVENTS_OCULTOS).find((e) => e.id === id) || null;
+}
