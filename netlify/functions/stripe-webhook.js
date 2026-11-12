@@ -126,7 +126,7 @@ const EVENT_EMAIL_CONTENT = {
     dayLabel: "17",
     // Lugar por confirmar: actualizar aquí en cuanto se cierre el espacio.
     venueLabel: "Madrid. Estamos cerrando el espacio: te escribimos con la dirección en cuanto esté confirmado",
-    capacityWord: "veinticinco",
+    // Sin capacityWord a propósito: este taller no dice cuántas plazas hay.
     queTraer:
       "Tus auriculares, si prefieres escuchar con ellos en algún momento. No son imprescindibles. No necesitas conocimientos musicales previos: solo curiosidad, ganas de escuchar y disposición para experimentar.",
     precios: { early: "16€ (early bird)", general: "19€" },
@@ -265,7 +265,7 @@ function amigxEmailHtml({ contenido, nombre, quien }) {
   const avisos = (contenido.avisosAlergias || []).map((t) => `<p>${t}</p>`).join("");
   return `
     <p>${saludo}</p>
-    <p>${invita} una plaza en <strong>${contenido.title}</strong>. Tu entrada ya está pagada dentro de un pack amigxs: no tienes que hacer nada para confirmarla. Somos ${contenido.capacityWord} personas, y tú eres una de ellas.</p>
+    <p>${invita} una plaza en <strong>${contenido.title}</strong>. Tu entrada ya está pagada dentro de un pack amigxs: no tienes que hacer nada para confirmarla.${contenido.capacityWord ? ` Somos ${contenido.capacityWord} personas, y tú eres una de ellas.` : ""}</p>
 
     <p><strong>Los datos</strong></p>
     <ul>
@@ -370,7 +370,7 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
 
   const html = `
     <p>¡Hola!</p>
-    <p>Ya está: ${plazaTexto} para <strong>${contenido.title}</strong> ${esAmigxs ? "están reservadas" : "está reservada"}. Somos ${contenido.capacityWord} personas, y ${esAmigxs ? "sois dos de ellas" : "tú eres una de ellas"}.</p>
+    <p>Ya está: ${plazaTexto} para <strong>${contenido.title}</strong> ${esAmigxs ? "están reservadas" : "está reservada"}.${contenido.capacityWord ? ` Somos ${contenido.capacityWord} personas, y ${esAmigxs ? "sois dos de ellas" : "tú eres una de ellas"}.` : ""}</p>
     <p>Gracias por venir. Fraccctal es un club muy joven (nació en Madrid este año) y cada entrada que se vende es lo que nos permite seguir programando. No lo decimos por cortesía: lo decimos porque es literal.</p>
 
     <p><strong>Los datos</strong></p>
@@ -395,7 +395,7 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
     <p><strong>Si necesitas cancelar</strong></p>
     <p>Las entradas no tienen devolución. Si no puedes venir, escríbenos a fraccctal.contact@gmail.com y vemos cómo resolverlo entre todxs.</p>
 
-    <p>Somos ${contenido.capacityWord} y las plazas se llenan por el boca a boca. Si se te ocurre alguien a quien esto le vendría bien, reenvíale este correo o pásale el enlace: ${contenido.pageUrl}</p>
+    <p>${contenido.capacityWord ? `Somos ${contenido.capacityWord} y las plazas` : "Las plazas"} se llenan por el boca a boca. Si se te ocurre alguien a quien esto le vendría bien, reenvíale este correo o pásale el enlace: ${contenido.pageUrl}</p>
 
     <p>Cualquier duda, responde a este mismo correo y te contestamos nosotras directamente. Somos dos personas, no un buzón automático.</p>
 
