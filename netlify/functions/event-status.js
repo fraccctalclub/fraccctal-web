@@ -58,7 +58,8 @@ exports.handler = async (event) => {
 
   return {
     statusCode: 200,
-    headers: { "Content-Type": "application/json" },
+    // noindex: es un dato para las fichas, no una página que deba salir en Google.
+    headers: { "Content-Type": "application/json", "X-Robots-Tag": "noindex" },
     body: JSON.stringify(resultado),
   };
 };

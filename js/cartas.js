@@ -86,15 +86,16 @@ async function renderCartaDetail(containerId) {
   document.title = `${carta.title} · Fraccctal`;
   const descMeta = document.querySelector('meta[name="description"]');
   if (descMeta) descMeta.setAttribute("content", carta.excerpt || carta.title);
-  // carta.html no trae canonical fijo (antes apuntaba al listado y Google trataba
-  // cada carta como "página alternativa"): se crea aquí, con la URL de la carta.
+  // La canónica la pone el servidor (netlify/edge-functions/carta-meta.js), que
+  // además sabe cuál es la original cuando una carta está repetida. Solo se crea
+  // aquí si no viene puesta (por ejemplo, si esa función falló).
   let canonical = document.querySelector('link[rel="canonical"]');
   if (!canonical) {
     canonical = document.createElement("link");
     canonical.rel = "canonical";
+    canonical.setAttribute("href", `https://fraccctal.com/cartas/${carta.slug}`);
     document.head.appendChild(canonical);
   }
-  canonical.setAttribute("href", `https://fraccctal.com/cartas/${carta.slug}`);
   document.querySelectorAll('meta[property="og:title"], meta[name="twitter:title"]').forEach((m) =>
     m.setAttribute("content", `${carta.title} · Fraccctal`)
   );
@@ -102,7 +103,7 @@ async function renderCartaDetail(containerId) {
     m.setAttribute("content", carta.excerpt || carta.title)
   );
   const ogUrl = document.querySelector('meta[property="og:url"]');
-  if (ogUrl) ogUrl.setAttribute("content", `https://fraccctal.com/cartas/${carta.slug}`);
+  if (ogUrl) ogUrl.setAttribute("content", canonical.getAttribute("href"));
 
   el.innerHTML = `
     <p class="carta-detail__meta">${formatFecha(carta.published_at)}</p>

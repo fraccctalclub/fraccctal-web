@@ -38,11 +38,14 @@ export default async (request, context) => {
   if (!match) return;
   const slug = decodeURIComponent(match[1]);
 
-  const [response, cartaRes] = await Promise.all([
+  const cabeceras = { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` };
+  const [response, cartaRes, listaRes] = await Promise.all([
     context.next(),
     fetch(`${SUPABASE_URL}/rest/v1/cartas?select=slug,title,excerpt,published_at,content_html&slug=eq.${encodeURIComponent(slug)}`, {
-      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+      headers: cabeceras,
     }),
+    // Índice de todas las cartas, para detectar las repetidas (ver más abajo).
+    fetch(`${SUPABASE_URL}/rest/v1/cartas?select=slug,title,published_at&order=published_at.asc`, { headers: cabeceras }),
   ]);
 
   const tipo = response.headers.get("content-type") || "";
@@ -62,7 +65,15 @@ export default async (request, context) => {
 
   const titulo = esc(`${carta.title} · Fraccctal`);
   const desc = esc(carta.excerpt || carta.title);
-  const canonica = `https://fraccctal.com/cartas/${encodeURIComponent(carta.slug)}`;
+  // Algunas cartas están dos veces en la tabla (la escrita y, después, su versión
+  // en audio con el mismo texto y un slug con sufijo). La canónica es siempre la
+  // más antigua con ese título, igual que hace scripts/generate-sitemap.js.
+  let slugCanonico = carta.slug;
+  if (listaRes.ok) {
+    const original = (await listaRes.json()).find((c) => c.title === carta.title);
+    if (original) slugCanonico = original.slug;
+  }
+  const canonica = `https://fraccctal.com/cartas/${encodeURIComponent(slugCanonico)}`;
 
   html = html
     .replace(/<title>[^<]*<\/title>/, `<title>${titulo}</title>\n<link rel="canonical" href="${canonica}">`)

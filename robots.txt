@@ -1,4 +1,9 @@
 User-agent: *
 Allow: /
+# Las funciones son para la web, no páginas: Google las rastreaba y las listaba
+# como errores. event-status se deja abierta porque las fichas la consultan para
+# los datos de disponibilidad que lee Google.
+Disallow: /.netlify/functions/
+Allow: /.netlify/functions/event-status
 
 Sitemap: https://fraccctal.com/sitemap.xml
