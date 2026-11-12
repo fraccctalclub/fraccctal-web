@@ -82,7 +82,7 @@ const FRACCCTAL_EVENTS = [
     tag: ["placer", "conocimiento"],
     facilitators: "Lara Alcázar (Onda Atelier Sonoro)",
     description:
-      "Un taller para afinar la escucha y recuperar tu propio criterio frente al algoritmo: escucha compartida, playlists hechas a mano y un vision board para el año que viene.",
+      "Un taller para afinar la escucha, descubrir cómo lo que oímos guía lo que pensamos y sentimos, y recuperar tu propio criterio frente al algoritmo.",
     ticketsUrl: "/encuentros/ver-de-oido",
     lumaUrl: "",
     detailUrl: "/encuentros/ver-de-oido",
