@@ -73,9 +73,12 @@
 
 <header class="hero" style="padding-bottom:40px">
   <div class="wrap">
-    <p class="hero__lockup" id="hero-lockup">Taller · Jueves 17 de diciembre</p>
-    <h1>Ver de oído: reconocerse a través de la escucha</h1>
+    <p class="hero__lockup" id="hero-lockup">Taller</p>
+    <h1>Ver de oído</h1>
+    <p style="font-family:var(--serif); font-size:clamp(1.25rem, 3.2vw, 1.7rem); line-height:1.25; margin:10px auto 0; max-width:24ch">Reconocerse a través de la escucha</p>
     <p class="lede" style="margin-left:auto;margin-right:auto">ONDA Atelier Sonoro × Fraccctal. Un taller con Lara Alcázar para afinar la escucha y recuperar tu propio criterio frente al algoritmo.</p>
+    <!-- El precio "desde" lo rellena el script con los datos del catálogo (js/events.js). -->
+    <p id="hero-datos" style="margin:-14px auto 0; font-size:0.95rem; color:var(--ink-soft)">Jueves 17 de diciembre · 19:00–21:30 · Madrid · 25 plazas<span data-precio-wrap hidden> · desde <span data-precio="min"></span> €</span></p>
     <!-- Flyer pendiente: cuando esté, añadir aquí <div class="hero__flyer"><img …></div> y cambiar og:image / twitter:image / "image" del JSON-LD. -->
   </div>
 </header>
@@ -83,24 +86,32 @@
 <section class="section--tight">
   <div class="wrap" style="max-width:65ch">
 
-    <div id="pasado-box" style="background:var(--bg-alt); border:1px solid var(--line); border-radius:18px; padding:28px 30px; margin-bottom:48px; display:none">
-      <p class="eyebrow" style="margin-bottom:16px">Encuentro pasado</p>
-      <p style="margin-top:0">Este taller se celebró el 17 de diciembre y ya no se pueden comprar entradas. Dejamos aquí la descripción por si quieres ver cómo fue.</p>
-      <p style="margin:16px 0 0"><a class="btn btn--ghost" href="/encuentros.html">Ver los próximos encuentros</a></p>
-    </div>
+    <!-- El aviso de taller ya celebrado vive en una plantilla: el script lo inserta
+         solo cuando el taller ha terminado, así no lo leen buscadores ni lectores
+         de pantalla mientras es un encuentro futuro. -->
+    <template id="pasado-tpl">
+      <div id="pasado-box" style="background:var(--bg-alt); border:1px solid var(--line); border-radius:18px; padding:28px 30px; margin-bottom:48px">
+        <p class="eyebrow" style="margin-bottom:16px">Encuentro pasado</p>
+        <p style="margin-top:0">Este taller se celebró el 17 de diciembre y ya no se pueden comprar entradas. Dejamos aquí la descripción por si quieres ver cómo fue.</p>
+        <p style="margin:16px 0 0"><a class="btn btn--ghost" href="/encuentros.html">Ver los próximos encuentros</a></p>
+      </div>
+    </template>
 
-    <div id="acceso-gate" style="background:var(--bg-alt); border:1px solid var(--line); border-radius:18px; padding:28px 30px; margin-bottom:48px; display:none">
+    <div id="compra" style="scroll-margin-top:90px"></div>
+
+    <div id="acceso-gate" hidden style="background:var(--bg-alt); border:1px solid var(--line); border-radius:18px; padding:28px 30px; margin-bottom:48px">
       <p class="eyebrow" style="margin-bottom:16px">Preventa exclusiva para socixs</p>
       <p style="margin-top:0">Hasta el 17 de noviembre, las entradas de este taller solo se pueden comprar siendo socix (fundadorx o miembro). Después se abre a todo el mundo.</p>
+      <p data-precio-wrap hidden style="margin:14px 0 0">Early bird <span data-precio="early"></span> € · General <span data-precio="general"></span> €</p>
       <form id="acceso-form" class="form-inline" style="margin-top:16px">
         <input type="email" id="acceso-email" placeholder="tu@email.com" required>
         <button type="submit" class="btn btn--primary" id="acceso-submit">Verificar</button>
       </form>
       <p id="acceso-mensaje" class="form-message" style="display:none; margin-top:12px"></p>
-      <p style="margin:16px 0 0; font-size:0.9rem"><a href="/membresia.html">¿Todavía no eres socia? Súmate aquí<span id="acceso-gate-gratis"> (es gratis)</span> →</a></p>
+      <p style="margin:16px 0 0; font-size:0.9rem"><a href="/membresia.html">¿Todavía no eres socix? Súmate aquí<span id="acceso-gate-gratis">: es gratis hasta el 3 de enero</span> →</a></p>
     </div>
 
-    <div id="tickets-box" style="background:var(--bg-alt); border:1px solid var(--line); border-radius:18px; padding:28px 30px; margin-bottom:48px; display:none">
+    <div id="tickets-box" hidden style="background:var(--bg-alt); border:1px solid var(--line); border-radius:18px; padding:28px 30px; margin-bottom:48px">
       <p class="eyebrow" style="margin-bottom:16px">Entradas</p>
       <div class="checkbox-field" style="margin:0 0 24px">
         <input type="checkbox" id="apoyo-checkbox">
@@ -109,20 +120,20 @@
       <div style="display:grid; gap:14px">
         <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap">
           <div>
-            <strong>Early bird — 16€</strong>
+            <strong>Early bird<span data-precio-wrap hidden> — <span data-precio="early"></span> €</span></strong>
             <p id="early-quedan" style="margin:2px 0 0; color:var(--ink-soft); font-size:0.9rem" hidden></p>
           </div>
           <button class="btn btn--primary" id="btn-early" disabled>Comprar</button>
         </div>
         <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; padding-top:14px; border-top:1px solid var(--line)">
           <div>
-            <strong>General — 19€</strong>
+            <strong>General<span data-precio-wrap hidden> — <span data-precio="general"></span> €</span></strong>
             <p id="general-quedan" style="margin:2px 0 0; color:var(--ink-soft); font-size:0.9rem" hidden></p>
           </div>
           <button class="btn btn--primary" id="btn-general" disabled>Comprar</button>
         </div>
       </div>
-      <div id="waitlist-box" style="display:none; margin-top:24px; padding-top:20px; border-top:1px solid var(--line)">
+      <div id="waitlist-box" hidden style="margin-top:24px; padding-top:20px; border-top:1px solid var(--line)">
         <p style="margin:0 0 4px"><strong>Lista de espera</strong></p>
         <p style="margin:0 0 14px; color:var(--ink-soft); font-size:0.9rem">Las plazas se han agotado. Si se libera alguna, te escribimos por orden de llegada. Solo usaremos tu email para eso.</p>
         <form id="waitlist-form" class="form-inline">
@@ -208,36 +219,26 @@
       </div>
     </div>
 
-    <p>La música guía el pensamiento, da forma al espacio que habitamos y mueve la energía y la emoción, casi siempre sin que nos demos cuenta. Este taller es para darse cuenta: afinar la escucha y recuperar tu propio criterio frente al algoritmo. Una colaboración de ONDA Atelier Sonoro y Fraccctal.</p>
+    <p>La música guía el pensamiento, da forma al espacio que habitamos y mueve la energía y la emoción, casi siempre sin que nos demos cuenta. Este taller es para darse cuenta.</p>
 
-    <p>¿Cómo escuchamos realmente? ¿Qué relación hay entre lo que escuchamos, lo que sentimos y lo que pensamos? ¿Y cómo podemos usar la música para crear atmósferas, acompañar momentos y transformar nuestro entorno?</p>
+    <p>Casi toda la música que escuchamos hoy nos llega elegida por otro: una lista automática, una recomendación, lo siguiente que suena. Aquí volvemos a escuchar por decisión propia: saber qué te gusta, por qué te gusta y cómo se lo recomendarías a alguien. En ONDA Atelier Sonoro lo llaman music hosting: seleccionar música a mano y con intención, leyendo el contexto, la energía y lo que pide cada momento.</p>
 
-    <p>El sonido conduce: nos acelera, nos calma, nos devuelve a un recuerdo o nos cambia el ánimo sin que lo decidamos. Aquí nos paramos a notar hacia dónde nos lleva.</p>
-
-    <p>Exploramos el concepto de <em>music hosting</em>: el arte de seleccionar música a mano y con intención. Musicalizar no es simplemente construir una playlist, sino desarrollar un criterio propio y aprender a leer el contexto, la energía y las necesidades de cada momento.</p>
-
-    <p>Casi toda la música que escuchamos hoy nos llega elegida por otro: una lista automática, una recomendación, lo siguiente que suena. Este encuentro es para volver a escuchar por decisión propia: saber qué te gusta, por qué te gusta, y cómo se lo recomendarías a alguien.</p>
-
-    <p>No es una charla. Es un intercambio de principio a fin: herramientas de autoexploración, una sesión colectiva de escucha activa y, al final, pasamos de escuchar a hacer, sin que ninguna plataforma decida por nosotrxs.</p>
-
-    <p>Y como es diciembre, la escucha mira hacia el año que viene. Te irás con algo pensado para ti, y habrás dejado algo pensado para otra persona.</p>
+    <p>No es una charla. Es un intercambio de principio a fin: empezamos por cómo escuchas, escuchamos juntxs y terminamos seleccionando música a mano. Y como es diciembre, la escucha mira hacia el año que viene: te irás con algo pensado para ti y habrás dejado algo pensado para otra persona.</p>
 
     <h2 style="margin-top:56px">Cómo será</h2>
     <ul>
       <li><strong>Tus hábitos de escucha.</strong> Empezamos con herramientas de autoexploración: cómo escuchas hoy, cuándo, dónde, con qué y quién elige lo que suena.</li>
-      <li><strong>Escucha activa, en colectivo.</strong> Una sesión de escucha en alta fidelidad y alta definición, con espacio para el lado más sensorial de la música y para poner en común lo que nos despierta.</li>
+      <li><strong>Escucha activa, en colectivo.</strong> Una sesión de escucha con el sonido cuidado, con espacio para el lado más sensorial de la música y para poner en común lo que nos despierta.</li>
       <li><strong>Lo que escuchamos y lo que enseñamos.</strong> Nos acercamos al «guilty pleasure» para cuestionar nuestros prejuicios musicales, explorar nuestros gustos y descubrir qué dicen de nosotrxs nuestras elecciones.</li>
       <li><strong>De escuchar a hacer.</strong> La última parte es práctica: seleccionar música a mano y con intención, sin algoritmo de por medio. No te contamos más: es mejor llegar sin saberlo.</li>
     </ul>
 
     <h2 style="margin-top:56px">Qué te llevas</h2>
     <ul>
-      <li><strong>Un momento de escucha colectiva.</strong> Música escuchada con atención y en compañía, en alta fidelidad y alta definición. Algo que casi nunca hacemos: sentarnos a escuchar, sin hacer otra cosa a la vez.</li>
-      <li><strong>Un momento de escucha interna.</strong> Espacio para notar qué te pasa por dentro mientras suena: qué piensas, qué recuerdas, qué te cambia el ánimo.</li>
+      <li><strong>Un rato de escucha de verdad.</strong> Música escuchada con atención y en compañía, sin hacer otra cosa a la vez.</li>
       <li><strong>Más claridad sobre tu propia escucha.</strong> Cómo lo que oyes influye en tu energía, en tu estado de ánimo y en lo que piensas, y qué puedes hacer con eso en tu día a día.</li>
       <li><strong>Tu criterio, afinado.</strong> Herramientas para elegir música con intención, leyendo el contexto, la energía y lo que pide cada momento, sin depender de las recomendaciones automáticas.</li>
-      <li><strong>Algo pensado para ti</strong> por otra persona del grupo.</li>
-      <li><strong>Algo tuyo</strong> para empezar el año que viene.</li>
+      <li><strong>Algo pensado para ti</strong> por otra persona del grupo, y algo tuyo para empezar el año que viene.</li>
       <li><strong>Gente con la que seguir la conversación.</strong> Un grupo pequeño con el que has compartido lo que escuchas, que es una manera bastante directa de conocerse.</li>
     </ul>
 
@@ -246,6 +247,13 @@
     <p>Incluido en tu entrada.</p>
 
     <h2 style="margin-top:56px">Sobre ONDA Atelier Sonoro y Lara Alcázar</h2>
+    <!-- Logo de ONDA: versión en negro tal como la envió ONDA, sin recolorear.
+         Foto de Lara: PENDIENTE. Cuando llegue, cambiar data-src por src y quitar
+         "hidden" de ese <img>; mientras tanto no se pide ni deja hueco. -->
+    <div id="colab-media" style="display:flex; align-items:center; gap:24px; flex-wrap:wrap; margin:4px 0 24px">
+      <img src="/assets/img/onda-atelier-sonoro-logo-negro.png" alt="Logo de ONDA Atelier Sonoro" width="1001" height="401" loading="lazy" style="width:200px; height:auto">
+      <img hidden data-src="/assets/img/lara-alcazar.webp" alt="Retrato de Lara Alcázar, fundadora de ONDA Atelier Sonoro" width="120" height="120" loading="lazy" style="width:120px; height:120px; object-fit:cover; border-radius:50%">
+    </div>
     <p>ONDA Atelier Sonoro es un estudio independiente de curaduría y consultoría musical fundado por Lara Alcázar. Desarrolla proyectos de musicalización a medida, asesoría artística y curaduría para artistas, marcas, espacios y proyectos culturales, con la sostenibilidad como eje. Su filosofía va más allá de la playlist: pone el foco en el contexto, el criterio y la artesanía que hay detrás del diseño musical y sonoro.</p>
     <p>Lara Alcázar es Head of Campaigns en [PIAS] Iberoamérica, donde lidera campañas para artistas y sellos discográficos en España y Latinoamérica. Ha trabajado en proyectos vinculados a sellos como Mute, Ninja Tune o Epitaph Records, y en campañas de artistas como Nick Cave &amp; The Bad Seeds, Fontaines D.C., PJ Harvey o SOPHIE. Forma parte de la junta directiva de MIM (Mujeres de la Industria de la Música), desde donde trabaja por la igualdad de género en el sector, y es profesora invitada en másteres de industria musical, donde imparte masterclasses sobre estrategia y desarrollo europeo para artistas.</p>
 
@@ -254,10 +262,11 @@
       <li><strong>Fecha:</strong> jueves 17 de diciembre de 2026</li>
       <li><strong>Horario:</strong> 19:00 – 21:30 h</li>
       <li><strong>Lugar:</strong> Madrid. Estamos cerrando el espacio: te lo comunicamos por email en cuanto esté confirmado.</li>
-      <li><strong>Sonido:</strong> escuchamos en alta fidelidad y alta definición.</li>
+      <li><strong>Sonido:</strong> escuchamos en sala, con el sonido cuidado.</li>
       <li><strong>Idioma:</strong> español</li>
       <li><strong>Aforo:</strong> 25 plazas</li>
-      <li><strong>Qué traer:</strong> tus auriculares.</li>
+      <li data-precio-wrap hidden><strong>Entrada:</strong> early bird <span data-precio="early"></span> € · general <span data-precio="general"></span> €</li>
+      <li><strong>Qué traer:</strong> tus auriculares, si prefieres escuchar con ellos en algún momento. No son imprescindibles.</li>
       <li>No necesitas conocimientos musicales previos. Solo curiosidad, ganas de escuchar y disposición para experimentar.</li>
     </ul>
 
@@ -267,6 +276,9 @@
       <li>No es un concierto ni una sesión de DJ.</li>
       <li>No es un examen de gusto: aquí nadie juzga lo que escucha nadie.</li>
     </ul>
+
+    <!-- Acceso a la compra repetido al final: lleva a la caja de preventa o de entradas. -->
+    <p id="cta-final" style="margin-top:48px; text-align:center"><a class="btn btn--primary" href="#compra">Comprar entrada</a></p>
 
     <p style="margin-top:56px; color:var(--ink-soft)">Fraccctal es un club nacido en Madrid en 2026. Creamos espacios para personas en tránsito — las que tienen la vida más o menos en orden pero sienten que algo no encaja. Cuatro pilares: placer, movimiento, conocimiento y curiosidad espiritual.</p>
 
@@ -295,13 +307,25 @@
   </div>
 </footer>
 
+<script src="/js/events.js"></script>
 <script src="/js/main.js"></script>
 <script type="module">
   import { checkMembership } from "/js/auth.js";
 
   const EVENT_ID = "ver-de-oido-2026-12";
-  // Precio de lista de cada entrada, para el valor que se manda a Meta.
-  const PRECIO_TIER = { early: 16, general: 19 };
+  // Precios: salen del catálogo (js/events.js), no se escriben a mano en la ficha.
+  // Sirven para lo que se ve en la página y para el valor que se manda a Meta.
+  const EVENTO = typeof fraccctalEvento === "function" ? fraccctalEvento(EVENT_ID) : null;
+  const PRECIO_TIER = Object.fromEntries((EVENTO?.offers || []).map((o) => [o.tier, o.price]));
+  if (Object.keys(PRECIO_TIER).length) {
+    const precios = { ...PRECIO_TIER, min: Math.min(...Object.values(PRECIO_TIER)) };
+    document.querySelectorAll("[data-precio]").forEach((el) => {
+      if (precios[el.dataset.precio] != null) el.textContent = precios[el.dataset.precio];
+    });
+    document.querySelectorAll("[data-precio-wrap]").forEach((el) => {
+      el.hidden = false;
+    });
+  }
   const MEMBERS_ONLY_UNTIL = new Date("2026-11-17T00:00:00+01:00");
   const gated = new Date() < MEMBERS_ONLY_UNTIL;
   // Terminado el taller la página se queda como ficha: sin entradas ni gate.
@@ -371,14 +395,16 @@
   const vieneDeCompra = params.get("compra") === "ok" || params.get("compra") === "cancelado";
 
   if (ENDED) {
-    document.getElementById("pasado-box").style.display = "block";
+    const tpl = document.getElementById("pasado-tpl");
+    tpl.parentNode.insertBefore(tpl.content.cloneNode(true), tpl);
+    document.getElementById("cta-final").hidden = true;
     const lock = document.getElementById("hero-lockup");
     lock.textContent = lock.textContent + " · Ya realizado";
   } else if (vieneDeCompra) {
     // Ya pasó por Stripe (haya salido bien o mal): mostramos el resultado
     // directo, sin volver a pedirle el gate de socia.
-    ticketsBox.style.display = "block";
-    accesoGate.style.display = "none";
+    ticketsBox.hidden = false;
+    accesoGate.hidden = true;
     mensaje.style.display = "block";
     if (params.get("compra") === "ok") {
       // Medición de la compra (solo si aceptó las cookies). La clave por sesión evita
@@ -409,9 +435,9 @@
     }
     cargarDisponibilidad();
   } else if (gated) {
-    accesoGate.style.display = "block";
+    accesoGate.hidden = false;
   } else {
-    ticketsBox.style.display = "block";
+    ticketsBox.hidden = false;
     cargarDisponibilidad();
   }
 
@@ -427,8 +453,8 @@
 
     if (isMember) {
       verifiedEmail = email;
-      accesoGate.style.display = "none";
-      ticketsBox.style.display = "block";
+      accesoGate.hidden = true;
+      ticketsBox.hidden = false;
       cargarDisponibilidad();
     } else {
       accesoMensaje.style.display = "block";
@@ -463,13 +489,9 @@
     .then((d) => d && actualizarOfertasSchema(d))
     .catch(() => {});
 
-  // El contador solo se enseña cuando quedan pocas plazas: "quedan 16 de 20" resta
-  // más de lo que suma. Con cupo holgado se oculta; al agotarse sale "Agotado".
-  const UMBRAL_QUEDAN = 5;
+  // No se publica cuántas plazas quedan ni cuántas se han vendido: solo "Agotado".
   function mostrarQuedan(el, quedan) {
-    if (quedan <= 0) el.textContent = "Agotado";
-    else if (quedan <= UMBRAL_QUEDAN) el.textContent = quedan === 1 ? "Queda 1 plaza" : `Quedan ${quedan}`;
-    else el.textContent = "";
+    el.textContent = quedan <= 0 ? "Agotado" : "";
     el.hidden = !el.textContent;
   }
 
@@ -487,7 +509,7 @@
       btnGeneral.textContent = data.general.quedan > 0 ? "Comprar" : "Agotado";
 
       const todoAgotado = data.early.quedan <= 0 && data.general.quedan <= 0;
-      waitlistBox.style.display = todoAgotado ? "block" : "none";
+      waitlistBox.hidden = !todoAgotado;
       document.getElementById("fundadora-section").style.display = todoAgotado ? "none" : "block";
     } catch {
       [earlyQuedan, generalQuedan].forEach((el) => {

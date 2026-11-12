@@ -35,6 +35,8 @@
  *                "tier" es la clave del tier en lib/events.js (para saber cuántas quedan); para Google
  *   publicSaleFrom  desde cuándo puede comprar cualquiera (fin de la preventa de socixs), ISO; para Google
  *   status       "abierto" | "agotado" | "cerrado" | "proximamente"
+ *   oculto       true = tiene ficha (para revisarla con el enlace) pero no sale en
+ *                listados, destacado de la home ni datos para buscadores. Opcional.
  */
 
 const FRACCCTAL_EVENTS = [
@@ -194,3 +196,15 @@ FRACCCTAL_EVENTS.sort((a, b) => {
   if (a.dateSort === b.dateSort) return 0;
   return (a.dateSort < b.dateSort ? -1 : 1) * (pa ? -1 : 1);
 });
+
+// Los encuentros con `oculto: true` se apartan de FRACCCTAL_EVENTS (que es lo que
+// leen los listados); su ficha los encuentra igualmente con fraccctalEvento(id).
+const FRACCCTAL_EVENTS_OCULTOS = [];
+for (let i = FRACCCTAL_EVENTS.length - 1; i >= 0; i--) {
+  if (FRACCCTAL_EVENTS[i].oculto) FRACCCTAL_EVENTS_OCULTOS.push(FRACCCTAL_EVENTS.splice(i, 1)[0]);
+}
+
+// Datos de un encuentro por su id (las fichas leen de aquí sus precios).
+function fraccctalEvento(id) {
+  return FRACCCTAL_EVENTS.concat(FRACCCTAL_EVENTS_OCULTOS).find((e) => e.id === id) || null;
+}
