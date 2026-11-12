@@ -26,6 +26,11 @@ const WAITLIST_EVENTS = {
     titulo: "Lo que el hambre sabe",
     fecha: "sábado 28 de noviembre",
   },
+  "ver-de-oido-2026-12": {
+    brevoList: null, // sin lista en Brevo todavía: se guarda solo en Supabase
+    titulo: "Ver de oído",
+    fecha: "jueves 17 de diciembre",
+  },
 };
 
 function escapeHtml(s) {

@@ -60,6 +60,19 @@ const EVENTS = {
     pideAcompanante: true,
     avisoCheckout: "Las dos recetas llevan frutos secos (anacardos y avellanas), por lo que este taller no es apto para personas con alergia a los frutos secos. Ninguna receta lleva gluten, aunque la harina de avena puede contener trazas.",
   },
+  "ver-de-oido-2026-12": {
+    title: "Ver de oído: reconocerse a través de la escucha",
+    slug: "/encuentros/ver-de-oido",
+    roomCap: 25,
+    // Preventa de socixs del 14 al 16 de noviembre; desde el 17, venta general.
+    // Debe coincidir con MEMBERS_ONLY_UNTIL de encuentro-ver-de-oido.html.
+    membersOnlyUntil: "2026-11-17T00:00:00+01:00",
+    endsAt: "2026-12-18T00:00:00+01:00",
+    tiers: {
+      early: { price: "price_1UazuKCYD2PjyybiwJdYm4Up", cap: 4, seats: 1 }, // 16 €
+      general: { price: "price_1UazuLCYD2PjyybicyBsWjWv", cap: 25, seats: 1 }, // 19 € (el tope real lo pone roomCap)
+    },
+  },
 };
 
 const DEFAULT_EVENT_ID = "una-vida-de-fantasia-2026-09";

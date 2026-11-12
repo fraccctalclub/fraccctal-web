@@ -69,6 +69,33 @@ const FRACCCTAL_EVENTS = [
     status: "abierto",
   },
   {
+    id: "ver-de-oido-2026-12",
+    title: "Ver de oído: reconocerse a través de la escucha",
+    dateLabel: "17",
+    dateMonth: "DIC",
+    dateSort: "2026-12-17",
+    venue: "", // por confirmar
+    city: "Madrid",
+    price: "Early bird 16€ · General 19€",
+    founderPrice: "",
+    founderTicketsUrl: "/encuentros/ver-de-oido",
+    tag: ["placer", "conocimiento"],
+    facilitators: "Lara Alcázar (Onda Atelier Sonoro)",
+    description:
+      "Un taller para afinar la escucha y recuperar tu propio criterio frente al algoritmo: escucha compartida, playlists hechas a mano y un vision board para el año que viene.",
+    ticketsUrl: "/encuentros/ver-de-oido",
+    lumaUrl: "",
+    detailUrl: "/encuentros/ver-de-oido",
+    startsAt: "2026-12-17T19:00:00+01:00",
+    endsAt: "2026-12-17T21:30:00+01:00",
+    publicSaleFrom: "2026-11-17T00:00:00+01:00",
+    offers: [
+      { tier: "early", name: "Early bird", price: 16 },
+      { tier: "general", name: "General", price: 19 },
+    ],
+    status: "abierto",
+  },
+  {
     id: "la-erotica-del-buentrato-2026-10",
     title: "La erótica del buentrato",
     dateLabel: "24",

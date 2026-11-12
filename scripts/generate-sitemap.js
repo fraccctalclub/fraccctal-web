@@ -31,6 +31,7 @@ const FICHAS = {
   "/encuentros/una-vida-de-fantasia": "encuentro-una-vida-de-fantasia.html",
   "/encuentros/la-erotica-del-buentrato": "encuentro-la-erotica-del-buentrato.html",
   "/encuentros/lo-que-el-hambre-sabe": "encuentro-lo-que-el-hambre-sabe.html",
+  "/encuentros/ver-de-oido": "encuentro-ver-de-oido.html",
 };
 
 function lastmod(file) {

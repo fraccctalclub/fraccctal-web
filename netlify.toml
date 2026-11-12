@@ -61,6 +61,12 @@
   to = "/encuentro-lo-que-el-hambre-sabe.html"
   status = 200
 
+# URL linda para el taller "Ver de oído".
+[[redirects]]
+  from = "/encuentros/ver-de-oido"
+  to = "/encuentro-ver-de-oido.html"
+  status = 200
+
 # Apple y los buscadores piden el icono en la raíz; las páginas ya apuntan a
 # assets/logo/favicon-180.png, esto evita el 404.
 [[redirects]]
