@@ -89,7 +89,7 @@ const FRACCCTAL_EVENTS = [
     lumaUrl: "",
     detailUrl: "/encuentros/ver-de-oido",
     startsAt: "2026-12-17T19:00:00+01:00",
-    endsAt: "2026-12-17T21:30:00+01:00",
+    endsAt: "2026-12-17T22:00:00+01:00",
     publicSaleFrom: "2026-11-17T00:00:00+01:00",
     offers: [
       { tier: "early", name: "Early bird", price: 16 },

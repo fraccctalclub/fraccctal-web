@@ -122,7 +122,7 @@ const EVENT_EMAIL_CONTENT = {
     shortTitle: "Ver de oído",
     facilitators: "Lara Alcázar, de ONDA Atelier Sonoro",
     typeLabel: "Taller de escucha y exploración musical, en colaboración con ONDA Atelier Sonoro,",
-    dateTimeLabel: "Jueves 17 de diciembre de 2026, de 19:00 a 21:30 h",
+    dateTimeLabel: "Jueves 17 de diciembre de 2026, de 19:00 a 22:00 h",
     dayLabel: "17",
     // Lugar por confirmar: actualizar aquí en cuanto se cierre el espacio.
     venueLabel: "Madrid. Estamos cerrando el espacio: te escribimos con la dirección en cuanto esté confirmado",
