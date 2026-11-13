@@ -84,7 +84,7 @@ const FRACCCTAL_EVENTS = [
     tag: ["placer", "conocimiento"],
     facilitators: "Lara Alcázar (ONDA Atelier Sonoro)",
     description:
-      "Un taller para afinar la escucha, descubrir cómo lo que oímos guía lo que pensamos y sentimos, y recuperar tu propio criterio frente al algoritmo.",
+      "Un encuentro de cierre de año: una experiencia sensorial a través de la música, la escucha y todo lo que evoca, para conectar con las emociones y jugar a desear el año que viene.",
     ticketsUrl: "/encuentros/ver-de-oido",
     lumaUrl: "",
     detailUrl: "/encuentros/ver-de-oido",
