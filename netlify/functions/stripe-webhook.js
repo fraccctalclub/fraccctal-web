@@ -117,6 +117,22 @@ const EVENT_EMAIL_CONTENT = {
     precios: { early: "25€ (early bird)", general: "30€", amigxs: "55€ (amigxs, 2 entradas)" },
     pageUrl: "https://fraccctal.com/encuentros/lo-que-el-hambre-sabe",
   },
+  "ver-de-oido-2026-12": {
+    title: "Ver de oído: reconocerse a través de la escucha",
+    shortTitle: "Ver de oído",
+    facilitators: "Lara Alcázar",
+    typeLabel: "Encuentro de cierre de año, en colaboración con ONDA Atelier Sonoro,",
+    dateTimeLabel: "Jueves 17 de diciembre de 2026, de 19:00 a 22:00 h",
+    dayLabel: "17",
+    // Lugar por confirmar: actualizar aquí en cuanto se cierre el espacio, y mandar
+    // entonces un correo con el lugar y la dirección a quienes ya hayan comprado.
+    venueLabel: "Madrid. Estamos terminando de confirmar el espacio: en cuanto lo tengamos, te escribimos por email para decirte dónde es",
+    // Sin capacityWord a propósito: este taller no dice cuántas plazas hay.
+    queTraer:
+      "Auriculares, si quieres. No hace falta saber de música: solo curiosidad, ganas de escuchar y disposición para experimentar.",
+    precios: { early: "16€ (early bird)", general: "19€" },
+    pageUrl: "https://fraccctal.com/encuentros/ver-de-oido",
+  },
 };
 
 function verifyStripeSignature(rawBody, signatureHeader, secret) {
@@ -250,7 +266,7 @@ function amigxEmailHtml({ contenido, nombre, quien }) {
   const avisos = (contenido.avisosAlergias || []).map((t) => `<p>${t}</p>`).join("");
   return `
     <p>${saludo}</p>
-    <p>${invita} una plaza en <strong>${contenido.title}</strong>. Tu entrada ya está pagada dentro de un pack amigxs: no tienes que hacer nada para confirmarla. Somos ${contenido.capacityWord} personas, y tú eres una de ellas.</p>
+    <p>${invita} una plaza en <strong>${contenido.title}</strong>. Tu entrada ya está pagada dentro de un pack amigxs: no tienes que hacer nada para confirmarla.${contenido.capacityWord ? ` Somos ${contenido.capacityWord} personas, y tú eres una de ellas.` : ""}</p>
 
     <p><strong>Los datos</strong></p>
     <ul>
@@ -291,6 +307,9 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
   const campo = (clave) => (session.custom_fields || []).find((f) => f.key === clave)?.text?.value?.trim() || null;
   const alergias = campo("alergias");
   const sinLactosa = session.metadata?.sin_lactosa === "true";
+  // Casilla de dificultad auditiva / apoyo para participar, y lo que escribió.
+  const necesitaApoyo = session.metadata?.necesita_apoyo === "true";
+  const accesibilidad = necesitaApoyo ? campo("apoyo") || "sí (sin detalle)" : null;
   // Pack amigxs: datos de la segunda persona.
   const acompananteNombre = campo("amigx_nombre");
   const acompananteEmail = campo("amigx_email");
@@ -311,6 +330,7 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
       status: "paid",
       alergias,
       sin_lactosa: sinLactosa,
+      accesibilidad,
       acompanante_nombre: acompananteNombre,
       acompanante_email: acompananteEmail,
     }),
@@ -351,7 +371,7 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
 
   const html = `
     <p>¡Hola!</p>
-    <p>Ya está: ${plazaTexto} para <strong>${contenido.title}</strong> ${esAmigxs ? "están reservadas" : "está reservada"}. Somos ${contenido.capacityWord} personas, y ${esAmigxs ? "sois dos de ellas" : "tú eres una de ellas"}.</p>
+    <p>Ya está: ${plazaTexto} para <strong>${contenido.title}</strong> ${esAmigxs ? "están reservadas" : "está reservada"}.${contenido.capacityWord ? ` Somos ${contenido.capacityWord} personas, y ${esAmigxs ? "sois dos de ellas" : "tú eres una de ellas"}.` : ""}</p>
     <p>Gracias por venir. Fraccctal es un club muy joven (nació en Madrid este año) y cada entrada que se vende es lo que nos permite seguir programando. No lo decimos por cortesía: lo decimos porque es literal.</p>
 
     <p><strong>Los datos</strong></p>
@@ -367,6 +387,8 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
     <p>${contenido.queTraer}</p>
     ${contenido.avisosAlergias ? `<p><strong>Alergias e intolerancias</strong></p>${contenido.avisosAlergias.map((t) => `<p>${t}</p>`).join("")}${sinLactosa ? `<p>Has marcado que ${esAmigxs ? "alguien del pack es" : "eres"} intolerante a la lactosa: prepararemos una alternativa.</p>` : ""}${esAmigxs ? "<p>Con el pack amigxs has indicado una sola respuesta en el pago: si tu amigx tiene alguna alergia o intolerancia, avísanos también.</p>" : ""}` : ""}
 
+    ${necesitaApoyo ? "<p><strong>Tu participación</strong></p><p>Has marcado que tienes alguna dificultad auditiva o necesitas algún apoyo para participar. Gracias por decírnoslo: te escribimos antes del taller para prepararlo contigo.</p>" : ""}
+
     <p><strong>Súmate a nuestra comunidad digital</strong></p>
     <p>Todo lo que tiene que ver con tu entrada pasa por ahí, no por email: actualizaciones del encuentro, y la posibilidad de conocer al resto de asistentes antes del taller si te apetece. Llegar con algunas caras ya vistas cambia bastante la experiencia. Es también el lugar donde seguimos encontrándonos y compartiendo reflexiones después de cada taller, y donde vas a tener acceso anticipado a los próximos encuentros, antes de que se abran al público.</p>
     <p><strong><a href="${DFOS_LINK}">Súmate al DFOS</a></strong>, el espacio digital de encuentro de la comunidad donde estamos todxs conectadxs (toma dos minutos), y <strong><a href="${WHATSAPP_LINK}">al canal de difusión de WhatsApp</a></strong>, donde avisamos las novedades.</p>
@@ -374,7 +396,7 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
     <p><strong>Si necesitas cancelar</strong></p>
     <p>Las entradas no tienen devolución. Si no puedes venir, escríbenos a fraccctal.contact@gmail.com y vemos cómo resolverlo entre todxs.</p>
 
-    <p>Somos ${contenido.capacityWord} y las plazas se llenan por el boca a boca. Si se te ocurre alguien a quien esto le vendría bien, reenvíale este correo o pásale el enlace: ${contenido.pageUrl}</p>
+    <p>${contenido.capacityWord ? `Somos ${contenido.capacityWord} y las plazas` : "Las plazas"} se llenan por el boca a boca. Si se te ocurre alguien a quien esto le vendría bien, reenvíale este correo o pásale el enlace: ${contenido.pageUrl}</p>
 
     <p>Cualquier duda, responde a este mismo correo y te contestamos nosotras directamente. Somos dos personas, no un buzón automático.</p>
 
@@ -420,8 +442,8 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
   await sendEmail(RESEND_API_KEY, {
     kind: "aviso_interno_entrada",
     to: NOTIFICACION_EMAIL,
-    subject: `Nueva entrada (${ticketTier}): ${email}${conAlergia ? " · CON ALERGIA/INTOLERANCIA" : ""}${sinLactosa ? " · SIN LACTOSA" : ""}`,
-    html: `<p>Nueva entrada vendida para ${eventId}.</p><ul><li>Tier: ${ticketTier}</li><li>Email: ${email}</li>${alergias ? `<li><strong>Alergias o intolerancias: ${escapeHtml(alergias)}</strong></li>` : ""}${sinLactosa ? `<li><strong>Intolerancia a la lactosa: SÍ, preparar alternativa${esAmigxs ? " (en el pack, no sabemos si es quien compró o su amigx)" : ""}</strong></li>` : ""}${acompananteNombre || acompananteEmail ? `<li>Segunda persona del pack: ${escapeHtml(acompananteNombre || "—")} · ${escapeHtml(acompananteEmail || "—")}${estadoAmigx ? ` — correo a esa persona: <strong>${escapeHtml(estadoAmigx)}</strong>` : ""}</li>` : ""}<li>Sesión: ${session.id}</li></ul>`,
+    subject: `Nueva entrada (${ticketTier}): ${email}${conAlergia ? " · CON ALERGIA/INTOLERANCIA" : ""}${sinLactosa ? " · SIN LACTOSA" : ""}${necesitaApoyo ? " · NECESITA APOYO" : ""}`,
+    html: `<p>Nueva entrada vendida para ${eventId}.</p><ul><li>Tier: ${ticketTier}</li><li>Email: ${email}</li>${necesitaApoyo ? `<li><strong>Dificultad auditiva o apoyo para participar: ${escapeHtml(accesibilidad)}. Hay que escribirle antes del taller.</strong></li>` : ""}${alergias ? `<li><strong>Alergias o intolerancias: ${escapeHtml(alergias)}</strong></li>` : ""}${sinLactosa ? `<li><strong>Intolerancia a la lactosa: SÍ, preparar alternativa${esAmigxs ? " (en el pack, no sabemos si es quien compró o su amigx)" : ""}</strong></li>` : ""}${acompananteNombre || acompananteEmail ? `<li>Segunda persona del pack: ${escapeHtml(acompananteNombre || "—")} · ${escapeHtml(acompananteEmail || "—")}${estadoAmigx ? ` — correo a esa persona: <strong>${escapeHtml(estadoAmigx)}</strong>` : ""}</li>` : ""}<li>Sesión: ${session.id}</li></ul>`,
   });
 }
 

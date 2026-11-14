@@ -87,15 +87,3 @@
   for = "/assets/*"
   [headers.values]
     Cache-Control = "public, max-age=86400"
-
-# "Ver de oído" está subida solo para revisión (Lara, ONDA): no sale en el
-# listado ni se vende, y con esto tampoco la indexa Google. QUITAR este bloque
-# al lanzar el taller (al fusionar la rama encuentro-ver-de-oido).
-[[headers]]
-  for = "/encuentros/ver-de-oido"
-  [headers.values]
-    X-Robots-Tag = "noindex"
-[[headers]]
-  for = "/encuentro-ver-de-oido.html"
-  [headers.values]
-    X-Robots-Tag = "noindex"
