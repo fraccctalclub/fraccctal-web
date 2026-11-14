@@ -86,7 +86,7 @@ const FRACCCTAL_EVENTS = [
     tag: ["placer", "conocimiento"],
     facilitators: "Lara Alcázar (ONDA Atelier Sonoro)",
     description:
-      "Un encuentro de cierre de año: una experiencia sensorial a través de la música, la escucha y todo lo que evoca, para conectar con las emociones y jugar a desear el año que viene.",
+      "Un cierre de año distinto: un encuentro para escuchar en compañía y convertir lo que suena en un juego para imaginar el año que viene.",
     ticketsUrl: "/encuentros/ver-de-oido",
     lumaUrl: "",
     detailUrl: "/encuentros/ver-de-oido",

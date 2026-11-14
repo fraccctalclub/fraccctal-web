@@ -129,7 +129,7 @@ const EVENT_EMAIL_CONTENT = {
     venueLabel: "Madrid. Estamos terminando de confirmar el espacio: en cuanto lo tengamos, te escribimos por email para decirte dónde es",
     // Sin capacityWord a propósito: este taller no dice cuántas plazas hay.
     queTraer:
-      "Tus auriculares, si prefieres escuchar con ellos en algún momento. No son imprescindibles. No necesitas conocimientos musicales previos: solo curiosidad, ganas de escuchar y disposición para experimentar.",
+      "Auriculares, si quieres. No hace falta saber de música: solo curiosidad, ganas de escuchar y disposición para experimentar.",
     precios: { early: "16€ (early bird)", general: "19€" },
     pageUrl: "https://fraccctal.com/encuentros/ver-de-oido",
   },
