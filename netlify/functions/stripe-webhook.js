@@ -344,8 +344,8 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
   const bloqueMembresia = esCombo
     ? ""
     : `
-    <p><strong>¿Y si te haces socixs?</strong></p>
-    <p>Ser socixs de Fraccctal implica esto: acceso a los encuentros y talleres, que desde enero son solo para la comunidad (los talleres facilitados por profesionales se pagan aparte), descuentos con nuestra red de terapeutas y talleristas, un merch de bienvenida, y tu lugar en la comunidad online donde la conversación sigue cada día. Y hoy <strong>ES GRATIS</strong>: no se cobra nada hasta el 3 de enero de 2027.</p>
+    <p><strong>¿Y si te haces socix?</strong></p>
+    <p>Ser socix de Fraccctal implica esto: acceso a los encuentros y talleres, que desde enero son solo para la comunidad (los talleres facilitados por profesionales se pagan aparte), descuentos con nuestra red de terapeutas y talleristas, un merch de bienvenida, y tu lugar en la comunidad online donde la conversación sigue cada día. Y hoy <strong>ES GRATIS</strong>: no se cobra nada hasta el 3 de enero de 2027.</p>
     <p><strong><a href="https://fraccctal.com/membresia.html">Conoce la membresía →</a></strong></p>
   `;
 
