@@ -77,6 +77,8 @@ const FRACCCTAL_EVENTS = [
     dateMonth: "DIC",
     dateSort: "2026-12-17",
     venue: "", // por confirmar
+    flyer: "/assets/img/flyer-ver-de-oido.webp",
+    flyerThumb: "/assets/img/flyer-ver-de-oido-thumb.webp",
     city: "Madrid",
     price: "Early bird 16€ · General 19€",
     founderPrice: "",
