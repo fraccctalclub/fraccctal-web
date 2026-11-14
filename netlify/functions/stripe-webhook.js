@@ -120,12 +120,13 @@ const EVENT_EMAIL_CONTENT = {
   "ver-de-oido-2026-12": {
     title: "Ver de oído: reconocerse a través de la escucha",
     shortTitle: "Ver de oído",
-    facilitators: "Lara Alcázar, de ONDA Atelier Sonoro",
-    typeLabel: "Taller de escucha y exploración musical, en colaboración con ONDA Atelier Sonoro,",
+    facilitators: "Lara Alcázar",
+    typeLabel: "Encuentro de cierre de año, en colaboración con ONDA Atelier Sonoro,",
     dateTimeLabel: "Jueves 17 de diciembre de 2026, de 19:00 a 22:00 h",
     dayLabel: "17",
-    // Lugar por confirmar: actualizar aquí en cuanto se cierre el espacio.
-    venueLabel: "Madrid. Estamos cerrando el espacio: te escribimos con la dirección en cuanto esté confirmado",
+    // Lugar por confirmar: actualizar aquí en cuanto se cierre el espacio, y mandar
+    // entonces un correo con el lugar y la dirección a quienes ya hayan comprado.
+    venueLabel: "Madrid. Estamos terminando de confirmar el espacio: en cuanto lo tengamos, te escribimos por email para decirte dónde es",
     // Sin capacityWord a propósito: este taller no dice cuántas plazas hay.
     queTraer:
       "Tus auriculares, si prefieres escuchar con ellos en algún momento. No son imprescindibles. No necesitas conocimientos musicales previos: solo curiosidad, ganas de escuchar y disposición para experimentar.",
@@ -363,8 +364,8 @@ async function handleEventTicket(session, email, { SUPABASE_URL, SUPABASE_SERVIC
   const bloqueMembresia = esCombo
     ? ""
     : `
-    <p><strong>¿Y si te haces socixs?</strong></p>
-    <p>Ser socixs de Fraccctal implica esto: acceso a los encuentros y talleres, que desde enero son solo para la comunidad (los talleres facilitados por profesionales se pagan aparte), descuentos con nuestra red de terapeutas y talleristas, un merch de bienvenida, y tu lugar en la comunidad online donde la conversación sigue cada día. Y hoy <strong>ES GRATIS</strong>: no se cobra nada hasta el 3 de enero de 2027.</p>
+    <p><strong>¿Y si te haces socix?</strong></p>
+    <p>Ser socix de Fraccctal implica esto: acceso a los encuentros y talleres, que desde enero son solo para la comunidad (los talleres facilitados por profesionales se pagan aparte), descuentos con nuestra red de terapeutas y talleristas, un merch de bienvenida, y tu lugar en la comunidad online donde la conversación sigue cada día. Y hoy <strong>ES GRATIS</strong>: no se cobra nada hasta el 3 de enero de 2027.</p>
     <p><strong><a href="https://fraccctal.com/membresia.html">Conoce la membresía →</a></strong></p>
   `;
 
