@@ -76,7 +76,7 @@ const FRACCCTAL_EVENTS = [
     dateLabel: "17",
     dateMonth: "DIC",
     dateSort: "2026-12-17",
-    venue: "", // por confirmar
+    venue: "Frecuencia",
     flyer: "/assets/img/flyer-ver-de-oido.webp",
     flyerThumb: "/assets/img/flyer-ver-de-oido-thumb.webp",
     city: "Madrid",
