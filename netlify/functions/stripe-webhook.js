@@ -124,9 +124,9 @@ const EVENT_EMAIL_CONTENT = {
     typeLabel: "Encuentro de cierre de año, en colaboración con ONDA Atelier Sonoro,",
     dateTimeLabel: "Jueves 17 de diciembre de 2026, de 19:00 a 22:00 h",
     dayLabel: "17",
-    // Lugar por confirmar: actualizar aquí en cuanto se cierre el espacio, y mandar
-    // entonces un correo con el lugar y la dirección a quienes ya hayan comprado.
-    venueLabel: "Madrid. Estamos terminando de confirmar el espacio: en cuanto lo tengamos, te escribimos por email para decirte dónde es",
+    // Pendiente: mandar un correo con el lugar a quienes compraron antes de que
+    // se confirmara el espacio (cuando Irina avise de que el acuerdo está firmado).
+    venueLabel: "Frecuencia · Madrid (C. de Lagasca, 103, local derecha, 28006 Madrid, metro Núñez de Balboa)",
     // Sin capacityWord a propósito: este taller no dice cuántas plazas hay.
     queTraer:
       "Auriculares, si quieres. No hace falta saber de música: solo curiosidad, ganas de escuchar y disposición para experimentar.",
